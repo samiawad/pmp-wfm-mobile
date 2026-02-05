@@ -25,7 +25,20 @@ import {
     Speed as RealTimeIcon,
     RequestPage as RequestsIcon,
     Settings as SettingsIcon,
+    BeachAccess as VacationIcon,
 } from '@mui/icons-material';
+
+// ... (styled components)
+
+const wfmMenuItems = [
+    { text: 'My Schedule', icon: <CalendarIcon />, path: 'schedule' },
+    { text: 'Adherence', icon: <AdherenceIcon />, path: 'adherence' },
+    { text: 'Real Time', icon: <RealTimeIcon />, path: 'realtime' },
+];
+
+const generalMenuItems = [
+    { text: 'Requests', icon: <RequestsIcon />, path: 'requests' },
+];
 
 // ============================================
 // Styled Components
@@ -87,25 +100,29 @@ const StyledDivider = styled(Divider)(({ theme }) => ({
 // Component
 // ============================================
 
-const NavigationDrawer = ({ open, onClose }) => {
+const NavigationDrawer = ({ open, onClose, onNavigation }) => {
     const pmpMenuItems = [
-        { text: 'My Performance', icon: <HomeIcon />, path: '/performance' },
-        { text: 'KPIs', icon: <AssessmentIcon />, path: '/kpis' },
-        { text: 'Coaching', icon: <CoachingIcon />, path: '/coaching' },
-        { text: 'Evaluations', icon: <EvaluationsIcon />, path: '/evaluations' },
-        { text: 'Rewards', icon: <RewardsIcon />, path: '/rewards' },
-        { text: 'Disputes', icon: <DisputesIcon />, path: '/disputes' },
+        { text: 'Performance', icon: <AssessmentIcon />, path: 'performance' },
+        { text: 'Coaching', icon: <CoachingIcon />, path: 'coaching' },
+        { text: 'Evaluations', icon: <EvaluationsIcon />, path: 'evaluations' },
+        { text: 'Rewards', icon: <RewardsIcon />, path: 'rewards' },
+        { text: 'Disputes', icon: <DisputesIcon />, path: 'disputes' },
     ];
 
     const wfmMenuItems = [
-        { text: 'My Schedule', icon: <CalendarIcon />, path: '/schedule' },
-        { text: 'Adherence', icon: <AdherenceIcon />, path: '/adherence' },
-        { text: 'Real Time', icon: <RealTimeIcon />, path: '/realtime' },
-        { text: 'Requests', icon: <RequestsIcon />, path: '/requests' },
+        { text: 'My Schedule', icon: <CalendarIcon />, path: 'schedule' },
+        { text: 'Adherence', icon: <AdherenceIcon />, path: 'adherence' },
+        { text: 'Real Time', icon: <RealTimeIcon />, path: 'realtime' },
     ];
 
+    const generalMenuItems = [
+        { text: 'Requests', icon: <RequestsIcon />, path: 'requests' },
+    ]
+
     const handleNavigation = (path) => {
-        console.log('Navigate to:', path);
+        if (onNavigation) {
+            onNavigation(path);
+        }
         onClose();
     };
 
@@ -173,14 +190,19 @@ const NavigationDrawer = ({ open, onClose }) => {
 
             {/* Settings */}
             <List>
-                <ListItem disablePadding>
-                    <StyledListItemButton onClick={() => handleNavigation('/settings')}>
-                        <StyledListItemIcon>
-                            <SettingsIcon />
-                        </StyledListItemIcon>
-                        <ListItemText primary="Settings" />
-                    </StyledListItemButton>
-                </ListItem>
+                <SectionTitle variant="overline">
+                    General
+                </SectionTitle>
+                {generalMenuItems.map((item) => (
+                    <ListItem key={item.text} disablePadding>
+                        <StyledListItemButton onClick={() => handleNavigation(item.path)}>
+                            <StyledListItemIcon>
+                                {item.icon}
+                            </StyledListItemIcon>
+                            <ListItemText primary={item.text} />
+                        </StyledListItemButton>
+                    </ListItem>
+                ))}
             </List>
         </StyledDrawer>
     );

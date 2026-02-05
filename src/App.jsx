@@ -1,6 +1,15 @@
 import { useState } from 'react';
 import HomeDashboard from './components/features/HomeDashboard';
 import SchedulePage from './components/features/SchedulePage';
+import PerformancePage from './components/features/PerformancePage';
+import ActivitiesPage from './components/features/ActivitiesPage';
+import CoachingPage from './components/features/CoachingPage';
+import RequestsPage from './components/features/RequestsPage';
+import EvaluationsPage from './components/features/EvaluationsPage';
+import RewardsPage from './components/features/RewardsPage';
+import DisputesPage from './components/features/DisputesPage';
+import LogsPage from './components/features/LogsPage';
+import EventsPage from './components/features/EventsPage';
 import AppLayout from './components/layout/AppLayout';
 import './App.css';
 
@@ -12,6 +21,15 @@ function App() {
       <div className="app-container">
         {currentPage === 'home' && <HomeDashboard />}
         {currentPage === 'schedule' && <SchedulePage />}
+        {currentPage === 'performance' && <PerformancePage />}
+        {currentPage === 'activities' && <ActivitiesPage />}
+        {currentPage === 'coaching' && <CoachingPage />}
+        {currentPage === 'requests' && <RequestsPage />}
+        {currentPage === 'rewards' && <RewardsPage />}
+        {currentPage === 'evaluations' && <EvaluationsPage />}
+        {currentPage === 'disputes' && <DisputesPage />}
+        {currentPage === 'events' && <EventsPage />}
+        {currentPage === 'logs' && <LogsPage />}
       </div>
     </AppLayout>
   );
