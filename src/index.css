@@ -2,17 +2,26 @@
   /* =========================================
      Global Tokens: Spacing & Sizing
      ========================================= */
-  
+
   /* Spacing Scale (8px baseline) */
-  --spacing-1: 0.25rem; /* 4px */
-  --spacing-2: 0.5rem;  /* 8px */
-  --spacing-3: 0.75rem; /* 12px */
-  --spacing-4: 1rem;    /* 16px */
-  --spacing-5: 1.5rem;  /* 24px */
-  --spacing-6: 2rem;    /* 32px */
-  --spacing-8: 3rem;    /* 48px */
-  --spacing-10: 4rem;   /* 64px */
-  --spacing-12: 6rem;   /* 96px */
+  --spacing-1: 0.25rem;
+  /* 4px */
+  --spacing-2: 0.5rem;
+  /* 8px */
+  --spacing-3: 0.75rem;
+  /* 12px */
+  --spacing-4: 1rem;
+  /* 16px */
+  --spacing-5: 1.5rem;
+  /* 24px */
+  --spacing-6: 2rem;
+  /* 32px */
+  --spacing-8: 3rem;
+  /* 48px */
+  --spacing-10: 4rem;
+  /* 64px */
+  --spacing-12: 6rem;
+  /* 96px */
 
   /* Border Radius */
   --radius-sm: 4px;
@@ -45,18 +54,19 @@
    Theme 1: Default (Corporate Blue)
    Clean, professional, trusted.
    ========================================= */
-:root, [data-theme="default"] {
+:root,
+[data-theme="default"] {
   --primary-color: #0056b3;
   --primary-hover: #004494;
   --secondary-color: #6c757d;
   --accent-color: #00a8cc;
-  
+
   --bg-color: #ffffff;
   --surface-color: #f8f9fa;
   --text-primary: #212529;
   --text-secondary: #495057;
   --border-color: #dee2e6;
-  
+
   --success-color: #28a745;
   --warning-color: #ffc107;
   --error-color: #dc3545;
@@ -71,13 +81,13 @@
   --primary-hover: #339af0;
   --secondary-color: #adb5bd;
   --accent-color: #22b8cf;
-  
+
   --bg-color: #121212;
   --surface-color: #1e1e1e;
   --text-primary: #e9ecef;
   --text-secondary: #adb5bd;
   --border-color: #343a40;
-  
+
   --success-color: #40c057;
   --warning-color: #ffd43b;
   --error-color: #fa5252;
@@ -88,17 +98,19 @@
    Teal, fresh, operational efficiency.
    ========================================= */
 [data-theme="ocean"] {
-  --primary-color: #008080; /* Teal */
+  --primary-color: #008080;
+  /* Teal */
   --primary-hover: #006666;
   --secondary-color: #5f9ea0;
   --accent-color: #40e0d0;
-  
-  --bg-color: #f0fdfa; /* Very light teal bg */
+
+  --bg-color: #f0fdfa;
+  /* Very light teal bg */
   --surface-color: #ffffff;
   --text-primary: #134e4a;
   --text-secondary: #336e6b;
   --border-color: #ccfbf1;
-  
+
   --success-color: #10b981;
   --warning-color: #f59e0b;
   --error-color: #ef4444;
@@ -112,17 +124,18 @@
     Let's stick to the requested distinct nature: Purple/Creative)
    ========================================= */
 [data-theme="royal"] {
-  --primary-color: #7048e8; /* Indigo/Purple */
+  --primary-color: #7048e8;
+  /* Indigo/Purple */
   --primary-hover: #5f3dc4;
   --secondary-color: #845ef7;
   --accent-color: #b197fc;
-  
+
   --bg-color: #f3f0ff;
   --surface-color: #ffffff;
   --text-primary: #3b2a7a;
   --text-secondary: #584b8e;
   --border-color: #d0bfff;
-  
+
   --success-color: #0ca678;
   --warning-color: #fcc419;
   --error-color: #e03131;
@@ -136,16 +149,18 @@
   --primary-color: #000000;
   --primary-hover: #333333;
   --secondary-color: #ffffff;
-  --accent-color: #ffff00; /* Yellow on black often used */
-  
+  --accent-color: #ffff00;
+  /* Yellow on black often used */
+
   --bg-color: #ffffff;
   --surface-color: #ffffff;
   --text-primary: #000000;
   --text-secondary: #000000;
   --border-color: #000000;
-  
+
   --success-color: #006400;
-  --warning-color: #a0522d; /* Brownish */
+  --warning-color: #a0522d;
+  /* Brownish */
   --error-color: #8b0000;
 }
 
@@ -159,7 +174,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  
+
   background-color: var(--bg-color);
   color: var(--text-primary);
   transition: background-color var(--transition-normal), color var(--transition-normal);
@@ -170,6 +185,8 @@ code {
     monospace;
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }

@@ -317,7 +317,7 @@ const StyledFormControl = styled(FormControl)(({ theme }) => ({
 
 const ViewSwitcherContainer = styled(Box)(({ theme }) => ({
     display: 'flex',
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-start',
     marginBottom: theme.spacing(2),
 }));
 
@@ -340,6 +340,7 @@ const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
 
 const ComparisonChip = styled(Chip)(({ theme, active }) => ({
     backgroundColor: active ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'white',
+    width: '50%',
     color: active ? 'white' : 'var(--text-primary)',
     fontWeight: 600,
     cursor: 'pointer',

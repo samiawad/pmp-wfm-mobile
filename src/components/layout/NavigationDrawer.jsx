@@ -32,8 +32,6 @@ import {
 
 const wfmMenuItems = [
     { text: 'My Schedule', icon: <CalendarIcon />, path: 'schedule' },
-    { text: 'Adherence', icon: <AdherenceIcon />, path: 'adherence' },
-    { text: 'Real Time', icon: <RealTimeIcon />, path: 'realtime' },
 ];
 
 const generalMenuItems = [
@@ -111,8 +109,6 @@ const NavigationDrawer = ({ open, onClose, onNavigation }) => {
 
     const wfmMenuItems = [
         { text: 'My Schedule', icon: <CalendarIcon />, path: 'schedule' },
-        { text: 'Adherence', icon: <AdherenceIcon />, path: 'adherence' },
-        { text: 'Real Time', icon: <RealTimeIcon />, path: 'realtime' },
     ];
 
     const generalMenuItems = [

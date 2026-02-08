@@ -258,10 +258,10 @@ const HomeDashboard = () => {
             <Grid container spacing={2} sx={{ mb: 3 }}>
                 {/* Adherence - WFM */}
                 <Grid item size={6} sx={{ display: 'flex' }}>
-                    <StatCard>
+                    <StatCard accentColor="#ff9800">
                         <CardContent>
                             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                                <ClockIcon sx={{ color: 'var(--primary-color)', fontSize: 20, mr: 1 }} />
+                                <ClockIcon sx={{ color: '#ff9800', fontSize: 20, mr: 1 }} />
                                 <Typography variant="caption" color="text.secondary">
                                     Adherence
                                 </Typography>
@@ -269,7 +269,7 @@ const HomeDashboard = () => {
                             <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
                                 92%
                             </Typography>
-                            <Typography variant="caption" sx={{ color: 'var(--primary-color)', fontWeight: 600 }}>
+                            <Typography variant="caption" sx={{ color: '#11998e', fontWeight: 600 }}>
                                 ↑ 3% from last week
                             </Typography>
                         </CardContent>
@@ -278,10 +278,10 @@ const HomeDashboard = () => {
 
                 {/* Current Reward - PMP */}
                 <Grid item size={6} sx={{ display: 'flex' }}>
-                    <StatCard>
+                    <StatCard accentColor="#9c27b0">
                         <CardContent>
                             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                                <TrophyIcon sx={{ color: 'var(--primary-color)', fontSize: 20, mr: 1 }} />
+                                <TrophyIcon sx={{ color: '#9c27b0', fontSize: 20, mr: 1 }} />
                                 <Typography variant="caption" color="text.secondary">
                                     Competition
                                 </Typography>
@@ -289,7 +289,7 @@ const HomeDashboard = () => {
                             <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
                                 #3
                             </Typography>
-                            <Typography variant="caption" sx={{ color: 'var(--primary-color)', fontWeight: 600 }}>
+                            <Typography variant="caption" sx={{ color: '#9c27b0', fontWeight: 600 }}>
                                 Best Sales
                             </Typography>
                         </CardContent>
@@ -297,10 +297,10 @@ const HomeDashboard = () => {
                 </Grid>
                 {/* AHT */}
                 <Grid item size={6} sx={{ display: 'flex' }}>
-                    <StatCard>
+                    <StatCard accentColor="#2196f3">
                         <CardContent>
                             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                                <PhoneIcon sx={{ color: 'var(--primary-color)', fontSize: 20, mr: 1 }} />
+                                <PhoneIcon sx={{ color: '#2196f3', fontSize: 20, mr: 1 }} />
                                 <Typography variant="caption" color="text.secondary">
                                     AHT
                                 </Typography>
@@ -308,7 +308,7 @@ const HomeDashboard = () => {
                             <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
                                 250s
                             </Typography>
-                            <Typography variant="caption" sx={{ color: 'var(--primary-color)', fontWeight: 600 }}>
+                            <Typography variant="caption" sx={{ color: '#2196f3', fontWeight: 600 }}>
                                 Average Handle Time
                             </Typography>
                         </CardContent>
@@ -316,10 +316,10 @@ const HomeDashboard = () => {
                 </Grid>
                 {/* Hold */}
                 <Grid item size={6} sx={{ display: 'flex' }}>
-                    <StatCard>
+                    <StatCard accentColor="#2196f3">
                         <CardContent>
                             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                                <PhoneIcon sx={{ color: 'var(--primary-color)', fontSize: 20, mr: 1 }} />
+                                <PhoneIcon sx={{ color: '#2196f3', fontSize: 20, mr: 1 }} />
                                 <Typography variant="caption" color="text.secondary">
                                     Hold %
                                 </Typography>
@@ -327,7 +327,7 @@ const HomeDashboard = () => {
                             <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
                                 5%
                             </Typography>
-                            <Typography variant="caption" sx={{ color: 'var(--primary-color)', fontWeight: 600 }}>
+                            <Typography variant="caption" sx={{ color: '#2196f3', fontWeight: 600 }}>
                                 Average Handle Time
                             </Typography>
                         </CardContent>

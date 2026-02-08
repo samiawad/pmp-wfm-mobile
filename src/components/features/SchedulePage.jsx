@@ -278,7 +278,7 @@ const OffDayText = styled(Typography)(({ theme }) => ({
 
 const ViewSwitcherContainer = styled(Box)(({ theme }) => ({
     display: 'flex',
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-start',
     marginBottom: theme.spacing(2),
 }));
 
