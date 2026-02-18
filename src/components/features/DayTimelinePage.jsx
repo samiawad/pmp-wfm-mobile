@@ -374,6 +374,25 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
         }
     }, [goToPrev, goToNext]);
 
+    // Mouse drag support (for desktop testing)
+    const handleMouseDown = useCallback((e) => {
+        touchStartX.current = e.clientX;
+        touchStartY.current = e.clientY;
+    }, []);
+
+    const handleMouseUp = useCallback((e) => {
+        if (touchStartX.current === null) return;
+        const deltaX = e.clientX - touchStartX.current;
+        const deltaY = e.clientY - touchStartY.current;
+        touchStartX.current = null;
+        touchStartY.current = null;
+
+        if (Math.abs(deltaX) > SWIPE_THRESHOLD && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
+            if (deltaX > 0) goToPrev();
+            else goToNext();
+        }
+    }, [goToPrev, goToNext]);
+
     // Mock detail data for each activity type
     const getActivityDetails = (act) => {
         if (!act) return [];
@@ -526,6 +545,8 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
             <ScrollArea
                 onTouchStart={handleTouchStart}
                 onTouchEnd={handleTouchEnd}
+                onMouseDown={handleMouseDown}
+                onMouseUp={handleMouseUp}
             >
                 <TimelineBody>
                     {/* Time Gutter */}
