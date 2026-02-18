@@ -40,14 +40,13 @@ import {
 // ============================================
 
 const PageContainer = styled(Box)(({ theme }) => ({
-    padding: theme.spacing(3),
-    // paddingBottom: theme.spacing(12),
-    minHeight: '100vh',
+    padding: '16px',
+    paddingBottom: theme.spacing(4),
     width: '100%',
     boxSizing: 'border-box',
     display: 'flex',
     flexDirection: 'column',
-    gap: theme.spacing(3), // Consistent vertical gap between rows
+    gap: theme.spacing(2),
 }));
 
 const PageHeader = styled(Box)(({ theme }) => ({
@@ -67,18 +66,20 @@ const PageTitle = styled(Typography)(({ theme }) => ({
 const RowContainer = styled(Box)(({ theme }) => ({
     width: '100%',
     display: 'flex',
-    gap: theme.spacing(3), // Consistent horizontal gap
+    flexDirection: 'column',
+    gap: theme.spacing(2),
 }));
 
 const DashboardCard = styled(Card)(({ theme }) => ({
-    borderRadius: '24px',
-    boxShadow: '0 8px 24px rgba(149, 157, 165, 0.1)',
+    borderRadius: '12px',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
     display: 'flex',
     flexDirection: 'column',
     overflow: 'hidden',
-    border: '1px solid rgba(255,255,255,0.5)',
-    flex: 1, // Ensures it takes available space in a flex container
-    width: '100%', // Default to full width
+    border: '1px solid #e8e8e8',
+    flex: 1,
+    width: '100%',
+    backgroundColor: '#fff',
 }));
 
 const CardHeader = styled(Box)(({ theme }) => ({

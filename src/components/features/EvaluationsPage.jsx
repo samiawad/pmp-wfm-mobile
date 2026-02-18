@@ -35,14 +35,13 @@ import {
 // ============================================
 
 const PageContainer = styled(Box)(({ theme }) => ({
-    padding: theme.spacing(3),
-    // paddingBottom: theme.spacing(12),
-    minHeight: '100vh',
+    padding: '16px',
+    paddingBottom: theme.spacing(4),
     width: '100%',
     boxSizing: 'border-box',
     display: 'flex',
     flexDirection: 'column',
-    gap: theme.spacing(3),
+    gap: theme.spacing(2),
 }));
 
 const PageHeader = styled(Box)(({ theme }) => ({
@@ -61,16 +60,17 @@ const PageTitle = styled(Typography)(({ theme }) => ({
 const RowContainer = styled(Box)(({ theme }) => ({
     width: '100%',
     display: 'flex',
-    gap: theme.spacing(3),
+    flexDirection: 'column',
+    gap: theme.spacing(2),
 }));
 
 const DashboardCard = styled(Card)(({ theme }) => ({
-    borderRadius: '24px',
-    boxShadow: '0 8px 24px rgba(149, 157, 165, 0.1)',
+    borderRadius: '12px',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
     display: 'flex',
     flexDirection: 'column',
     overflow: 'hidden',
-    border: '1px solid rgba(255,255,255,0.5)',
+    border: '1px solid #e8e8e8',
     flex: 1,
     width: '100%',
     backgroundColor: '#fff',
@@ -185,7 +185,7 @@ const EvaluationsPage = () => {
                         </Avatar>
                         <CardTitle>Score Trend</CardTitle>
                     </CardHeader>
-                    <Box sx={{ height: 300, width: '100%', p: 3 }}>
+                    <Box sx={{ height: 200, width: '100%', p: 2 }}>
                         <ResponsiveContainer width="100%" height="100%">
                             <LineChart data={scoreTrendData}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ecf0f1" />

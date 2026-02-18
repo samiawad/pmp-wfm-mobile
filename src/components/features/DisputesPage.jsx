@@ -27,27 +27,74 @@ import {
 // ============================================
 
 const PageContainer = styled(Box)(({ theme }) => ({
-    paddingBottom: theme.spacing(3),
-    backgroundColor: '#e7e7e7',
-    minHeight: '100%',
-    margin: '-var(--spacing-md)',
-    padding: 'var(--spacing-md)',
+    paddingBottom: theme.spacing(2),
+    backgroundColor: '#f5f5f5',
+    width: '100%',
+    padding: '16px',
+    boxSizing: 'border-box',
 }));
 
-const Header = styled(Box)(({ theme }) => ({
-    marginBottom: theme.spacing(2),
+const FilterRow = styled(Box)(({ theme }) => ({
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    overflowX: 'auto',
+    paddingBottom: theme.spacing(1.5),
+    marginBottom: theme.spacing(1),
+    scrollbarWidth: 'none',
+    '&::-webkit-scrollbar': { display: 'none' },
+    flexWrap: 'nowrap',
 }));
 
-const PageTitle = styled(Typography)(({ theme }) => ({
+const PageTitle = styled(Typography)({
     fontWeight: 700,
+    fontSize: '1rem',
     color: 'var(--color-on-background)',
-}));
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
+});
 
-const FilterSection = styled(Card)(({ theme }) => ({
-    marginBottom: theme.spacing(3),
-    borderRadius: '12px',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
-}));
+const FilterChipSelect = styled(TextField)({
+    width: 'fit-content',
+    flexShrink: 0,
+    '& .MuiOutlinedInput-root': {
+        height: 32,
+        borderRadius: 20,
+        backgroundColor: '#fff',
+        fontSize: '0.75rem',
+        '& fieldset': { borderColor: '#e0e0e0' },
+    },
+    '& .MuiInputBase-input': {
+        padding: '4px 28px 4px 12px !important',
+        fontSize: '0.75rem',
+    },
+    '& .MuiInputLabel-root': {
+        fontSize: '0.75rem',
+        top: -5,
+    },
+    minWidth: 90,
+});
+
+const FilterDateField = styled(TextField)({
+    width: 'fit-content',
+    flexShrink: 0,
+    '& .MuiOutlinedInput-root': {
+        height: 32,
+        borderRadius: 20,
+        backgroundColor: '#fff',
+        fontSize: '0.75rem',
+        '& fieldset': { borderColor: '#e0e0e0' },
+    },
+    '& .MuiInputBase-input': {
+        padding: '4px 12px !important',
+        fontSize: '0.75rem',
+    },
+    '& .MuiInputLabel-root': {
+        fontSize: '0.75rem',
+        top: -5,
+    },
+    minWidth: 110,
+});
 
 const DisputeCard = styled(Card)(({ theme }) => ({
     marginBottom: theme.spacing(2),
@@ -124,58 +171,40 @@ const DisputesPage = () => {
 
     return (
         <PageContainer>
-            <Header>
-                <PageTitle variant="h4">My Disputes</PageTitle>
-            </Header>
-
-            {/* Filters */}
-            <FilterSection>
-                <CardContent>
-                    <Grid container spacing={2}>
-                        <Grid item xs={6}>
-                            <TextField
-                                select
-                                label="KPI"
-                                value={selectedKPI}
-                                onChange={(e) => setSelectedKPI(e.target.value)}
-                                fullWidth
-                                size="small"
-                                variant="outlined"
-                            >
-                                {kpiOptions.map((opt) => (
-                                    <MenuItem key={opt} value={opt}>{opt}</MenuItem>
-                                ))}
-                            </TextField>
-                        </Grid>
-                        <Grid item xs={6}>
-                            <TextField
-                                select
-                                label="Reason"
-                                value={selectedReason}
-                                onChange={(e) => setSelectedReason(e.target.value)}
-                                fullWidth
-                                size="small"
-                                variant="outlined"
-                            >
-                                {reasonOptions.map((opt) => (
-                                    <MenuItem key={opt} value={opt}>{opt}</MenuItem>
-                                ))}
-                            </TextField>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <TextField
-                                type="date"
-                                label="Date" // Use label to mimic placeholder behavior for date input if needed, or simply label
-                                value={selectedDate}
-                                onChange={(e) => setSelectedDate(e.target.value)}
-                                fullWidth
-                                size="small"
-                                InputLabelProps={{ shrink: true }}
-                            />
-                        </Grid>
-                    </Grid>
-                </CardContent>
-            </FilterSection>
+            {/* Title + Filters in one horizontal scrolling row */}
+            <FilterRow>
+                <PageTitle>My Disputes</PageTitle>
+                <FilterChipSelect
+                    select
+                    label="KPI"
+                    value={selectedKPI}
+                    onChange={(e) => setSelectedKPI(e.target.value)}
+                    size="small"
+                >
+                    {kpiOptions.map((opt) => (
+                        <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+                    ))}
+                </FilterChipSelect>
+                <FilterChipSelect
+                    select
+                    label="Reason"
+                    value={selectedReason}
+                    onChange={(e) => setSelectedReason(e.target.value)}
+                    size="small"
+                >
+                    {reasonOptions.map((opt) => (
+                        <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+                    ))}
+                </FilterChipSelect>
+                <FilterDateField
+                    type="date"
+                    label="Date"
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    size="small"
+                    InputLabelProps={{ shrink: true }}
+                />
+            </FilterRow>
 
             {/* List */}
             <Box>

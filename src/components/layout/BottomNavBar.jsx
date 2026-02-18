@@ -3,14 +3,14 @@ import {
     BottomNavigation,
     BottomNavigationAction,
     Paper,
-    Fab,
 } from '@mui/material';
 import {
     Home as HomeIcon,
     HomeOutlined as HomeOutlinedIcon,
     CalendarMonth as ScheduleIcon,
     CalendarMonthOutlined as ScheduleOutlinedIcon,
-    Add as AddIcon,
+    History as ActivitiesIcon,
+    HistoryOutlined as ActivitiesOutlinedIcon,
     Assessment as PerformanceIcon,
     AssessmentOutlined as PerformanceOutlinedIcon,
     MoreHoriz as MoreIcon,
@@ -21,72 +21,47 @@ import {
 // Styled Components
 // ============================================
 
-const StyledPaper = styled(Paper)(({ theme }) => ({
+const StyledPaper = styled(Paper)({
     position: 'fixed',
     bottom: 0,
     left: 0,
     right: 0,
     zIndex: 1000,
-    padding: 'var(--spacing-3) 0',
+    paddingTop: 4,
+    paddingBottom: 'env(safe-area-inset-bottom, 4px)',
     backgroundColor: '#ffffff',
-    borderTop: '1px solid var(--color-outline-variant)',
-}));
+    borderTop: '1px solid #e0e0e0',
+});
 
-const StyledBottomNavigation = styled(BottomNavigation)(({ theme }) => ({
+const StyledBottomNavigation = styled(BottomNavigation)({
     backgroundColor: 'transparent',
-    height: 'var(--spacing-xl)',
+    height: 56,
     '& .MuiBottomNavigationAction-root': {
         color: '#9e9e9e',
         minWidth: 'auto',
-        padding: 'var(--spacing-xs) var(--spacing-sm)',
+        padding: '4px 0',
         '&.Mui-selected': {
-            color: 'var(--color-primary)',
+            color: 'var(--primary-color, #0056b3)',
         },
     },
     '& .MuiBottomNavigationAction-label': {
-        fontSize: 'var(--font-size-xs)',
+        fontSize: '0.65rem',
         fontWeight: 500,
+        marginTop: 2,
         '&.Mui-selected': {
-            fontSize: 'var(--font-size-xs)',
+            fontSize: '0.65rem',
             fontWeight: 600,
         },
     },
-}));
-
-const CenterPlaceholder = styled(BottomNavigationAction)(({ theme }) => ({
-    visibility: 'hidden',
-    pointerEvents: 'none',
-}));
-
-const StyledFab = styled(Fab)(({ theme }) => ({
-    position: 'absolute',
-    bottom: '28px',
-    left: '50%',
-    transform: 'translateX(-50%)',
-    backgroundColor: '#ffffff',
-    color: 'var(--color-primary)',
-    width: 56,
-    height: 56,
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-    '&:hover': {
-        backgroundColor: '#f5f5f5',
-    },
-    '&:active': {
-        backgroundColor: '#ffffff',
-    },
-}));
-
-const AddIconStyled = styled(AddIcon)(({ theme }) => ({
-    fontSize: 28,
-}));
+});
 
 // ============================================
 // Component
 // ============================================
 
-const BottomNavBar = ({ value, onChange, onActionClick }) => {
+const BottomNavBar = ({ value, onChange }) => {
     return (
-        <StyledPaper elevation={3}>
+        <StyledPaper elevation={0}>
             <StyledBottomNavigation value={value} onChange={onChange} showLabels>
                 <BottomNavigationAction
                     label="Home"
@@ -98,10 +73,11 @@ const BottomNavBar = ({ value, onChange, onActionClick }) => {
                     value="schedule"
                     icon={value === 'schedule' ? <ScheduleIcon /> : <ScheduleOutlinedIcon />}
                 />
-
-                {/* Center FAB placeholder */}
-                <CenterPlaceholder disabled />
-
+                <BottomNavigationAction
+                    label="Activities"
+                    value="activities"
+                    icon={value === 'activities' ? <ActivitiesIcon /> : <ActivitiesOutlinedIcon />}
+                />
                 <BottomNavigationAction
                     label="Performance"
                     value="performance"
@@ -113,11 +89,6 @@ const BottomNavBar = ({ value, onChange, onActionClick }) => {
                     icon={value === 'more' ? <MoreIcon /> : <MoreOutlinedIcon />}
                 />
             </StyledBottomNavigation>
-
-            {/* Floating Action Button (FAB) for Actions */}
-            <StyledFab aria-label="actions" onClick={onActionClick}>
-                <AddIconStyled />
-            </StyledFab>
         </StyledPaper>
     );
 };

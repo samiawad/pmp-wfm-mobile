@@ -24,14 +24,13 @@ import {
 // ============================================
 
 const PageContainer = styled(Box)(({ theme }) => ({
-    padding: theme.spacing(3),
-    paddingBottom: theme.spacing(12),
-    minHeight: '100vh',
+    padding: '16px',
+    paddingBottom: theme.spacing(4),
     width: '100%',
     boxSizing: 'border-box',
     display: 'flex',
     flexDirection: 'column',
-    gap: theme.spacing(3),
+    gap: theme.spacing(2),
 }));
 
 const PageHeader = styled(Box)(({ theme }) => ({
@@ -48,24 +47,24 @@ const PageTitle = styled(Typography)(({ theme }) => ({
 }));
 
 const DashboardCard = styled(Card)(({ theme }) => ({
-    borderRadius: '24px',
-    boxShadow: '0 8px 24px rgba(149, 157, 165, 0.1)',
+    borderRadius: '12px',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
     display: 'flex',
     flexDirection: 'column',
     overflow: 'hidden',
-    border: '1px solid rgba(255,255,255,0.5)',
+    border: '1px solid #e8e8e8',
     width: '100%',
     backgroundColor: '#fff',
 }));
 
 const ChallengeCard = styled(Card)(({ theme }) => ({
-    minWidth: 280,
-    maxWidth: 280,
-    borderRadius: '20px',
+    minWidth: 260,
+    maxWidth: 260,
+    borderRadius: '12px',
     boxShadow: 'none',
     border: '2px solid #f0f0f0',
     flexShrink: 0,
-    marginRight: theme.spacing(2),
+    marginRight: theme.spacing(1.5),
 }));
 
 const ScrollContainer = styled(Box)(({ theme }) => ({

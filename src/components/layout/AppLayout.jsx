@@ -1,137 +1,160 @@
 import { useState } from 'react';
 import { styled } from '@mui/material/styles';
-import { Box, IconButton, AppBar, Toolbar, Typography, Menu, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
 import {
-    Menu as MenuIcon,
+    Box, IconButton, AppBar, Toolbar, Typography,
+    SwipeableDrawer,
+    Snackbar, Alert,
+} from '@mui/material';
+import {
     Notifications as NotificationsIcon,
-    Gavel as DisputeIcon,
-    History as HistoryIcon,
     School as SchoolIcon,
-    Description as DescriptionIcon,
-    Gavel as DisciplinaryIcon,
     RateReview as EvaluationIcon,
-    BeachAccess as VacationIcon,
-    Sick as SickIcon,
-    Weekend as LeaveIcon,
-    SwapHoriz as SwapIcon,
-    FreeBreakfast as BreakIcon,
+    EmojiEvents as RewardsIcon,
+    RequestPage as RequestsIcon,
+    Gavel as DisputeIcon,
+    Event as EventIcon,
+    Description as LogsIcon,
 } from '@mui/icons-material';
-import NavigationDrawer from './NavigationDrawer';
 import BottomNavBar from './BottomNavBar';
 import DisputeModal from '../common/DisputeModal';
 import VacationRequestModal from '../common/VacationRequestModal';
 import ShiftSwapRequestModal from '../common/ShiftSwapRequestModal';
-import { Snackbar, Alert } from '@mui/material';
 
 // ============================================
 // Styled Components
 // ============================================
 
-const RootContainer = styled(Box)(({ theme }) => ({
+const RootContainer = styled(Box)({
     display: 'flex',
     flexDirection: 'column',
     minHeight: '100vh',
-    backgroundColor: 'var(--color-background)',
-}));
+    width: '100%',
+    overflow: 'hidden',
+    backgroundColor: '#f5f5f5',
+});
 
-const StyledAppBar = styled(AppBar)(({ theme }) => ({
+const StyledAppBar = styled(AppBar)({
     backgroundColor: 'var(--primary-color)',
-    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-}));
+    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.12)',
+});
 
-const MenuIconButton = styled(IconButton)(({ theme }) => ({
-    marginRight: theme.spacing(2),
-    color: '#ffffff',
-}));
-
-const AppTitle = styled(Typography)(({ theme }) => ({
+const AppTitle = styled(Typography)({
     flexGrow: 1,
-    textAlign: 'center',
     fontWeight: 600,
+    fontSize: '1.1rem',
     color: '#ffffff',
-}));
+});
 
-const NotificationIconButton = styled(IconButton)(({ theme }) => ({
+const NotificationIconButton = styled(IconButton)({
     color: '#ffffff',
-}));
+});
 
-const MainContent = styled(Box)(({ theme }) => ({
+const MainContent = styled(Box)({
     flexGrow: 1,
-    paddingTop: 'calc(56px + var(--spacing-md))',
-    paddingBottom: 'calc(var(--spacing-xl) + 16px)',
-    paddingLeft: 'var(--spacing-md)',
-    paddingRight: 'var(--spacing-md)',
+    paddingTop: '56px', // AppBar height
+    paddingBottom: 'calc(56px + env(safe-area-inset-bottom, 0px))', // BottomNav + safe area
+});
+
+// Bottom Sheet Styles
+const BottomSheetContainer = styled(Box)({
+    borderRadius: '20px 20px 0 0',
+    paddingBottom: 'env(safe-area-inset-bottom, 16px)',
+    backgroundColor: '#ffffff',
+});
+
+const DragHandle = styled(Box)({
+    width: 36,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#d0d0d0',
+    margin: '12px auto 8px',
+});
+
+const BottomSheetTitle = styled(Typography)({
+    fontWeight: 700,
+    fontSize: '1.1rem',
+    padding: '8px 20px 16px',
+    color: '#1a1a1a',
+});
+
+// Grid item for MS Teams style
+const GridItem = styled(Box)({
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 6,
+    cursor: 'pointer',
+    padding: '8px 4px',
+    borderRadius: 12,
+    '&:active': {
+        backgroundColor: '#f0f0f0',
+        transform: 'scale(0.95)',
+        transition: 'transform 0.1s ease',
+    },
+});
+
+const GridIconBox = styled(Box)(({ bgcolor }) => ({
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: bgcolor,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
 }));
+
+const GridLabel = styled(Typography)({
+    fontSize: '0.7rem',
+    fontWeight: 500,
+    color: '#333',
+    textAlign: 'center',
+    lineHeight: 1.2,
+});
+
+// ============================================
+// More Menu Items (all pages from side nav)
+// ============================================
+
+const moreMenuItems = [
+    { label: 'Coaching', icon: <SchoolIcon />, page: 'coaching', color: '#2196f3' },
+    { label: 'Evaluations', icon: <EvaluationIcon />, page: 'evaluations', color: '#9c27b0' },
+    { label: 'Rewards', icon: <RewardsIcon />, page: 'rewards', color: '#ff9800' },
+    { label: 'Requests', icon: <RequestsIcon />, page: 'requests', color: '#4caf50' },
+    { label: 'Disputes', icon: <DisputeIcon />, page: 'disputes', color: '#f44336' },
+    { label: 'Events', icon: <EventIcon />, page: 'events', color: '#e91e63' },
+    { label: 'Logs', icon: <LogsIcon />, page: 'logs', color: '#607d8b' },
+];
 
 // ============================================
 // Component
 // ============================================
 
 const AppLayout = ({ children, currentPage, onPageChange }) => {
-    const [drawerOpen, setDrawerOpen] = useState(false);
-    const [actionsMenuAnchor, setActionsMenuAnchor] = useState(null);
-    const [moreMenuAnchor, setMoreMenuAnchor] = useState(null);
+    const [moreDrawerOpen, setMoreDrawerOpen] = useState(false);
     const [disputeModalOpen, setDisputeModalOpen] = useState(false);
     const [vacationModalOpen, setVacationModalOpen] = useState(false);
     const [swapModalOpen, setSwapModalOpen] = useState(false);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
 
-    const handleDrawerOpen = () => {
-        setDrawerOpen(true);
-    };
-
-    const handleDrawerClose = () => {
-        setDrawerOpen(false);
-    };
-
     const handleBottomNavChange = (event, newValue) => {
         if (newValue === 'more') {
-            setMoreMenuAnchor(event.currentTarget);
+            setMoreDrawerOpen(true);
         } else {
             onPageChange(newValue);
         }
     };
 
-    const handleActionClick = (event) => {
-        setActionsMenuAnchor(event.currentTarget);
-    };
-
-    const handleActionsMenuClose = () => {
-        setActionsMenuAnchor(null);
-    };
-
-    const handleMoreMenuClose = () => {
-        setMoreMenuAnchor(null);
-    };
+    const handleMoreDrawerClose = () => setMoreDrawerOpen(false);
+    const handleMoreDrawerOpen = () => setMoreDrawerOpen(true);
 
     const handleMoreMenuItemClick = (page) => {
-        handleMoreMenuClose();
+        handleMoreDrawerClose();
         onPageChange(page);
     };
 
-    // --- Modal Openers ---
-    const handleDisputeClick = () => {
-        handleActionsMenuClose();
-        setDisputeModalOpen(true);
-    };
-
-    const handleVacationClick = () => {
-        handleActionsMenuClose();
-        setVacationModalOpen(true);
-    };
-
-    const handleSwapClick = () => {
-        handleActionsMenuClose();
-        setSwapModalOpen(true);
-    };
-
-    // ... (rest of handlers)
-
     const handleSnackbarClose = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
+        if (reason === 'clickaway') return;
         setSnackbarOpen(false);
     };
 
@@ -140,7 +163,6 @@ const AppLayout = ({ children, currentPage, onPageChange }) => {
         const existingData = JSON.parse(localStorage.getItem('userRequests') || '[]');
         const updatedData = [...existingData, newRequest];
         localStorage.setItem('userRequests', JSON.stringify(updatedData));
-
         setSnackbarMessage('Request Submitted Successfully!');
         setSnackbarOpen(true);
     };
@@ -190,20 +212,11 @@ const AppLayout = ({ children, currentPage, onPageChange }) => {
         setSwapModalOpen(false);
     };
 
-
     return (
         <RootContainer>
-            {/* Top Navigation Bar */}
+            {/* Top Navigation Bar — no hamburger */}
             <StyledAppBar position="fixed">
-                <Toolbar>
-                    <MenuIconButton
-                        edge="start"
-                        color="inherit"
-                        aria-label="menu"
-                        onClick={handleDrawerOpen}
-                    >
-                        <MenuIcon />
-                    </MenuIconButton>
+                <Toolbar variant="dense" sx={{ minHeight: 56 }}>
                     <AppTitle variant="h6" component="div">
                         Globitel Workforce
                     </AppTitle>
@@ -217,13 +230,6 @@ const AppLayout = ({ children, currentPage, onPageChange }) => {
                 </Toolbar>
             </StyledAppBar>
 
-            {/* Navigation Drawer */}
-            <NavigationDrawer
-                open={drawerOpen}
-                onClose={handleDrawerClose}
-                onNavigation={onPageChange}
-            />
-
             {/* Main Content Area */}
             <MainContent component="main">
                 {children}
@@ -233,100 +239,52 @@ const AppLayout = ({ children, currentPage, onPageChange }) => {
             <BottomNavBar
                 value={currentPage}
                 onChange={handleBottomNavChange}
-                onActionClick={handleActionClick}
             />
 
-            {/* Actions Menu */}
-            <Menu
-                anchorEl={actionsMenuAnchor}
-                open={Boolean(actionsMenuAnchor)}
-                onClose={handleActionsMenuClose}
-                anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'center',
+            {/* More Bottom Sheet — MS Teams grid style */}
+            <SwipeableDrawer
+                anchor="bottom"
+                open={moreDrawerOpen}
+                onClose={handleMoreDrawerClose}
+                onOpen={handleMoreDrawerOpen}
+                disableSwipeToOpen
+                PaperProps={{
+                    sx: {
+                        borderRadius: '20px 20px 0 0',
+                        maxHeight: '50vh',
+                        backgroundColor: '#ffffff',
+                    },
                 }}
-                transformOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'center',
-                }}
-            >
-                <MenuItem onClick={handleDisputeClick}>
-                    <ListItemIcon>
-                        <DisputeIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText>Dispute</ListItemText>
-                </MenuItem>
-                <MenuItem onClick={handleVacationClick}>
-                    <ListItemIcon>
-                        <VacationIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText>Vacation</ListItemText>
-                </MenuItem>
-                <MenuItem onClick={handleSwapClick}>
-                    <ListItemIcon>
-                        <SwapIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText>Swap</ListItemText>
-                </MenuItem>
-            </Menu>
-
-            {/* More Menu */}
-            <Menu
-                anchorEl={moreMenuAnchor}
-                open={Boolean(moreMenuAnchor)}
-                onClose={handleMoreMenuClose}
-                anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'center',
-                }}
-                transformOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'center',
+                ModalProps={{
+                    keepMounted: true,
                 }}
             >
-                <MenuItem onClick={() => handleMoreMenuItemClick('activities')}>
-                    <ListItemIcon>
-                        <HistoryIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText>Activities</ListItemText>
-                </MenuItem>
-                <MenuItem onClick={() => handleMoreMenuItemClick('coaching')}>
-                    <ListItemIcon>
-                        <SchoolIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText>Coaching</ListItemText>
-                </MenuItem>
-                <MenuItem onClick={() => handleMoreMenuItemClick('requests')}>
-                    <ListItemIcon>
-                        <VacationIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText>Requests</ListItemText>
-                </MenuItem>
-                <MenuItem onClick={() => handleMoreMenuItemClick('disputes')}>
-                    <ListItemIcon>
-                        <DisputeIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText>Disputes</ListItemText>
-                </MenuItem>
-                <MenuItem onClick={() => handleMoreMenuItemClick('evaluations')}>
-                    <ListItemIcon>
-                        <EvaluationIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText>Evaluations</ListItemText>
-                </MenuItem>
-                <MenuItem onClick={() => handleMoreMenuItemClick('events')}>
-                    <ListItemIcon>
-                        <DisciplinaryIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText>Events</ListItemText>
-                </MenuItem>
-                <MenuItem onClick={() => handleMoreMenuItemClick('logs')}>
-                    <ListItemIcon>
-                        <DescriptionIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText>Logs</ListItemText>
-                </MenuItem>
-            </Menu>
+                <BottomSheetContainer>
+                    <DragHandle />
+                    <BottomSheetTitle>More</BottomSheetTitle>
+                    <Box sx={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(4, 1fr)',
+                        gap: '12px',
+                        padding: '0 20px 24px',
+                    }}>
+                        {moreMenuItems.map((item) => (
+                            <GridItem
+                                key={item.page}
+                                onClick={() => handleMoreMenuItemClick(item.page)}
+                            >
+                                <GridIconBox bgcolor={`${item.color}18`}>
+                                    {/* Clone icon with color */}
+                                    <Box sx={{ color: item.color, display: 'flex' }}>
+                                        {item.icon}
+                                    </Box>
+                                </GridIconBox>
+                                <GridLabel>{item.label}</GridLabel>
+                            </GridItem>
+                        ))}
+                    </Box>
+                </BottomSheetContainer>
+            </SwipeableDrawer>
 
             {/* Modals */}
             <DisputeModal
@@ -362,7 +320,6 @@ const AppLayout = ({ children, currentPage, onPageChange }) => {
                     {snackbarMessage}
                 </Alert>
             </Snackbar>
-
         </RootContainer>
     );
 };

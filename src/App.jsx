@@ -10,17 +10,44 @@ import RewardsPage from './components/features/RewardsPage';
 import DisputesPage from './components/features/DisputesPage';
 import LogsPage from './components/features/LogsPage';
 import EventsPage from './components/features/EventsPage';
+import DayTimelinePage from './components/features/DayTimelinePage';
 import AppLayout from './components/layout/AppLayout';
 import './App.css';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
+  const [selectedDayData, setSelectedDayData] = useState(null);
+  const [scheduleList, setScheduleList] = useState([]);
+
+  const handleDayClick = (dayData, index, schedule) => {
+    setSelectedDayData(dayData);
+    setScheduleList(schedule);
+    setCurrentPage('dayTimeline');
+  };
+
+  const handleBackFromDayTimeline = () => {
+    setCurrentPage('schedule');
+    setSelectedDayData(null);
+    setScheduleList([]);
+  };
+
+  const handleDayChange = (newDayData) => {
+    setSelectedDayData(newDayData);
+  };
 
   return (
     <AppLayout currentPage={currentPage} onPageChange={setCurrentPage}>
       <div className="app-container">
         {currentPage === 'home' && <HomeDashboard />}
-        {currentPage === 'schedule' && <SchedulePage />}
+        {currentPage === 'schedule' && <SchedulePage onDayClick={handleDayClick} />}
+        {currentPage === 'dayTimeline' && (
+          <DayTimelinePage
+            dayData={selectedDayData}
+            scheduleList={scheduleList}
+            onDayChange={handleDayChange}
+            onBack={handleBackFromDayTimeline}
+          />
+        )}
         {currentPage === 'performance' && <PerformancePage />}
         {currentPage === 'activities' && <ActivitiesPage />}
         {currentPage === 'coaching' && <CoachingPage />}

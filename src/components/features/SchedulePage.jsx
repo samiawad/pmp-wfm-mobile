@@ -10,8 +10,6 @@ import {
     Select,
     MenuItem,
     FormControl,
-    ToggleButtonGroup,
-    ToggleButton,
     Tooltip,
 } from '@mui/material';
 import {
@@ -172,48 +170,82 @@ const scheduleData = {
 
 const ScheduleContainer = styled(Box)(({ theme }) => ({
     paddingBottom: theme.spacing(2),
-    backgroundColor: '#e7e7e7',
-    minHeight: '100vh',
-    margin: '-var(--spacing-md)',
-    padding: 'var(--spacing-md)',
-}));
-
-const PageTitle = styled(Typography)(({ theme }) => ({
-    fontWeight: 700,
-    color: 'var(--color-on-background)',
-    marginBottom: theme.spacing(0.5),
-}));
-
-const FilterContainer = styled(Box)(({ theme }) => ({
-    marginBottom: theme.spacing(3),
-}));
-
-const StyledFormControl = styled(FormControl)(({ theme }) => ({
+    backgroundColor: '#f5f5f5',
     width: '100%',
+    padding: '16px',
+    boxSizing: 'border-box',
+}));
+
+const FilterRow = styled(Box)(({ theme }) => ({
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    overflowX: 'auto',
+    paddingBottom: theme.spacing(1.5),
+    marginBottom: theme.spacing(1),
+    scrollbarWidth: 'none',
+    '&::-webkit-scrollbar': { display: 'none' },
+    flexWrap: 'nowrap',
+}));
+
+const PageTitle = styled(Typography)({
+    fontWeight: 700,
+    fontSize: '1rem',
+    color: 'var(--color-on-background)',
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
+});
+
+const FilterChipSelect = styled(FormControl)({
+    width: 'fit-content',
+    flexShrink: 0,
     '& .MuiOutlinedInput-root': {
-        backgroundColor: 'white',
-        borderRadius: '12px',
-        '&:hover': {
-            backgroundColor: '#f5f5f5',
-        },
+        height: 32,
+        borderRadius: 20,
+        backgroundColor: '#fff',
+        fontSize: '0.75rem',
+        '& fieldset': { borderColor: '#e0e0e0' },
+    },
+    '& .MuiSelect-select': {
+        padding: '4px 28px 4px 12px !important',
+        fontSize: '0.75rem',
+    },
+});
+
+const FilterChip = styled(Chip)(({ selected }) => ({
+    height: 32,
+    borderRadius: 20,
+    border: selected ? 'none' : '1px solid #e0e0e0',
+    padding: '4px 4px',
+    fontSize: '0.75rem',
+    fontWeight: 500,
+    cursor: 'pointer',
+    backgroundColor: selected ? undefined : '#fff',
+    background: selected ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : undefined,
+    color: selected ? '#fff' : undefined,
+    '& .MuiChip-icon': {
+        fontSize: 16,
+        marginLeft: '8px',
+        color: selected ? '#fff' : undefined,
+    },
+    '&:hover': {
+        opacity: 0.85,
     },
 }));
 
 const DayCard = styled(Card)(({ theme, isOffDay, isToday }) => ({
-    marginBottom: theme.spacing(2),
+    marginBottom: theme.spacing(1.5),
     background: isOffDay
         ? 'linear-gradient(135deg, rgba(255,235,238,0.9) 0%, rgba(255,205,210,0.7) 100%)'
         : isToday
             ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-            : 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%)',
-    borderRadius: '16px',
-    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-    backdropFilter: 'blur(10px)',
-    border: isToday ? '2px solid #667eea' : '1px solid rgba(255, 255, 255, 0.5)',
-    transition: 'all 0.3s ease',
-    '&:hover': {
-        transform: 'translateY(-2px)',
-        boxShadow: '0 8px 28px rgba(0, 0, 0, 0.12)',
+            : '#ffffff',
+    borderRadius: '12px',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
+    border: isToday ? '2px solid #667eea' : '1px solid #e8e8e8',
+    '&:active': {
+        transform: 'scale(0.98)',
+        transition: 'transform 0.1s ease',
     },
 }));
 
@@ -276,36 +308,15 @@ const OffDayText = styled(Typography)(({ theme }) => ({
     padding: theme.spacing(2),
 }));
 
-const ViewSwitcherContainer = styled(Box)(({ theme }) => ({
-    display: 'flex',
-    justifyContent: 'flex-start',
-    marginBottom: theme.spacing(2),
-}));
-
-const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
-    backgroundColor: 'white',
-    borderRadius: '12px',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-    '& .MuiToggleButton-root': {
-        border: 'none',
-        padding: theme.spacing(1, 2),
-        '&.Mui-selected': {
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            color: 'white',
-            '&:hover': {
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            },
-        },
-    },
-}));
+// ViewSwitcherContainer and StyledToggleButtonGroup removed — merged into FilterRow
 
 // Timeline View Styled Components
 const TimelineContainer = styled(Box)(({ theme }) => ({
     backgroundColor: 'white',
-    borderRadius: '16px',
+    borderRadius: '12px',
     padding: theme.spacing(2),
-    paddingLeft: 0, // Remove left padding to make day labels flush
-    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+    paddingLeft: 0,
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
     overflowX: 'auto',
 }));
 
@@ -402,7 +413,7 @@ const HourHeaderCell = styled(Box)(({ theme }) => ({
 // Component
 // ============================================
 
-const SchedulePage = () => {
+const SchedulePage = ({ onDayClick }) => {
     const [selectedWeek, setSelectedWeek] = useState('current');
     const [viewMode, setViewMode] = useState('cards'); // 'cards' or 'timeline'
 
@@ -410,11 +421,6 @@ const SchedulePage = () => {
         setSelectedWeek(event.target.value);
     };
 
-    const handleViewChange = (event, newView) => {
-        if (newView !== null) {
-            setViewMode(newView);
-        }
-    };
 
     const currentSchedule = scheduleData[selectedWeek];
     const currentStatus = getShiftStatus(selectedWeek);
@@ -606,6 +612,8 @@ const SchedulePage = () => {
                         key={index}
                         isOffDay={shift.isOffDay}
                         isToday={shift.isToday}
+                        onClick={() => onDayClick && onDayClick(shift, index, currentSchedule.schedule)}
+                        sx={{ cursor: 'pointer' }}
                     >
                         <CardContent>
                             <DayHeader isToday={shift.isToday}>
@@ -663,16 +671,10 @@ const SchedulePage = () => {
 
     return (
         <ScheduleContainer>
-            {/* Header */}
-            <Box sx={{ mb: 2 }}>
-                <PageTitle variant="h5">
-                    My Schedule
-                </PageTitle>
-            </Box>
-
-            {/* Week Filter */}
-            <FilterContainer>
-                <StyledFormControl>
+            {/* Title + Filters in one horizontal scrolling row */}
+            <FilterRow>
+                <PageTitle>My Schedule</PageTitle>
+                <FilterChipSelect size="small">
                     <Select
                         value={selectedWeek}
                         onChange={handleWeekChange}
@@ -682,27 +684,20 @@ const SchedulePage = () => {
                         <MenuItem value="current">{scheduleData.current.label}</MenuItem>
                         <MenuItem value="next">{scheduleData.next.label}</MenuItem>
                     </Select>
-                </StyledFormControl>
-            </FilterContainer>
-
-            {/* View Switcher */}
-            <ViewSwitcherContainer>
-                <StyledToggleButtonGroup
-                    value={viewMode}
-                    exclusive
-                    onChange={handleViewChange}
-                    aria-label="view mode"
-                >
-                    <ToggleButton value="cards" aria-label="card view">
-                        <CardViewIcon sx={{ mr: 1 }} />
-                        Cards
-                    </ToggleButton>
-                    <ToggleButton value="timeline" aria-label="timeline view">
-                        <TimelineIcon sx={{ mr: 1 }} />
-                        Timeline
-                    </ToggleButton>
-                </StyledToggleButtonGroup>
-            </ViewSwitcherContainer>
+                </FilterChipSelect>
+                <FilterChip
+                    label="Cards"
+                    icon={<CardViewIcon />}
+                    selected={viewMode === 'cards'}
+                    onClick={() => setViewMode('cards')}
+                />
+                <FilterChip
+                    label="Timeline"
+                    icon={<TimelineIcon />}
+                    selected={viewMode === 'timeline'}
+                    onClick={() => setViewMode('timeline')}
+                />
+            </FilterRow>
 
             {/* Render View Based on Mode */}
             {viewMode === 'timeline' ? renderTimelineView() : renderCardView()}

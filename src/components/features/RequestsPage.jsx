@@ -25,35 +25,67 @@ import {
 // ============================================
 
 const PageContainer = styled(Box)(({ theme }) => ({
-    padding: theme.spacing(3),
-    paddingBottom: theme.spacing(12),
-    minHeight: '100vh',
+    padding: '16px',
+    paddingBottom: theme.spacing(4),
     width: '100%',
     boxSizing: 'border-box',
     display: 'flex',
     flexDirection: 'column',
-    gap: theme.spacing(3),
+    gap: theme.spacing(2),
 }));
 
-const PageHeader = styled(Box)(({ theme }) => ({
-    textAlign: 'center',
-    width: '100%',
+const FilterRow = styled(Box)(({ theme }) => ({
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    overflowX: 'auto',
+    paddingBottom: theme.spacing(1.5),
+    marginBottom: theme.spacing(1),
+    scrollbarWidth: 'none',
+    '&::-webkit-scrollbar': { display: 'none' },
+    flexWrap: 'nowrap',
 }));
 
-const PageTitle = styled(Typography)(({ theme }) => ({
-    fontWeight: 800,
+const PageTitle = styled(Typography)({
+    fontWeight: 700,
+    fontSize: '1rem',
     color: '#1a1a1a',
-    letterSpacing: '-0.5px',
-    marginBottom: theme.spacing(0.5),
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
+});
+
+const FilterPill = styled(Box)(({ active }) => ({
+    height: 32,
+    borderRadius: 20,
+    padding: '0 16px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '0.75rem',
+    fontWeight: 600,
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
+    backgroundColor: active ? '#667eea' : '#fff',
+    color: active ? '#fff' : '#555',
+    border: active ? 'none' : '1px solid #e0e0e0',
+    transition: 'all 0.15s ease',
+    '&:active': {
+        transform: 'scale(0.95)',
+    },
 }));
 
 const RequestCard = styled(Card)(({ theme, $statusColor }) => ({
-    borderRadius: '16px',
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+    borderRadius: '12px',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
     border: '1px solid #f0f0f0',
-    marginBottom: theme.spacing(2),
+    marginBottom: theme.spacing(1.5),
     overflow: 'visible',
     position: 'relative',
+    '&:active': {
+        transform: 'scale(0.98)',
+        transition: 'transform 0.1s ease',
+    },
     '&:before': {
         content: '""',
         position: 'absolute',
@@ -154,22 +186,13 @@ const RequestsPage = () => {
 
     return (
         <PageContainer>
-            <PageHeader>
-                <PageTitle variant="h4">My Requests</PageTitle>
-                <Tabs
-                    value={tabValue}
-                    onChange={handleTabChange}
-                    centered
-                    sx={{
-                        '& .MuiTabs-indicator': { borderRadius: 2, height: 3 },
-                        '& .MuiTab-root': { fontWeight: 600, textTransform: 'none', fontSize: '1rem' }
-                    }}
-                >
-                    <Tab label="All" />
-                    <Tab label="Vacations" />
-                    <Tab label="Swaps" />
-                </Tabs>
-            </PageHeader>
+            {/* Title + Tab filters in one horizontal scrolling row */}
+            <FilterRow>
+                <PageTitle>My Requests</PageTitle>
+                <FilterPill active={tabValue === 0} onClick={() => setTabValue(0)}>All</FilterPill>
+                <FilterPill active={tabValue === 1} onClick={() => setTabValue(1)}>Vacations</FilterPill>
+                <FilterPill active={tabValue === 2} onClick={() => setTabValue(2)}>Swaps</FilterPill>
+            </FilterRow>
 
             <Box>
                 {filteredRequests.map((req) => (

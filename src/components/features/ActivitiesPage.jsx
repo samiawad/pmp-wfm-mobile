@@ -34,37 +34,61 @@ import {
 // ============================================
 
 const PageContainer = styled(Box)(({ theme }) => ({
+    backgroundColor: '#f5f5f5',
+    width: '100%',
+    padding: '16px',
+    boxSizing: 'border-box',
     paddingBottom: theme.spacing(2),
-    backgroundColor: '#e7e7e7',
-    minHeight: '100%',
-    margin: '-var(--spacing-md)',
-    padding: 'var(--spacing-md)',
 }));
 
-const Header = styled(Box)(({ theme }) => ({
-    marginBottom: theme.spacing(3),
+const FilterRow = styled(Box)(({ theme }) => ({
     display: 'flex',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 8,
+    overflowX: 'auto',
+    paddingBottom: theme.spacing(1.5),
+    marginBottom: theme.spacing(1),
+    scrollbarWidth: 'none',
+    '&::-webkit-scrollbar': { display: 'none' },
+    flexWrap: 'nowrap',
 }));
 
-const PageTitle = styled(Typography)(({ theme }) => ({
+const PageTitle = styled(Typography)({
     fontWeight: 700,
+    fontSize: '1rem',
     color: 'var(--color-on-background)',
-}));
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
+});
 
-const SearchBar = styled(TextField)(({ theme }) => ({
-    backgroundColor: 'white',
-    borderRadius: '12px',
+const FilterChipSelect = styled(FormControl)({
+    width: 'fit-content',
+    flexShrink: 0,
     '& .MuiOutlinedInput-root': {
-        borderRadius: '12px',
-        '& fieldset': {
-            border: 'none',
-        },
+        height: 32,
+        borderRadius: 20,
+        backgroundColor: '#fff',
+        fontSize: '0.75rem',
+        '& fieldset': { borderColor: '#e0e0e0' },
     },
-    marginBottom: theme.spacing(3),
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
-}));
+    '& .MuiSelect-select': {
+        padding: '4px 28px 4px 12px !important',
+        fontSize: '0.75rem',
+    },
+});
+
+const FilterSearchField = styled(TextField)({
+    width: 'fit-content',
+    flexShrink: 0,
+    '& .MuiOutlinedInput-root': {
+        height: 32,
+        borderRadius: 20,
+        backgroundColor: '#fff',
+        fontSize: '0.75rem',
+        '& fieldset': { borderColor: '#e0e0e0' },
+    },
+    minWidth: 120,
+});
 
 const TimelineGroup = styled(Box)(({ theme }) => ({
     marginBottom: theme.spacing(3),
@@ -335,38 +359,37 @@ const ActivitiesPage = ({ initialFilter = 'All' }) => {
 
     return (
         <PageContainer>
-            <Header>
-                <PageTitle variant="h4">Activities</PageTitle>
-                <FormControl variant="outlined" size="small" sx={{ minWidth: 120, backgroundColor: 'white', borderRadius: 1 }}>
+            {/* Title + Filters in one horizontal scrolling row */}
+            <FilterRow>
+                <PageTitle>Activities</PageTitle>
+                <FilterChipSelect size="small">
                     <Select
                         value={filterCategory}
                         onChange={handleFilterChange}
                         displayEmpty
-                        inputProps={{ 'aria-label': 'Filter By' }}
                     >
-                        <MenuItem value="All">All Activities</MenuItem>
+                        <MenuItem value="All">All</MenuItem>
                         <MenuItem value="Coaching">Coaching</MenuItem>
                         <MenuItem value="Logs">Logs</MenuItem>
                         <MenuItem value="Events">Events</MenuItem>
                         <MenuItem value="Evaluations">Evaluations</MenuItem>
                         <MenuItem value="Alerts">Alerts</MenuItem>
                     </Select>
-                </FormControl>
-            </Header>
-
-            <SearchBar
-                fullWidth
-                placeholder="Search..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                InputProps={{
-                    startAdornment: (
-                        <InputAdornment position="start">
-                            <SearchIcon color="action" />
-                        </InputAdornment>
-                    ),
-                }}
-            />
+                </FilterChipSelect>
+                <FilterSearchField
+                    placeholder="Search..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    size="small"
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchIcon sx={{ fontSize: 16 }} color="action" />
+                            </InputAdornment>
+                        ),
+                    }}
+                />
+            </FilterRow>
 
             {Object.keys(groupedActivities).length > 0 ? (
                 Object.keys(groupedActivities).map((date) => (

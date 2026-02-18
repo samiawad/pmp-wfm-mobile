@@ -5,8 +5,6 @@ import {
     Card,
     CardContent,
     Typography,
-    ToggleButtonGroup,
-    ToggleButton,
     Table,
     TableBody,
     TableCell,
@@ -80,6 +78,7 @@ const kpiConfig = [
         lowerIsBetter: true,
         aggregationType: 'average', // average, sum, or last
         thresholds: { good: 240, average: 300 },
+        lastUpdated: '17/02/2026 at 3:57 PM',
     },
     {
         id: 'adherence',
@@ -90,6 +89,7 @@ const kpiConfig = [
         lowerIsBetter: false,
         aggregationType: 'average',
         thresholds: { good: 90, average: 80 },
+        lastUpdated: '17/02/2026 at 3:45 PM',
     },
     {
         id: 'ctc',
@@ -100,6 +100,7 @@ const kpiConfig = [
         lowerIsBetter: true,
         aggregationType: 'sum',
         thresholds: { good: 28, average: 42 }, // 4*7 days, 6*7 days
+        lastUpdated: '17/02/2026 at 2:30 PM',
     },
     {
         id: 'ctb',
@@ -110,6 +111,7 @@ const kpiConfig = [
         lowerIsBetter: true,
         aggregationType: 'sum',
         thresholds: { good: 35, average: 49 }, // 5*7 days, 7*7 days
+        lastUpdated: '17/02/2026 at 1:15 PM',
     },
     {
         id: 'ctcom',
@@ -120,6 +122,7 @@ const kpiConfig = [
         lowerIsBetter: true,
         aggregationType: 'sum',
         thresholds: { good: 14, average: 28 }, // 2*7 days, 4*7 days
+        lastUpdated: '17/02/2026 at 12:50 PM',
     },
     {
         id: 'hold',
@@ -130,6 +133,7 @@ const kpiConfig = [
         lowerIsBetter: true,
         aggregationType: 'average',
         thresholds: { good: 3, average: 5 },
+        lastUpdated: '17/02/2026 at 11:20 AM',
     },
     {
         id: 'fcr',
@@ -140,6 +144,7 @@ const kpiConfig = [
         lowerIsBetter: false,
         aggregationType: 'average',
         thresholds: { good: 80, average: 70 },
+        lastUpdated: '17/02/2026 at 10:05 AM',
     },
     {
         id: 'csat',
@@ -150,6 +155,7 @@ const kpiConfig = [
         lowerIsBetter: false,
         aggregationType: 'average',
         thresholds: { good: 85, average: 70 },
+        lastUpdated: '16/02/2026 at 4:30 PM',
     },
     {
         id: 'quality',
@@ -160,6 +166,7 @@ const kpiConfig = [
         lowerIsBetter: false,
         aggregationType: 'average',
         thresholds: { good: 85, average: 75 },
+        lastUpdated: '16/02/2026 at 3:15 PM',
     },
     {
         id: 'occupancy',
@@ -170,6 +177,7 @@ const kpiConfig = [
         lowerIsBetter: false,
         aggregationType: 'average',
         thresholds: { good: 70, average: 60 },
+        lastUpdated: '16/02/2026 at 2:00 PM',
     },
 ];
 
@@ -286,69 +294,70 @@ const formatValue = (value, unit) => {
 
 const PerformanceContainer = styled(Box)(({ theme }) => ({
     paddingBottom: theme.spacing(2),
-    backgroundColor: '#e7e7e7',
-    minHeight: '100vh',
-    margin: '-var(--spacing-md)',
-    padding: 'var(--spacing-md)',
+    backgroundColor: '#f5f5f5',
+    width: '100%',
+    padding: '16px',
+    boxSizing: 'border-box',
 }));
 
-const PageTitle = styled(Typography)(({ theme }) => ({
-    fontWeight: 700,
-    color: 'var(--color-on-background)',
-    marginBottom: theme.spacing(0.5),
-}));
-
-const FilterContainer = styled(Box)(({ theme }) => ({
+const FilterRow = styled(Box)(({ theme }) => ({
     display: 'flex',
-    gap: theme.spacing(2),
-    marginBottom: theme.spacing(2),
-    flexWrap: 'wrap',
     alignItems: 'center',
+    gap: 8,
+    overflowX: 'auto',
+    paddingBottom: theme.spacing(1.5),
+    marginBottom: theme.spacing(1),
+    scrollbarWidth: 'none',
+    '&::-webkit-scrollbar': { display: 'none' },
+    flexWrap: 'nowrap',
 }));
 
-const StyledFormControl = styled(FormControl)(({ theme }) => ({
-    minWidth: 150,
-    backgroundColor: 'white',
-    borderRadius: '12px',
+const PageTitle = styled(Typography)({
+    fontWeight: 700,
+    fontSize: '1rem',
+    color: 'var(--color-on-background)',
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
+});
+
+const FilterChipSelect = styled(FormControl)({
+    width: 'fit-content',
+    flexShrink: 0,
     '& .MuiOutlinedInput-root': {
-        borderRadius: '12px',
+        height: 32,
+        borderRadius: 20,
+        backgroundColor: '#fff',
+        fontSize: '0.75rem',
+        '& fieldset': { borderColor: '#e0e0e0' },
     },
-}));
-
-const ViewSwitcherContainer = styled(Box)(({ theme }) => ({
-    display: 'flex',
-    justifyContent: 'flex-start',
-    marginBottom: theme.spacing(2),
-}));
-
-const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
-    backgroundColor: 'white',
-    borderRadius: '12px',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-    '& .MuiToggleButton-root': {
-        border: 'none',
-        padding: theme.spacing(1, 2),
-        '&.Mui-selected': {
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            color: 'white',
-            '&:hover': {
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            },
-        },
+    '& .MuiSelect-select': {
+        padding: '4px 28px 4px 12px !important',
+        fontSize: '0.75rem',
     },
-}));
+});
 
-const ComparisonChip = styled(Chip)(({ theme, active }) => ({
-    backgroundColor: active ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'white',
-    width: '50%',
-    color: active ? 'white' : 'var(--text-primary)',
-    fontWeight: 600,
+const FilterChip = styled(Chip)(({ theme, active, selected }) => ({
+    height: 32,
+    borderRadius: 20,
+    backgroundColor: (active || selected) ? undefined : '#fff',
+    background: (active || selected) ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : undefined,
+    color: (active || selected) ? '#fff' : 'var(--text-primary)',
+    fontWeight: 500,
+    fontSize: '0.75rem',
+    border: (active || selected) ? 'none' : '1px solid #e0e0e0',
     cursor: 'pointer',
-    border: active ? 'none' : '1px solid #e0e0e0',
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
+    '& .MuiChip-icon': {
+        color: (active || selected) ? '#fff' : 'inherit',
+        fontSize: 16,
+        marginLeft: '8px',
+    },
     '&:hover': {
-        backgroundColor: active ? '#667eea' : '#f5f5f5',
+        opacity: 0.85,
     },
 }));
+
 
 // Card View Components
 const KPIGrid = styled(Box)(({ theme }) => ({
@@ -361,16 +370,14 @@ const KPIGrid = styled(Box)(({ theme }) => ({
 }));
 
 const KPICard = styled(Card)(({ theme, performanceColor }) => ({
-    background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%)',
-    borderRadius: '16px',
-    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-    backdropFilter: 'blur(10px)',
+    background: '#ffffff',
+    borderRadius: '12px',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
     border: `2px solid ${performanceColor}20`,
-    transition: 'all 0.3s ease',
     cursor: 'pointer',
-    '&:hover': {
-        transform: 'translateY(-2px)',
-        boxShadow: '0 8px 28px rgba(0, 0, 0, 0.12)',
+    '&:active': {
+        transform: 'scale(0.97)',
+        transition: 'transform 0.1s ease',
     },
 }));
 
@@ -425,9 +432,9 @@ const ChartContainer = styled(Box)(({ theme }) => ({
 // List View Components
 const ListContainer = styled(Box)(({ theme }) => ({
     backgroundColor: 'white',
-    borderRadius: '16px',
+    borderRadius: '12px',
     padding: theme.spacing(2),
-    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
 }));
 
 const ListItem = styled(Box)(({ theme }) => ({
@@ -464,11 +471,7 @@ const PerformancePage = () => {
     const [showComparison, setShowComparison] = useState(false);
     const [selectedKPI, setSelectedKPI] = useState(null);
 
-    const handleViewChange = (event, newView) => {
-        if (newView !== null) {
-            setViewMode(newView);
-        }
-    };
+
 
     const handleDateRangeChange = (event) => {
         setDateRangePreset(event.target.value);
@@ -603,6 +606,19 @@ const PerformancePage = () => {
                                         </AreaChart>
                                     </ResponsiveContainer>
                                 </ChartContainer>
+                                <Typography
+                                    variant="caption"
+                                    sx={{
+                                        display: 'block',
+                                        textAlign: 'right',
+                                        color: 'var(--text-secondary)',
+                                        fontSize: '0.65rem',
+                                        mt: 1,
+                                        opacity: 0.7,
+                                    }}
+                                >
+                                    Last updated: {kpi.lastUpdated}
+                                </Typography>
                             </KPICardContent>
                         </KPICard>
                     );
@@ -666,6 +682,7 @@ const PerformancePage = () => {
                             <TableCell align="right" sx={{ fontWeight: 700 }}>Target</TableCell>
                             {showComparison && <TableCell align="center" sx={{ fontWeight: 700 }}>Change</TableCell>}
                             <TableCell align="center" sx={{ fontWeight: 700 }}>Status</TableCell>
+                            <TableCell align="center" sx={{ fontWeight: 700 }}>Last Update</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -710,6 +727,9 @@ const PerformancePage = () => {
                                             }}
                                         />
                                     </TableCell>
+                                    <TableCell align="center" sx={{ fontSize: '0.75rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
+                                        {kpi.lastUpdated}
+                                    </TableCell>
                                 </TableRow>
                             );
                         })}
@@ -732,16 +752,10 @@ const PerformancePage = () => {
 
     return (
         <PerformanceContainer>
-            {/* Header */}
-            <Box sx={{ mb: 2 }}>
-                <PageTitle variant="h5">
-                    My Performance
-                </PageTitle>
-            </Box>
-
-            {/* Filters */}
-            <FilterContainer>
-                <StyledFormControl size="small">
+            {/* Title + Filters in one horizontal scrolling row */}
+            <FilterRow>
+                <PageTitle>My Performance</PageTitle>
+                <FilterChipSelect size="small">
                     <Select
                         value={dateRangePreset}
                         onChange={handleDateRangeChange}
@@ -753,38 +767,33 @@ const PerformancePage = () => {
                             </MenuItem>
                         ))}
                     </Select>
-                </StyledFormControl>
-
-                <ComparisonChip
+                </FilterChipSelect>
+                <FilterChip
                     icon={<CompareIcon />}
-                    label="Compare with Previous Period"
+                    label="Compare"
                     onClick={toggleComparison}
                     active={showComparison}
+                    size="small"
                 />
-            </FilterContainer>
-
-            {/* View Switcher */}
-            <ViewSwitcherContainer>
-                <StyledToggleButtonGroup
-                    value={viewMode}
-                    exclusive
-                    onChange={handleViewChange}
-                    aria-label="view mode"
-                >
-                    <ToggleButton value="cards" aria-label="card view">
-                        <CardViewIcon sx={{ mr: 1 }} />
-                        Cards
-                    </ToggleButton>
-                    <ToggleButton value="list" aria-label="list view">
-                        <ListViewIcon sx={{ mr: 1 }} />
-                        List
-                    </ToggleButton>
-                    <ToggleButton value="table" aria-label="table view">
-                        <TableViewIcon sx={{ mr: 1 }} />
-                        Table
-                    </ToggleButton>
-                </StyledToggleButtonGroup>
-            </ViewSwitcherContainer>
+                <FilterChip
+                    label="Cards"
+                    icon={<CardViewIcon />}
+                    selected={viewMode === 'cards'}
+                    onClick={() => setViewMode('cards')}
+                />
+                <FilterChip
+                    label="List"
+                    icon={<ListViewIcon />}
+                    selected={viewMode === 'list'}
+                    onClick={() => setViewMode('list')}
+                />
+                <FilterChip
+                    label="Table"
+                    icon={<TableViewIcon />}
+                    selected={viewMode === 'table'}
+                    onClick={() => setViewMode('table')}
+                />
+            </FilterRow>
 
             {/* Render View Based on Mode */}
             {viewMode === 'cards' && renderCardView()}
