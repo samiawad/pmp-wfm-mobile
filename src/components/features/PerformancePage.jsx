@@ -12,10 +12,15 @@ import {
     TableHead,
     TableRow,
     Paper,
-    Select,
-    MenuItem,
     FormControl,
     Chip,
+    SwipeableDrawer,
+    List,
+    ListItem,
+    ListItemText,
+    ListItemButton,
+    Radio,
+    IconButton as MuiIconButton,
 } from '@mui/material';
 import {
     GridView as CardViewIcon,
@@ -24,6 +29,9 @@ import {
     TrendingUp as TrendingUpIcon,
     TrendingDown as TrendingDownIcon,
     CompareArrows as CompareIcon,
+    Close as CloseIcon,
+    CalendarToday as CalendarIcon,
+    ExpandMore as DropdownIcon,
 } from '@mui/icons-material';
 import { AreaChart, Area, ResponsiveContainer, Tooltip } from 'recharts';
 import KPIDetailView from './KPIDetailView';
@@ -72,7 +80,6 @@ const kpiConfig = [
     {
         id: 'aht',
         name: 'AHT',
-        fullName: 'Average Handle Time',
         unit: 's',
         target: 240,
         lowerIsBetter: true,
@@ -83,7 +90,6 @@ const kpiConfig = [
     {
         id: 'adherence',
         name: 'Adherence',
-        fullName: 'Schedule Adherence',
         unit: '%',
         target: 90,
         lowerIsBetter: false,
@@ -94,7 +100,6 @@ const kpiConfig = [
     {
         id: 'ctc',
         name: 'CTC',
-        fullName: 'Calls to Close',
         unit: '',
         target: 4,
         lowerIsBetter: true,
@@ -105,7 +110,6 @@ const kpiConfig = [
     {
         id: 'ctb',
         name: 'CTB',
-        fullName: 'Calls to Break',
         unit: '',
         target: 5,
         lowerIsBetter: true,
@@ -116,7 +120,6 @@ const kpiConfig = [
     {
         id: 'ctcom',
         name: 'CTCOM',
-        fullName: 'Calls to Complaint',
         unit: '',
         target: 2,
         lowerIsBetter: true,
@@ -127,7 +130,6 @@ const kpiConfig = [
     {
         id: 'hold',
         name: 'Hold %',
-        fullName: 'Hold Percentage',
         unit: '%',
         target: 3,
         lowerIsBetter: true,
@@ -138,7 +140,6 @@ const kpiConfig = [
     {
         id: 'fcr',
         name: 'FCR',
-        fullName: 'First Call Resolution',
         unit: '%',
         target: 80,
         lowerIsBetter: false,
@@ -149,7 +150,6 @@ const kpiConfig = [
     {
         id: 'csat',
         name: 'CSAT',
-        fullName: 'Customer Satisfaction',
         unit: '%',
         target: 85,
         lowerIsBetter: false,
@@ -160,7 +160,6 @@ const kpiConfig = [
     {
         id: 'quality',
         name: 'Quality',
-        fullName: 'Quality Score',
         unit: '%',
         target: 85,
         lowerIsBetter: false,
@@ -171,7 +170,6 @@ const kpiConfig = [
     {
         id: 'occupancy',
         name: 'Occupancy',
-        fullName: 'Occupancy Rate',
         unit: '%',
         target: 75,
         lowerIsBetter: false,
@@ -358,6 +356,39 @@ const FilterChip = styled(Chip)(({ theme, active, selected }) => ({
     },
 }));
 
+const DropdownTrigger = styled(Box)(({ theme }) => ({
+    height: 32,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+    padding: '0 12px 0 8px',
+    borderRadius: 20,
+    backgroundColor: '#fff',
+    border: '1px solid #c4c4c4',
+    cursor: 'pointer',
+    color: 'var(--text-primary)',
+    fontWeight: 500,
+    fontSize: '0.75rem',
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
+    '&:hover': {
+        borderColor: '#212121',
+        backgroundColor: '#fafafa',
+    },
+    '&:active': {
+        backgroundColor: '#f5f5f5',
+    },
+}));
+
+const DragHandle = styled(Box)({
+    width: 36,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#d0d0d0',
+    margin: '12px auto 8px',
+});
+
 
 // Card View Components
 const KPIGrid = styled(Box)(({ theme }) => ({
@@ -437,7 +468,7 @@ const ListContainer = styled(Box)(({ theme }) => ({
     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
 }));
 
-const ListItem = styled(Box)(({ theme }) => ({
+const KPIListItem = styled(Box)(({ theme }) => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -465,28 +496,29 @@ const ListItemRight = styled(Box)(({ theme }) => ({
 // Component
 // ============================================
 
-const PerformancePage = () => {
+const PerformancePage = ({ selectedKPI, onKPIClick, onBack }) => {
     const [viewMode, setViewMode] = useState('cards');
     const [dateRangePreset, setDateRangePreset] = useState('last7');
     const [showComparison, setShowComparison] = useState(false);
-    const [selectedKPI, setSelectedKPI] = useState(null);
+    const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
 
-
-
-    const handleDateRangeChange = (event) => {
-        setDateRangePreset(event.target.value);
+    const handleDateRangeSelect = (presetId) => {
+        setDateRangePreset(presetId);
+        setIsBottomSheetOpen(false);
     };
+
+
 
     const toggleComparison = () => {
         setShowComparison(!showComparison);
     };
 
     const handleKPIClick = (kpi) => {
-        setSelectedKPI(kpi);
+        if (onKPIClick) onKPIClick(kpi);
     };
 
     const handleBackToList = () => {
-        setSelectedKPI(null);
+        if (onBack) onBack();
     };
 
     // Calculate current period data
@@ -636,10 +668,10 @@ const PerformancePage = () => {
                     const trendColor = getTrendColor(kpi.change, kpi.lowerIsBetter);
 
                     return (
-                        <ListItem key={kpi.id}>
+                        <KPIListItem key={kpi.id}>
                             <ListItemLeft>
                                 <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                                    {kpi.fullName}
+                                    {kpi.name}
                                 </Typography>
                                 {showComparison && kpi.change !== 0 && (
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -662,7 +694,7 @@ const PerformancePage = () => {
                                     Target: {formatValue(kpi.target, kpi.unit)}
                                 </Typography>
                             </ListItemRight>
-                        </ListItem>
+                        </KPIListItem>
                     );
                 })}
             </ListContainer>
@@ -692,7 +724,7 @@ const PerformancePage = () => {
 
                             return (
                                 <TableRow key={kpi.id} hover>
-                                    <TableCell>{kpi.fullName}</TableCell>
+                                    <TableCell>{kpi.name}</TableCell>
                                     <TableCell align="right" sx={{ fontWeight: 600, color: performanceColor }}>
                                         {formatValue(kpi.value, kpi.unit)}
                                     </TableCell>
@@ -755,19 +787,13 @@ const PerformancePage = () => {
             {/* Title + Filters in one horizontal scrolling row */}
             <FilterRow>
                 <PageTitle>My Performance</PageTitle>
-                <FilterChipSelect size="small">
-                    <Select
-                        value={dateRangePreset}
-                        onChange={handleDateRangeChange}
-                        displayEmpty
-                    >
-                        {dateRangePresets.map(preset => (
-                            <MenuItem key={preset.id} value={preset.id}>
-                                {preset.label}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FilterChipSelect>
+                <DropdownTrigger onClick={() => setIsBottomSheetOpen(true)}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <CalendarIcon sx={{ fontSize: '1rem', color: '#757575' }} />
+                        {dateRangePresets.find(p => p.id === dateRangePreset)?.label || 'Select Period'}
+                    </Box>
+                    <DropdownIcon sx={{ fontSize: '1.2rem', color: '#757575' }} />
+                </DropdownTrigger>
                 <FilterChip
                     icon={<CompareIcon />}
                     label="Compare"
@@ -799,6 +825,48 @@ const PerformancePage = () => {
             {viewMode === 'cards' && renderCardView()}
             {viewMode === 'list' && renderListView()}
             {viewMode === 'table' && renderTableView()}
+
+            {/* Bottom Sheet for Date Range Filter */}
+            <SwipeableDrawer
+                anchor="bottom"
+                open={isBottomSheetOpen}
+                onClose={() => setIsBottomSheetOpen(false)}
+                onOpen={() => setIsBottomSheetOpen(true)}
+                PaperProps={{
+                    sx: {
+                        borderTopLeftRadius: '24px',
+                        borderTopRightRadius: '24px',
+                        paddingBottom: '20px',
+                        maxHeight: '60vh'
+                    }
+                }}
+            >
+                <DragHandle />
+                <Box sx={{ px: 3, pt: 1, pb: 2 }}>
+                    <Typography variant="h6" fontWeight={700} textAlign="center">Select Period</Typography>
+                </Box>
+                <List sx={{ pt: 1 }}>
+                    {dateRangePresets.map((preset) => (
+                        <ListItem disablePadding key={preset.id}>
+                            <ListItemButton onClick={() => handleDateRangeSelect(preset.id)} sx={{ px: 3 }}>
+                                <Radio
+                                    checked={dateRangePreset === preset.id}
+                                    onChange={() => handleDateRangeSelect(preset.id)}
+                                    size="small"
+                                    sx={{ mr: 1 }}
+                                />
+                                <ListItemText
+                                    primary={preset.label}
+                                    primaryTypographyProps={{
+                                        fontWeight: dateRangePreset === preset.id ? 700 : 500,
+                                        fontSize: '0.95rem'
+                                    }}
+                                />
+                            </ListItemButton>
+                        </ListItem>
+                    ))}
+                </List>
+            </SwipeableDrawer>
         </PerformanceContainer>
     );
 };

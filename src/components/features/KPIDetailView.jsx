@@ -34,8 +34,9 @@ const DetailContainer = styled(Box)(({ theme }) => ({
     paddingBottom: theme.spacing(2),
     backgroundColor: '#e7e7e7',
     minHeight: '100vh',
-    margin: '-var(--spacing-md)',
-    padding: 'var(--spacing-md)',
+    // margin removed to align with parent container (MainContent has 0 horizontal padding)
+    padding: '20px', // Match PerformancePage container padding
+    boxSizing: 'border-box',
 }));
 
 const Header = styled(Box)(({ theme }) => ({
@@ -632,7 +633,7 @@ const KPIDetailView = ({ kpi, onBack, dateRange }) => {
                 <BackButton onClick={onBack}>
                     <ArrowBackIcon />
                 </BackButton>
-                <KPITitle variant="h5">{kpi.fullName}</KPITitle>
+                <KPITitle variant="h5">{kpi.name}</KPITitle>
             </Header>
 
             {/* Stats Summary */}
@@ -700,7 +701,7 @@ const KPIDetailView = ({ kpi, onBack, dateRange }) => {
                 onSubmit={handleSubmitDispute}
                 prefilledData={selectedInterval ? {
                     kpiId: kpi.id,
-                    kpiName: kpi.fullName,
+                    kpiName: kpi.name,
                     period: selectedInterval.label,
                     startDate: new Date(selectedInterval.date).toISOString().split('T')[0],
                     endDate: new Date(selectedInterval.date).toISOString().split('T')[0],

@@ -17,14 +17,32 @@ import './App.css';
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [requestsTab, setRequestsTab] = useState(0);
-  const [selectedDayData, setSelectedDayData] = useState(null);
-  const [scheduleList, setScheduleList] = useState([]);
+  const [activitiesFilter, setActivitiesFilter] = useState('All');
+  const [selectedKPI, setSelectedKPI] = useState(null);
 
-  const handleNotificationClick = (page, tabIndex = 0) => {
+  const handleNotificationClick = (page, tabIndexOrFilter = 0) => {
     setCurrentPage(page);
     if (page === 'requests') {
-      setRequestsTab(tabIndex);
+      setRequestsTab(tabIndexOrFilter);
+    } else if (page === 'activities') {
+      setActivitiesFilter(tabIndexOrFilter);
+    } else if (page === 'coaching') {
+      setCurrentPage('activities'); // Redirect to Activities
+      setActivitiesFilter('Coaching');
+    } else if (page === 'evaluations') {
+      setCurrentPage('activities'); // Redirect to Activities
+      setActivitiesFilter('Evaluations');
     }
+  };
+
+  const handleKPIClick = (kpi) => {
+    setSelectedKPI(kpi);
+    setCurrentPage('performanceDetails');
+  };
+
+  const handleBackFromKPI = () => {
+    setSelectedKPI(null);
+    setCurrentPage('performance');
   };
 
   const handleDayClick = (dayData, index, schedule) => {
@@ -46,7 +64,7 @@ function App() {
   return (
     <AppLayout currentPage={currentPage} onPageChange={setCurrentPage}>
       <div className="app-container">
-        {currentPage === 'home' && <HomeDashboard onAction={handleNotificationClick} onPageChange={setCurrentPage} />}
+        {currentPage === 'home' && <HomeDashboard onAction={handleNotificationClick} onPageChange={setCurrentPage} onDayClick={handleDayClick} />}
         {currentPage === 'schedule' && <SchedulePage onDayClick={handleDayClick} />}
         {currentPage === 'dayTimeline' && (
           <DayTimelinePage
@@ -56,15 +74,16 @@ function App() {
             onBack={handleBackFromDayTimeline}
           />
         )}
-        {currentPage === 'performance' && <PerformancePage />}
-        {currentPage === 'activities' && <ActivitiesPage />}
-        {currentPage === 'coaching' && <CoachingPage />}
+        {currentPage === 'performance' && <PerformancePage onKPIClick={handleKPIClick} />}
+        {currentPage === 'performanceDetails' && <PerformancePage selectedKPI={selectedKPI} onBack={handleBackFromKPI} />}
+        {currentPage === 'activities' && <ActivitiesPage initialFilter={activitiesFilter} />}
+
         {currentPage === 'requests' && <RequestsPage defaultTab={requestsTab} />}
         {currentPage === 'rewards' && <RewardsPage />}
-        {currentPage === 'evaluations' && <EvaluationsPage />}
-        {currentPage === 'disputes' && <DisputesPage />}
-        {currentPage === 'events' && <EventsPage />}
-        {currentPage === 'logs' && <LogsPage />}
+        {currentPage === 'evaluations' && <ActivitiesPage initialFilter="Evaluations" />}
+        {currentPage === 'disputes' && <RequestsPage defaultTab={4} />}
+        {currentPage === 'events' && <ActivitiesPage initialFilter="Events" />}
+        {currentPage === 'logs' && <ActivitiesPage initialFilter="Logs" />}
       </div>
     </AppLayout>
   );

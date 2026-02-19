@@ -3,7 +3,7 @@ import { styled } from '@mui/material/styles';
 import {
     Box, IconButton, AppBar, Toolbar, Typography,
     SwipeableDrawer,
-    Snackbar, Alert,
+    Snackbar, Alert, Badge, List, ListItem, ListItemText, ListItemAvatar, Avatar, Button,
 } from '@mui/material';
 import {
     Notifications as NotificationsIcon,
@@ -14,6 +14,9 @@ import {
     Gavel as DisputeIcon,
     Event as EventIcon,
     Description as LogsIcon,
+    Close as CloseIcon,
+    SwapHoriz as SwapIcon,
+    NotificationImportant as AlertIcon,
 } from '@mui/icons-material';
 import BottomNavBar from './BottomNavBar';
 import DisputeModal from '../common/DisputeModal';
@@ -129,6 +132,44 @@ const moreMenuItems = [
 // Component
 // ============================================
 
+const mockNotifications = [
+    {
+        id: 1,
+        title: "Shift Swap Request",
+        message: "Omar Jabri requested a shift swap for Feb 19.",
+        time: "30m ago",
+        read: false,
+        icon: <SwapIcon />,
+        color: "#2196f3"
+    },
+    {
+        id: 2,
+        title: "System Alert",
+        message: "Scheduled maintenance tonight at 02:00 AM.",
+        time: "2h ago",
+        read: false,
+        icon: <AlertIcon />,
+        color: "#ff9800"
+    },
+    {
+        id: 3,
+        title: "Evaluation Available",
+        message: "Your Q1 performance review is ready.",
+        time: "1d ago",
+        read: true,
+        icon: <EvaluationIcon />,
+        color: "#9c27b0"
+    }
+];
+
+const NotificationItem = styled(ListItem)(({ theme, unread }) => ({
+    backgroundColor: unread ? 'rgba(33, 150, 243, 0.08)' : 'transparent',
+    borderBottom: '1px solid #f0f0f0',
+    '&:last-child': {
+        borderBottom: 'none',
+    },
+}));
+
 const AppLayout = ({ children, currentPage, onPageChange }) => {
     const [moreDrawerOpen, setMoreDrawerOpen] = useState(false);
     const [disputeModalOpen, setDisputeModalOpen] = useState(false);
@@ -136,6 +177,7 @@ const AppLayout = ({ children, currentPage, onPageChange }) => {
     const [swapModalOpen, setSwapModalOpen] = useState(false);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [notificationDrawerOpen, setNotificationDrawerOpen] = useState(false);
 
     const handleBottomNavChange = (event, newValue) => {
         if (newValue === 'more') {
@@ -224,8 +266,30 @@ const AppLayout = ({ children, currentPage, onPageChange }) => {
                         edge="end"
                         color="inherit"
                         aria-label="notifications"
+                        onClick={() => setNotificationDrawerOpen(true)}
                     >
-                        <NotificationsIcon />
+                        <Badge
+                            badgeContent={2}
+                            color="error"
+                            sx={{
+                                '& .MuiBadge-badge': {
+                                    right: 4,
+                                    top: 4,
+                                    border: `2px solid var(--primary-color)`,
+                                    padding: '0 4px',
+                                    height: 18,
+                                    minWidth: 18,
+                                    fontSize: '0.65rem',
+                                    fontWeight: 700,
+                                    lineHeight: 0, // Centering fix requested by user
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                }
+                            }}
+                        >
+                            <NotificationsIcon />
+                        </Badge>
                     </NotificationIconButton>
                 </Toolbar>
             </StyledAppBar>
@@ -235,11 +299,13 @@ const AppLayout = ({ children, currentPage, onPageChange }) => {
                 {children}
             </MainContent>
 
-            {/* Bottom Navigation Bar */}
-            <BottomNavBar
-                value={currentPage}
-                onChange={handleBottomNavChange}
-            />
+            {/* Bottom Navigation Bar - Hide on sub-pages */}
+            {!['dayTimeline', 'performanceDetails'].includes(currentPage) && (
+                <BottomNavBar
+                    value={currentPage}
+                    onChange={handleBottomNavChange}
+                />
+            )}
 
             {/* More Bottom Sheet — MS Teams grid style */}
             <SwipeableDrawer
@@ -283,6 +349,66 @@ const AppLayout = ({ children, currentPage, onPageChange }) => {
                             </GridItem>
                         ))}
                     </Box>
+                </BottomSheetContainer>
+            </SwipeableDrawer>
+
+            {/* Notification Drawer */}
+            <SwipeableDrawer
+                anchor="bottom"
+                open={notificationDrawerOpen}
+                onClose={() => setNotificationDrawerOpen(false)}
+                onOpen={() => setNotificationDrawerOpen(true)}
+                disableSwipeToOpen
+                PaperProps={{
+                    sx: {
+                        borderRadius: '20px 20px 0 0',
+                        maxHeight: '70vh',
+                        backgroundColor: '#ffffff',
+                    },
+                }}
+            >
+                <BottomSheetContainer>
+                    <DragHandle />
+                    <Box sx={{ px: 3, pt: 1, pb: 2 }}>
+                        <Typography variant="h6" fontWeight={700} textAlign="center">Notifications</Typography>
+                    </Box>
+                    <List sx={{ pt: 0 }}>
+                        {mockNotifications.map((notif) => (
+                            <NotificationItem key={notif.id} unread={notif.read ? 0 : 1} disablePadding>
+                                <Box sx={{ width: '100%', p: 2, display: 'flex', gap: 2 }}>
+                                    <Avatar sx={{ bgcolor: `${notif.color}20`, color: notif.color, width: 40, height: 40 }}>
+                                        {notif.icon}
+                                    </Avatar>
+                                    <Box sx={{ flex: 1 }}>
+                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                                            <Typography variant="subtitle2" fontWeight={700} sx={{ fontSize: '0.9rem' }}>
+                                                {notif.title}
+                                            </Typography>
+                                            <Typography variant="caption" color="text.secondary">
+                                                {notif.time}
+                                            </Typography>
+                                        </Box>
+                                        <Typography variant="body2" color="text.primary" sx={{ fontSize: '0.85rem', lineHeight: 1.3, mb: 0.5 }}>
+                                            {notif.message}
+                                        </Typography>
+                                        {!notif.read && (
+                                            <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+                                                <Button size="small" variant="text" sx={{ p: 0, minWidth: 'auto', fontSize: '0.75rem', fontWeight: 600 }}>
+                                                    View
+                                                </Button>
+                                                <Button size="small" variant="text" color="inherit" sx={{ p: 0, minWidth: 'auto', fontSize: '0.75rem', color: '#888' }}>
+                                                    Dismiss
+                                                </Button>
+                                            </Box>
+                                        )}
+                                    </Box>
+                                    {!notif.read && (
+                                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#2196f3', mt: 1 }} />
+                                    )}
+                                </Box>
+                            </NotificationItem>
+                        ))}
+                    </List>
                 </BottomSheetContainer>
             </SwipeableDrawer>
 
