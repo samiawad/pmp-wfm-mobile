@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { styled } from '@mui/material/styles';
 import {
     Box,
@@ -11,6 +11,7 @@ import {
     MenuItem,
     FormControl,
     Tooltip,
+    IconButton,
 } from '@mui/material';
 import {
     AccessTime as ClockIcon,
@@ -19,6 +20,9 @@ import {
     ViewModule as CardViewIcon,
     Timeline as TimelineIcon,
     TaskAlt as CompletedIcon,
+    CalendarMonth as CalendarIcon,
+    ChevronLeft as ChevronLeftIcon,
+    ChevronRight as ChevronRightIcon,
 } from '@mui/icons-material';
 
 // ============================================
@@ -162,6 +166,56 @@ const scheduleData = {
             { day: 'Sunday', date: 'Feb 2', isToday: false, isOffDay: true },
         ]
     },
+};
+
+// ============================================
+// Full Month Schedule Data
+// (keyed by "YYYY-M-D" for fast lookup)
+// ============================================
+
+const buildScheduleMap = () => {
+    const map = {};
+    Object.values(scheduleData).forEach(period => {
+        period.schedule.forEach(shift => {
+            // Parse "Feb 3" style dates into a lookup key
+            const months = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
+            const parts = shift.date.split(' ');
+            const month = months[parts[0]];
+            const day = parseInt(parts[1]);
+            // Determine year from context (2026 for this app)
+            const year = 2026;
+            const key = `${year}-${month}-${day}`;
+            map[key] = shift;
+        });
+    });
+    return map;
+};
+
+const SCHEDULE_MAP = buildScheduleMap();
+
+// ============================================
+// Mock Adherence Data (% for each day)
+// Keyed like SCHEDULE_MAP: "YYYY-M-D"
+// ============================================
+
+const ADHERENCE_MAP = (() => {
+    const map = {};
+    // Generate adherence for every day we have schedule data
+    Object.keys(SCHEDULE_MAP).forEach(key => {
+        const shift = SCHEDULE_MAP[key];
+        if (shift.isOffDay) return; // no adherence for off days
+        // Pseudo-random adherence based on day number
+        const dayNum = parseInt(key.split('-')[2]);
+        const values = [95, 88, 72, 91, 65, 97, 80, 55, 93, 86, 78, 99, 60, 84, 92, 70, 96, 83, 58, 90, 74, 100, 67, 89, 76, 94, 82, 63, 87, 71, 98];
+        map[key] = values[dayNum % values.length];
+    });
+    return map;
+})();
+
+const getAdherenceColor = (pct) => {
+    if (pct == null) return null;
+    if (pct >= 80) return '#4caf50'; // good — green
+    return '#f44336'; // bad — red
 };
 
 // ============================================
@@ -415,7 +469,23 @@ const HourHeaderCell = styled(Box)(({ theme }) => ({
 
 const SchedulePage = ({ onDayClick }) => {
     const [selectedWeek, setSelectedWeek] = useState('current');
-    const [viewMode, setViewMode] = useState('cards'); // 'cards' or 'timeline'
+    const [viewMode, setViewMode] = useState('calendar'); // 'calendar', 'cards', or 'timeline'
+
+    const MONTH_NAMES = useMemo(() => ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'], []);
+
+    // Calendar month navigation
+    const [calendarMonth, setCalendarMonth] = useState(1); // 0-indexed, 1 = February
+    const [calendarYear, setCalendarYear] = useState(2026);
+
+    const weekKeys = ['prev1', 'current', 'next'];
+    const currentWeekIndex = weekKeys.indexOf(selectedWeek);
+
+    const navigateToPeriod = (direction) => {
+        const newIndex = currentWeekIndex + direction;
+        if (newIndex >= 0 && newIndex < weekKeys.length) {
+            setSelectedWeek(weekKeys[newIndex]);
+        }
+    };
 
     const handleWeekChange = (event) => {
         setSelectedWeek(event.target.value);
@@ -603,69 +673,354 @@ const SchedulePage = ({ onDayClick }) => {
         );
     };
 
+    // ============================================
+    // Calendar View
+    // ============================================
+
+    const DAY_HEADERS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+
+    const calendarDays = useMemo(() => {
+        const firstDay = new Date(calendarYear, calendarMonth, 1);
+        const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+        const startDayOfWeek = firstDay.getDay(); // 0 = Sunday
+        const today = new Date();
+
+        const cells = [];
+
+        // Leading empty cells for alignment
+        for (let i = 0; i < startDayOfWeek; i++) {
+            cells.push({ empty: true });
+        }
+
+        // Actual days
+        for (let d = 1; d <= daysInMonth; d++) {
+            const key = `${calendarYear}-${calendarMonth}-${d}`;
+            const shift = SCHEDULE_MAP[key] || null;
+            const isToday = today.getDate() === d && today.getMonth() === calendarMonth && today.getFullYear() === calendarYear;
+            cells.push({
+                empty: false,
+                day: d,
+                shift,
+                isToday,
+                isOffDay: shift?.isOffDay || false,
+                startTime: shift?.startTime || null,
+                adherence: ADHERENCE_MAP[key] ?? null,
+            });
+        }
+
+        return cells;
+    }, [calendarMonth, calendarYear]);
+
+    const goToPrevMonth = () => {
+        if (calendarMonth === 0) {
+            setCalendarMonth(11);
+            setCalendarYear(y => y - 1);
+        } else {
+            setCalendarMonth(m => m - 1);
+        }
+    };
+
+    const goToNextMonth = () => {
+        if (calendarMonth === 11) {
+            setCalendarMonth(0);
+            setCalendarYear(y => y + 1);
+        } else {
+            setCalendarMonth(m => m + 1);
+        }
+    };
+
+    const renderCalendarView = () => (
+        <Box sx={{ backgroundColor: '#fff', borderRadius: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+            {/* Month header with nav arrows */}
+            <Box sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                px: 1.5,
+                py: 1.5,
+            }}>
+                <IconButton onClick={goToPrevMonth} size="small" sx={{ color: '#555' }}>
+                    <ChevronLeftIcon />
+                </IconButton>
+                <Typography sx={{ fontWeight: 700, fontSize: '1rem', color: '#1a1a1a' }}>
+                    {MONTH_NAMES[calendarMonth]} {calendarYear}
+                </Typography>
+                <IconButton onClick={goToNextMonth} size="small" sx={{ color: '#555' }}>
+                    <ChevronRightIcon />
+                </IconButton>
+            </Box>
+
+            {/* Day-of-week headers */}
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', px: 1, pb: 0.5 }}>
+                {DAY_HEADERS.map(dh => (
+                    <Typography key={dh} sx={{
+                        textAlign: 'center',
+                        fontSize: '0.7rem',
+                        fontWeight: 600,
+                        color: '#999',
+                        py: 0.5,
+                    }}>
+                        {dh}
+                    </Typography>
+                ))}
+            </Box>
+
+            {/* Day cells grid — CIRCLES with adherence dot badge */}
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', px: 0.5, pb: 1, gap: '4px 0' }}>
+                {calendarDays.map((cell, idx) => {
+                    if (cell.empty) {
+                        return <Box key={`e-${idx}`} sx={{ display: 'flex', justifyContent: 'center', minHeight: 58 }} />;
+                    }
+
+                    const hasShift = cell.shift && !cell.isOffDay;
+                    const isOff = cell.isOffDay;
+                    const noData = !cell.shift;
+                    const adherenceColor = getAdherenceColor(cell.adherence);
+                    const circleSize = 46;
+
+                    return (
+                        <Box
+                            key={cell.day}
+                            sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: 58, justifyContent: 'center' }}
+                        >
+                            <Box
+                                onClick={() => {
+                                    if (cell.shift && onDayClick) {
+                                        const allSchedules = Object.values(scheduleData).flatMap(p => p.schedule);
+                                        const matchIdx = allSchedules.findIndex(s => s.date === cell.shift.date);
+                                        onDayClick(cell.shift, matchIdx >= 0 ? matchIdx : 0, allSchedules);
+                                    }
+                                }}
+                                sx={{
+                                    width: circleSize,
+                                    height: circleSize,
+                                    borderRadius: '50%',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    cursor: cell.shift ? 'pointer' : 'default',
+                                    transition: 'all 0.15s ease',
+                                    position: 'relative',
+                                    border: '1.5px solid #e8e8e8',
+                                    ...(cell.isToday && {
+                                        background: 'linear-gradient(135deg, #667eea, #764ba2)',
+                                        boxShadow: '0 3px 10px rgba(102,126,234,0.4)',
+                                        border: '1.5px solid transparent',
+                                    }),
+                                    ...(isOff && !cell.isToday && {
+                                        backgroundColor: '#fff5f5',
+                                        border: '1.5px solid #ffcdd2',
+                                    }),
+                                    ...(noData && !cell.isToday && {
+                                        backgroundColor: '#fafafa',
+                                    }),
+                                    '&:active': cell.shift ? {
+                                        transform: 'scale(0.9)',
+                                    } : {},
+                                }}
+                            >
+                                {/* Adherence dot badge — top right */}
+                                {adherenceColor && (
+                                    <Box sx={{
+                                        position: 'absolute',
+                                        top: 1,
+                                        right: 1,
+                                        width: 8,
+                                        height: 8,
+                                        borderRadius: '50%',
+                                        backgroundColor: adherenceColor,
+                                        border: cell.isToday ? '1.5px solid rgba(255,255,255,0.8)' : '1.5px solid #fff',
+                                    }} />
+                                )}
+
+                                {/* Day number */}
+                                <Typography sx={{
+                                    fontWeight: cell.isToday ? 800 : 600,
+                                    fontSize: '0.85rem',
+                                    color: cell.isToday ? '#fff' : isOff ? '#c62828' : noData ? '#ccc' : '#333',
+                                    lineHeight: 1.1,
+                                }}>
+                                    {cell.day}
+                                </Typography>
+
+                                {/* Shift start time (compact) */}
+                                {hasShift && (
+                                    <Typography sx={{
+                                        fontSize: '0.45rem',
+                                        fontWeight: 600,
+                                        color: cell.isToday ? 'rgba(255,255,255,0.85)' : '#667eea',
+                                        lineHeight: 1,
+                                        mt: 0.15,
+                                    }}>
+                                        {cell.startTime}
+                                    </Typography>
+                                )}
+                                {isOff && (
+                                    <Typography sx={{
+                                        fontSize: '0.4rem',
+                                        fontWeight: 700,
+                                        color: cell.isToday ? 'rgba(255,255,255,0.85)' : '#c62828',
+                                        lineHeight: 1,
+                                        mt: 0.15,
+                                    }}>
+                                        OFF
+                                    </Typography>
+                                )}
+                            </Box>
+                        </Box>
+                    );
+                })}
+            </Box>
+
+            {/* Legend */}
+            <Box sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 3,
+                pb: 2,
+                pt: 0.5,
+            }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <Box sx={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#4caf50' }} />
+                    <Typography sx={{ fontSize: '0.7rem', color: '#666' }}>Adherence ≥ 80%</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <Box sx={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#f44336' }} />
+                    <Typography sx={{ fontSize: '0.7rem', color: '#666' }}>Adherence &lt; 80%</Typography>
+                </Box>
+            </Box>
+        </Box>
+    );
+
+    // Swipe handlers for Cards View
+    const [touchStart, setTouchStart] = useState(null);
+    const [touchEnd, setTouchEnd] = useState(null);
+    const minSwipeDistance = 50;
+
+    const onTouchStart = (e) => {
+        setTouchEnd(null);
+        setTouchStart(e.targetTouches[0].clientX);
+    };
+
+    const onTouchMove = (e) => setTouchEnd(e.targetTouches[0].clientX);
+
+    const onTouchEnd = () => {
+        if (!touchStart || !touchEnd) return;
+        const distance = touchStart - touchEnd;
+        const isLeftSwipe = distance > minSwipeDistance;
+        const isRightSwipe = distance < -minSwipeDistance;
+
+        if (isLeftSwipe) navigateToPeriod(1);
+        if (isRightSwipe) navigateToPeriod(-1);
+    };
+
     // Render Card View
     const renderCardView = () => {
         return (
-            <>
-                {currentSchedule.schedule.map((shift, index) => (
-                    <DayCard
-                        key={index}
-                        isOffDay={shift.isOffDay}
-                        isToday={shift.isToday}
-                        onClick={() => onDayClick && onDayClick(shift, index, currentSchedule.schedule)}
-                        sx={{ cursor: 'pointer' }}
+            <Box sx={{ position: 'relative', width: '100%' }}>
+                {/* Left Chevron */}
+                {currentWeekIndex > 0 && (
+                    <IconButton
+                        onClick={() => navigateToPeriod(-1)}
+                        sx={{
+                            position: 'fixed',
+                            left: 0,
+                            top: '55%',
+                            zIndex: 10,
+                            backgroundColor: 'rgba(255,255,255,0.8)',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                            '&:hover': { backgroundColor: '#fff' }
+                        }}
                     >
-                        <CardContent>
-                            <DayHeader isToday={shift.isToday}>
-                                <Box>
-                                    <DayName isToday={shift.isToday}>
-                                        {shift.day}
-                                        {shift.isToday && ' (Today)'}
-                                    </DayName>
-                                    <DateText isToday={shift.isToday}>
-                                        {shift.date}
-                                    </DateText>
-                                </Box>
-                                {!shift.isOffDay && (
-                                    <StatusChip
-                                        label={statusInfo.label}
-                                        size="small"
-                                        icon={statusInfo.icon}
-                                        chipColor={statusInfo.color}
-                                    />
-                                )}
-                            </DayHeader>
+                        <ChevronLeftIcon />
+                    </IconButton>
+                )}
 
-                            {shift.isOffDay ? (
-                                <OffDayText>
-                                    Off Day
-                                </OffDayText>
-                            ) : (
-                                <>
-                                    <Divider sx={{
-                                        my: 1.5,
-                                        borderColor: shift.isToday ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.1)'
-                                    }} />
-                                    <ShiftDetails>
-                                        <TimeBox isToday={shift.isToday}>
-                                            <TimeLabel isToday={shift.isToday}>Start Time</TimeLabel>
-                                            <TimeValue isToday={shift.isToday}>{shift.startTime}</TimeValue>
-                                        </TimeBox>
-                                        <TimeBox isToday={shift.isToday}>
-                                            <TimeLabel isToday={shift.isToday}>End Time</TimeLabel>
-                                            <TimeValue isToday={shift.isToday}>{shift.endTime}</TimeValue>
-                                        </TimeBox>
-                                        <TimeBox isToday={shift.isToday}>
-                                            <TimeLabel isToday={shift.isToday}>Duration</TimeLabel>
-                                            <TimeValue isToday={shift.isToday}>{shift.duration}</TimeValue>
-                                        </TimeBox>
-                                    </ShiftDetails>
-                                </>
-                            )}
-                        </CardContent>
-                    </DayCard>
-                ))}
-            </>
+                {/* Right Chevron */}
+                {currentWeekIndex < weekKeys.length - 1 && (
+                    <IconButton
+                        onClick={() => navigateToPeriod(1)}
+                        sx={{
+                            position: 'fixed',
+                            right: 0,
+                            top: '55%',
+                            zIndex: 10,
+                            backgroundColor: 'rgba(255,255,255,0.8)',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                            '&:hover': { backgroundColor: '#fff' }
+                        }}
+                    >
+                        <ChevronRightIcon />
+                    </IconButton>
+                )}
+
+                <Box
+                    onTouchStart={onTouchStart}
+                    onTouchMove={onTouchMove}
+                    onTouchEnd={onTouchEnd}
+                >
+                    {currentSchedule.schedule.map((shift, index) => (
+                        <DayCard
+                            key={index}
+                            isOffDay={shift.isOffDay}
+                            isToday={shift.isToday}
+                            onClick={() => onDayClick && onDayClick(shift, index, currentSchedule.schedule)}
+                            sx={{ cursor: 'pointer' }}
+                        >
+                            <CardContent>
+                                <DayHeader isToday={shift.isToday}>
+                                    <Box>
+                                        <DayName isToday={shift.isToday}>
+                                            {shift.day}
+                                            {shift.isToday && ' (Today)'}
+                                        </DayName>
+                                        <DateText isToday={shift.isToday}>
+                                            {shift.date}
+                                        </DateText>
+                                    </Box>
+                                    {!shift.isOffDay && (
+                                        <StatusChip
+                                            label={statusInfo.label}
+                                            size="small"
+                                            icon={statusInfo.icon}
+                                            chipColor={statusInfo.color}
+                                        />
+                                    )}
+                                </DayHeader>
+
+                                {shift.isOffDay ? (
+                                    <OffDayText>
+                                        Off Day
+                                    </OffDayText>
+                                ) : (
+                                    <>
+                                        <Divider sx={{
+                                            my: 1.5,
+                                            borderColor: shift.isToday ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.1)'
+                                        }} />
+                                        <ShiftDetails>
+                                            <TimeBox isToday={shift.isToday}>
+                                                <TimeLabel isToday={shift.isToday}>Start Time</TimeLabel>
+                                                <TimeValue isToday={shift.isToday}>{shift.startTime}</TimeValue>
+                                            </TimeBox>
+                                            <TimeBox isToday={shift.isToday}>
+                                                <TimeLabel isToday={shift.isToday}>End Time</TimeLabel>
+                                                <TimeValue isToday={shift.isToday}>{shift.endTime}</TimeValue>
+                                            </TimeBox>
+                                            <TimeBox isToday={shift.isToday}>
+                                                <TimeLabel isToday={shift.isToday}>Duration</TimeLabel>
+                                                <TimeValue isToday={shift.isToday}>{shift.duration}</TimeValue>
+                                            </TimeBox>
+                                        </ShiftDetails>
+                                    </>
+                                )}
+                            </CardContent>
+                        </DayCard>
+                    ))}
+                </Box>
+            </Box>
         );
     };
 
@@ -674,33 +1029,67 @@ const SchedulePage = ({ onDayClick }) => {
             {/* Title + Filters in one horizontal scrolling row */}
             <FilterRow>
                 <PageTitle>My Schedule</PageTitle>
-                <FilterChipSelect size="small">
-                    <Select
-                        value={selectedWeek}
-                        onChange={handleWeekChange}
-                        displayEmpty
-                    >
-                        <MenuItem value="prev1">{scheduleData.prev1.label}</MenuItem>
-                        <MenuItem value="current">{scheduleData.current.label}</MenuItem>
-                        <MenuItem value="next">{scheduleData.next.label}</MenuItem>
-                    </Select>
-                </FilterChipSelect>
+
+                {viewMode === 'calendar' ? (
+                    // Stable Month/Year chip for Calendar View (replaces Select to prevent shifting)
+                    <Box sx={{
+                        height: 32,
+                        borderRadius: 20,
+                        backgroundColor: '#fff',
+                        border: '1px solid #e0e0e0',
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                        color: '#667eea',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        px: 2,
+                        flexShrink: 0,
+                        minWidth: '160px', // Match typical width of the selector
+                    }}>
+                        {MONTH_NAMES[calendarMonth]} {calendarYear}
+                    </Box>
+                ) : (
+                    <FilterChipSelect size="small">
+                        <Select
+                            value={selectedWeek}
+                            onChange={handleWeekChange}
+                            displayEmpty
+                        >
+                            <MenuItem value="prev1">{scheduleData.prev1.label}</MenuItem>
+                            <MenuItem value="current">{scheduleData.current.label}</MenuItem>
+                            <MenuItem value="next">{scheduleData.next.label}</MenuItem>
+                        </Select>
+                    </FilterChipSelect>
+                )}
+
+                <FilterChip
+                    label="Calendar"
+                    icon={<CalendarIcon />}
+                    selected={viewMode === 'calendar'}
+                    onClick={() => setViewMode('calendar')}
+                />
                 <FilterChip
                     label="Cards"
                     icon={<CardViewIcon />}
                     selected={viewMode === 'cards'}
                     onClick={() => setViewMode('cards')}
                 />
-                <FilterChip
-                    label="Timeline"
-                    icon={<TimelineIcon />}
-                    selected={viewMode === 'timeline'}
-                    onClick={() => setViewMode('timeline')}
-                />
+                {/* Timeline view (hidden, code retained) */}
+                {false && (
+                    <FilterChip
+                        label="Timeline"
+                        icon={<TimelineIcon />}
+                        selected={viewMode === 'timeline'}
+                        onClick={() => setViewMode('timeline')}
+                    />
+                )}
             </FilterRow>
 
             {/* Render View Based on Mode */}
-            {viewMode === 'timeline' ? renderTimelineView() : renderCardView()}
+            {viewMode === 'calendar' && renderCalendarView()}
+            {viewMode === 'timeline' && renderTimelineView()}
+            {viewMode === 'cards' && renderCardView()}
         </ScheduleContainer>
     );
 };

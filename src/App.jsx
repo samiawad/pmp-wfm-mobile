@@ -16,8 +16,16 @@ import './App.css';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
+  const [requestsTab, setRequestsTab] = useState(0);
   const [selectedDayData, setSelectedDayData] = useState(null);
   const [scheduleList, setScheduleList] = useState([]);
+
+  const handleNotificationClick = (page, tabIndex = 0) => {
+    setCurrentPage(page);
+    if (page === 'requests') {
+      setRequestsTab(tabIndex);
+    }
+  };
 
   const handleDayClick = (dayData, index, schedule) => {
     setSelectedDayData(dayData);
@@ -38,7 +46,7 @@ function App() {
   return (
     <AppLayout currentPage={currentPage} onPageChange={setCurrentPage}>
       <div className="app-container">
-        {currentPage === 'home' && <HomeDashboard />}
+        {currentPage === 'home' && <HomeDashboard onAction={handleNotificationClick} onPageChange={setCurrentPage} />}
         {currentPage === 'schedule' && <SchedulePage onDayClick={handleDayClick} />}
         {currentPage === 'dayTimeline' && (
           <DayTimelinePage
@@ -51,7 +59,7 @@ function App() {
         {currentPage === 'performance' && <PerformancePage />}
         {currentPage === 'activities' && <ActivitiesPage />}
         {currentPage === 'coaching' && <CoachingPage />}
-        {currentPage === 'requests' && <RequestsPage />}
+        {currentPage === 'requests' && <RequestsPage defaultTab={requestsTab} />}
         {currentPage === 'rewards' && <RewardsPage />}
         {currentPage === 'evaluations' && <EvaluationsPage />}
         {currentPage === 'disputes' && <DisputesPage />}

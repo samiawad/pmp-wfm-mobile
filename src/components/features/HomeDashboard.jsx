@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import {
     Box,
@@ -9,6 +10,8 @@ import {
     Grid,
     Avatar,
     Divider,
+    Button,
+    IconButton,
 } from '@mui/material';
 import {
     CalendarMonth as CalendarIcon,
@@ -18,6 +21,10 @@ import {
     CheckCircle as CheckIcon,
     Warning as WarningIcon,
     Phone as PhoneIcon,
+    NotificationsActive as AlertIcon,
+    ChevronLeft as ChevronLeftIcon,
+    ChevronRight as ChevronRightIcon,
+    SwapHoriz as SwapIcon,
 } from '@mui/icons-material';
 
 // ============================================
@@ -30,16 +37,6 @@ const DashboardContainer = styled(Box)({
     minHeight: '100%',
 });
 
-const WelcomeSection = styled(Box)({
-    marginBottom: 16,
-});
-
-const WelcomeTitle = styled(Typography)({
-    fontWeight: 700,
-    fontSize: '1.25rem',
-    color: '#1a1a1a',
-    marginBottom: 4,
-});
 
 // Modern Card with gradient
 const ModernCard = styled(Card)(({ gradient }) => ({
@@ -136,22 +133,150 @@ const ActionItemBox = styled(Box)({
     },
 });
 
+const BannerCard = styled(Card)(({ theme }) => ({
+    background: 'linear-gradient(135deg, #FF512F 0%, #DD2476 100%)',
+    borderRadius: 16,
+    color: 'white',
+    marginBottom: 20,
+    position: 'relative',
+    overflow: 'hidden',
+    boxShadow: '0 8px 24px rgba(221, 36, 118, 0.25)',
+    border: 'none',
+}));
+
+const BannerDot = styled(Box)(({ active }) => ({
+    width: 6,
+    height: 6,
+    borderRadius: '50%',
+    backgroundColor: active ? '#fff' : 'rgba(255,255,255,0.4)',
+    transition: 'all 0.3s ease',
+}));
+
 // ============================================
 // Component
 // ============================================
 
-const HomeDashboard = () => {
+const HomeDashboard = ({ onAction, onPageChange }) => {
+    const [currentAnnouncement, setCurrentAnnouncement] = useState(0);
+    const [touchStart, setTouchStart] = useState(null);
+    const [touchEnd, setTouchEnd] = useState(null);
+
+    const announcements = [
+        {
+            id: 1,
+            title: "Pending Shift Swap",
+            message: "You have an incoming shift swap request from Omar Jabri that needs action.",
+            icon: <SwapIcon />,
+            actionLabel: "View Request",
+            target: 'requests',
+            tabIndex: 3 // Incoming Tab
+        },
+        {
+            id: 2,
+            title: "New Evaluation",
+            message: "Your Q1 Performance Evaluation is now available for review and feedback.",
+            icon: <TrophyIcon />,
+            actionLabel: "Open Dashboard",
+            target: 'performance'
+        },
+        {
+            id: 3,
+            title: "General Alert",
+            message: "Team Meeting scheduled for 3:00 PM in Conference Room B.",
+            icon: <AlertIcon />,
+            actionLabel: "Dismiss",
+            target: null
+        }
+    ];
+
+    const handleNext = () => {
+        setCurrentAnnouncement((prev) => (prev + 1) % announcements.length);
+    };
+
+    const handlePrev = () => {
+        setCurrentAnnouncement((prev) => (prev - 1 + announcements.length) % announcements.length);
+    };
+
+    const onTouchStart = (e) => {
+        setTouchEnd(null);
+        setTouchStart(e.targetTouches[0].clientX);
+    };
+
+    const onTouchMove = (e) => setTouchEnd(e.targetTouches[0].clientX);
+
+    const onTouchEnd = () => {
+        if (!touchStart || !touchEnd) return;
+        const distance = touchStart - touchEnd;
+        const minSwipeDistance = 50;
+        if (distance > minSwipeDistance) handleNext();
+        if (distance < -minSwipeDistance) handlePrev();
+    };
+
+    const current = announcements[currentAnnouncement];
+
     return (
         <DashboardContainer>
-            {/* Welcome Section */}
-            <WelcomeSection>
-                <WelcomeTitle>
-                    Welcome back, Wael
-                </WelcomeTitle>
-                <Typography variant="body2" sx={{ color: '#666', fontSize: '0.85rem' }}>
-                    Here's your performance overview for today
-                </Typography>
-            </WelcomeSection>
+
+            {/* Announcement Banner (Toaster-style) */}
+            <BannerCard
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
+            >
+                <CardContent sx={{ p: 2, '&:last-child': { pb: 1.5 } }}>
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
+                        <Box sx={{
+                            backgroundColor: 'rgba(255,255,255,0.2)',
+                            borderRadius: '12px',
+                            p: 1,
+                            display: 'flex',
+                            color: '#fff'
+                        }}>
+                            {current.icon}
+                        </Box>
+                        <Box sx={{ flexGrow: 1 }}>
+                            <Typography sx={{ fontWeight: 800, fontSize: '0.95rem', mb: 0.2 }}>
+                                {current.title}
+                            </Typography>
+                            <Typography sx={{ fontSize: '0.8rem', opacity: 0.95, lineHeight: 1.4, mb: 1.5 }}>
+                                {current.message}
+                            </Typography>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <Button
+                                    variant="contained"
+                                    size="small"
+                                    onClick={() => {
+                                        if (current.target) {
+                                            if (onAction) {
+                                                onAction(current.target, current.tabIndex);
+                                            } else if (onPageChange) {
+                                                onPageChange(current.target);
+                                            }
+                                        }
+                                    }}
+                                    sx={{
+                                        backgroundColor: '#fff',
+                                        color: '#DD2476',
+                                        fontWeight: 700,
+                                        textTransform: 'none',
+                                        borderRadius: '8px',
+                                        px: 2,
+                                        '&:hover': { backgroundColor: 'rgba(255,255,255,0.9)' }
+                                    }}
+                                >
+                                    {current.actionLabel}
+                                </Button>
+
+                                <Box sx={{ display: 'flex', gap: 0.5 }}>
+                                    {announcements.map((_, idx) => (
+                                        <BannerDot key={idx} active={idx === currentAnnouncement} />
+                                    ))}
+                                </Box>
+                            </Box>
+                        </Box>
+                    </Box>
+                </CardContent>
+            </BannerCard>
 
             {/* Next Shift Card */}
             <ModernCard gradient="linear-gradient(135deg, #667eea 0%, #764ba2 100%)">

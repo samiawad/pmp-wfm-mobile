@@ -105,7 +105,7 @@ const RewardsPage = () => {
             <PageHeader>
                 <PageTitle variant="h4">Rewards & Gamification</PageTitle>
                 <Typography variant="body1" color="text.secondary">
-                    Level 5 • 10,800 Points
+                    Level 5 - 10,800 Points
                 </Typography>
             </PageHeader>
 
