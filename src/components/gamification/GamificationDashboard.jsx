@@ -66,7 +66,7 @@ const GamificationDashboard = () => {
                     }}
                 >
                     <Tab label="Competitions" />
-                    <Tab label="Trophy Case" />
+                    <Tab label="Trophies" />
                     <Tab label="Hall of Fame" />
                 </Tabs>
             </Box>

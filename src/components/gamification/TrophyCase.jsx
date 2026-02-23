@@ -74,8 +74,8 @@ const TrophyCase = ({ viewedUser }) => {
                 </Box>
             </ProfileHeader>
 
-            <Grid container spacing={4}>
-                <Grid item xs={12} md={8}>
+            <Grid container spacing={{ xs: 2, md: 4 }} disableEqualOverflow>
+                <Grid item sx={{ width: '100%' }}>
                     <Typography variant="h5" sx={{ mb: 3, fontWeight: 700, color: 'var(--text-primary)' }}>
                         Trophy Collection
                     </Typography>
