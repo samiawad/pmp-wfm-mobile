@@ -6,7 +6,7 @@ import ActivitiesPage from './components/features/ActivitiesPage';
 import CoachingPage from './components/features/CoachingPage';
 import RequestsPage from './components/features/RequestsPage';
 import EvaluationsPage from './components/features/EvaluationsPage';
-import RewardsPage from './components/features/RewardsPage';
+import GamificationDashboard from './components/gamification/GamificationDashboard';
 import DisputesPage from './components/features/DisputesPage';
 import LogsPage from './components/features/LogsPage';
 import EventsPage from './components/features/EventsPage';
@@ -19,6 +19,8 @@ function App() {
   const [requestsTab, setRequestsTab] = useState(0);
   const [activitiesFilter, setActivitiesFilter] = useState('All');
   const [selectedKPI, setSelectedKPI] = useState(null);
+  const [selectedDayData, setSelectedDayData] = useState(null);
+  const [scheduleList, setScheduleList] = useState([]);
 
   const handleNotificationClick = (page, tabIndexOrFilter = 0) => {
     setCurrentPage(page);
@@ -79,7 +81,7 @@ function App() {
         {currentPage === 'activities' && <ActivitiesPage initialFilter={activitiesFilter} />}
 
         {currentPage === 'requests' && <RequestsPage defaultTab={requestsTab} />}
-        {currentPage === 'rewards' && <RewardsPage />}
+        {currentPage === 'rewards' && <GamificationDashboard />}
         {currentPage === 'evaluations' && <ActivitiesPage initialFilter="Evaluations" />}
         {currentPage === 'disputes' && <RequestsPage defaultTab={4} />}
         {currentPage === 'events' && <ActivitiesPage initialFilter="Events" />}
