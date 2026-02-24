@@ -506,7 +506,9 @@ const ActivitiesPage = ({ initialFilter = 'All' }) => {
                                     size="small"
                                     sx={{ mr: 1 }}
                                 />
-
+                                <Typography sx={{ fontWeight: filterCategory === cat ? 700 : 500 }}>
+                                    {cat}
+                                </Typography>
                             </ListItemButton>
                         </ListItem>
                     ))}

@@ -2,82 +2,75 @@ import React from 'react';
 import { Box, Typography, styled, Avatar } from '@mui/material';
 import UserHoverCard from './UserHoverCard';
 
-const getLevelStyles = (level) => {
-    if (level >= 50) return { frameColor: '#9E9E9E', glow: 'none', gradient: 'none', badge: 'Platinum' };
-    if (level >= 30) return { frameColor: '#FFD700', glow: 'none', gradient: 'none', badge: 'Gold' };
-    if (level >= 15) return { frameColor: '#C0C0C0', glow: 'none', gradient: 'none', badge: 'Silver' };
-    return { frameColor: '#8B5A2B', glow: 'none', gradient: 'none', badge: 'Wood' };
-};
+// Left border color is always the neutral wood tone for rank 4+;
+// top-3 are shown on the podium, not in rows.
+const getLevelStyles = () => ({ frameColor: '#8B5A2B' });
 
 const RowContainer = styled(Box)(({ theme, levelStyles }) => ({
     display: 'flex',
     alignItems: 'center',
-    padding: theme.spacing(2),
+    padding: theme.spacing(1.25, 1.5),
     background: 'var(--surface-color)',
-    // backgroundImage: levelStyles.gradient, // Removed as gradient is 'none'
-    borderRadius: 12,
+    borderRadius: 10,
     border: `1px solid var(--border-color)`,
-    borderLeft: `4px solid ${levelStyles.frameColor}`,
+    borderLeft: `3px solid ${levelStyles.frameColor}`,
     transition: 'all 0.2s ease',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+    boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
     cursor: 'pointer',
     '&:hover': {
-        transform: 'translateX(5px)',
+        transform: 'translateX(4px)',
         backgroundColor: 'var(--bg-color)',
-        borderColor: levelStyles.frameColor,
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+        boxShadow: '0 3px 10px rgba(0,0,0,0.08)',
     }
 }));
 
-const AvatarFrame = styled(Box)(({ color, glow }) => ({
-    width: 52,
-    height: 52,
-    borderRadius: '50%',
-    padding: 2,
-    background: `linear-gradient(135deg, ${color} 0%, transparent 100%)`,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    boxShadow: glow,
-}));
-
-const RankNumber = styled(Typography)({
-    width: 40,
-    fontWeight: 800,
-    fontSize: '1.2rem',
-    color: 'var(--text-secondary)',
-    textAlign: 'center',
-});
-
 const LeaderboardRow = ({ user, onClick }) => {
     const styles = getLevelStyles(user.level);
-
     return (
         <UserHoverCard user={user} styles={styles}>
             <RowContainer levelStyles={styles} onClick={onClick}>
-                <RankNumber>#{user.rank}</RankNumber>
 
-                <AvatarFrame color={styles.frameColor} glow={styles.glow} sx={{ mr: 2, ml: 1 }}>
-                    <Avatar src={user.avatar} sx={{ width: 44, height: 44 }} />
-                </AvatarFrame>
+                {/* Rank */}
+                <Typography sx={{
+                    width: 28, fontWeight: 800, fontSize: '0.8rem',
+                    color: 'var(--text-secondary)', textAlign: 'center', flexShrink: 0,
+                }}>
+                    #{user.rank}
+                </Typography>
 
-                <Box sx={{ flexGrow: 1 }}>
-                    <Typography variant="h6" sx={{ fontWeight: 700, color: 'var(--text-primary)' }}>
+                {/* Avatar — no colored border */}
+                <Avatar src={user.avatar} sx={{ width: 38, height: 38, mx: 1.25, flexShrink: 0 }} />
+
+                {/* Name + Milestone (competition-tied) */}
+                <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                    <Typography sx={{
+                        fontWeight: 700, fontSize: '0.82rem',
+                        color: 'var(--text-primary)', lineHeight: 1.2,
+                        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                    }}>
                         {user.name}
                     </Typography>
-                    <Typography variant="caption" sx={{ color: styles.frameColor, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
-                        {styles.badge} Tier
+                    <Typography sx={{ fontSize: '0.68rem', color: 'var(--text-secondary)', mt: 0.25 }}>
+                        Milestone{' '}
+                        <Box component="span" sx={{ fontWeight: 700, color: styles.frameColor }}>
+                            {user.milestone ?? '—'}
+                        </Box>
                     </Typography>
                 </Box>
 
-                <Box sx={{ textAlign: 'right', mr: 2 }}>
-                    <Typography variant="h6" sx={{ fontWeight: 900, color: 'var(--primary-color)' }}>
-                        Lvl {user.level}
+                {/* Level (permanent) + Gold earned */}
+                <Box sx={{ textAlign: 'right', flexShrink: 0, ml: 1 }}>
+                    <Typography sx={{
+                        fontWeight: 700, fontSize: '0.78rem',
+                        color: 'var(--primary-color)', lineHeight: 1.2,
+                    }}>
+                        Lv. {user.level}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: 'var(--text-secondary)' }}>
-                        {user.totalGold.toLocaleString()} Gold
+                    <Typography sx={{ fontSize: '0.65rem', color: 'var(--text-secondary)', mt: 0.2 }}>
+                        {user.totalGold.toLocaleString()} G
                     </Typography>
                 </Box>
+
             </RowContainer>
         </UserHoverCard>
     );

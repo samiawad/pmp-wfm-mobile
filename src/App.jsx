@@ -28,9 +28,6 @@ function App() {
       setRequestsTab(tabIndexOrFilter);
     } else if (page === 'activities') {
       setActivitiesFilter(tabIndexOrFilter);
-    } else if (page === 'coaching') {
-      setCurrentPage('activities'); // Redirect to Activities
-      setActivitiesFilter('Coaching');
     } else if (page === 'evaluations') {
       setCurrentPage('activities'); // Redirect to Activities
       setActivitiesFilter('Evaluations');
@@ -79,6 +76,7 @@ function App() {
         {currentPage === 'performance' && <PerformancePage onKPIClick={handleKPIClick} />}
         {currentPage === 'performanceDetails' && <PerformancePage selectedKPI={selectedKPI} onBack={handleBackFromKPI} />}
         {currentPage === 'activities' && <ActivitiesPage initialFilter={activitiesFilter} />}
+        {currentPage === 'coaching' && <CoachingPage />}
 
         {currentPage === 'requests' && <RequestsPage defaultTab={requestsTab} />}
         {currentPage === 'rewards' && <GamificationDashboard />}
