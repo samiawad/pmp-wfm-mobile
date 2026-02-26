@@ -461,7 +461,10 @@ const SchedulePage = ({ onDayClick }) => {
 
     const [selectedWeek, setSelectedWeek] = useState('current');
     const [viewMode, setViewMode] = useState(getInitialView);
-    const [periodSheetOpen, setPeriodSheetOpen] = useState(false);
+    const [periodSheetOpen, setPeriodSheetOpen] = useState(() => {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('period') === 'selector';
+    });
 
     // Sync page=schedule and view= with URL whenever viewMode changes
     useEffect(() => {
