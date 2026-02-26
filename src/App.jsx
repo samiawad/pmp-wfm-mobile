@@ -5,7 +5,14 @@ import PerformancePage from './components/features/PerformancePage';
 import ActivitiesPage from './components/features/ActivitiesPage';
 import RequestsPage from './components/features/RequestsPage';
 import EvaluationsPage from './components/features/EvaluationsPage';
+<<<<<<< HEAD
 import GamificationDashboard from './components/gamification/GamificationDashboard';
+=======
+import RewardsPage from './components/features/RewardsPage';
+import DisputesPage from './components/features/DisputesPage';
+import LogsPage from './components/features/LogsPage';
+import EventsPage from './components/features/EventsPage';
+>>>>>>> parent of f359df4 (Competitions change)
 import DayTimelinePage from './components/features/DayTimelinePage';
 import AppLayout from './components/layout/AppLayout';
 import useUrlState from './hooks/useUrlState';
@@ -71,6 +78,7 @@ function App() {
   const [requestsTab, setRequestsTab] = useState(0);
   const [activitiesFilter, setActivitiesFilter] = useState('All');
   const [selectedKPI, setSelectedKPI] = useState(null);
+<<<<<<< HEAD
 
   // For dayTimeline: use URL-injected mock data if driven by ?view=dayTimeline
   const [selectedDayData, setSelectedDayData] = useState(
@@ -100,6 +108,8 @@ function App() {
     params.set('view', 'activities');
     window.history.pushState({}, '', `?${params.toString()}`);
   };
+=======
+>>>>>>> parent of f359df4 (Competitions change)
 
   const handleNotificationClick = (page, tabIndexOrFilter = 0) => {
 <<<<<<< HEAD
@@ -189,6 +199,7 @@ function App() {
 
 >>>>>>> fd0f6baee8b068cfb6340cd9bb2fe737188e1707
         {currentPage === 'requests' && <RequestsPage defaultTab={requestsTab} />}
+<<<<<<< HEAD
         {currentPage === 'rewards' && (
           <GamificationDashboard
             initialTab={urlState.tab || urlState.view}
@@ -198,6 +209,10 @@ function App() {
         )}
         {currentPage === 'coaching' && <ActivitiesPage initialFilter="Coaching" />}
         {currentPage === 'evaluations' && <EvaluationsPage />}
+=======
+        {currentPage === 'rewards' && <RewardsPage />}
+        {currentPage === 'evaluations' && <ActivitiesPage initialFilter="Evaluations" />}
+>>>>>>> parent of f359df4 (Competitions change)
         {currentPage === 'disputes' && <RequestsPage defaultTab={4} />}
         {currentPage === 'events' && <ActivitiesPage initialFilter="Events" />}
         {currentPage === 'logs' && <ActivitiesPage initialFilter="Logs" />}
