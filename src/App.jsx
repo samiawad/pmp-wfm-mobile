@@ -6,10 +6,20 @@ import ActivitiesPage from './components/features/ActivitiesPage';
 import CoachingPage from './components/features/CoachingPage';
 import RequestsPage from './components/features/RequestsPage';
 import EvaluationsPage from './components/features/EvaluationsPage';
+<<<<<<< HEAD
 import GamificationDashboard from './components/gamification/GamificationDashboard';
+<<<<<<< HEAD
+=======
+import RewardsPage from './components/features/RewardsPage';
 import DisputesPage from './components/features/DisputesPage';
 import LogsPage from './components/features/LogsPage';
 import EventsPage from './components/features/EventsPage';
+>>>>>>> parent of f359df4 (Competitions change)
+=======
+import DisputesPage from './components/features/DisputesPage';
+import LogsPage from './components/features/LogsPage';
+import EventsPage from './components/features/EventsPage';
+>>>>>>> parent of 06e16e3 (Will revert this commit)
 import DayTimelinePage from './components/features/DayTimelinePage';
 import AppLayout from './components/layout/AppLayout';
 import './App.css';
@@ -54,15 +64,73 @@ function App() {
   const [requestsTab, setRequestsTab] = useState(0);
   const [activitiesFilter, setActivitiesFilter] = useState('All');
   const [selectedKPI, setSelectedKPI] = useState(null);
+<<<<<<< HEAD
   const [selectedDayData, setSelectedDayData] = useState(initial.selectedDayData || null);
   const [scheduleList, setScheduleList] = useState(initial.scheduleList || []);
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+
+  // For dayTimeline: use URL-injected mock data if driven by ?view=dayTimeline
+  const [selectedDayData, setSelectedDayData] = useState(
+    urlState.view === 'dayTimeline' ? MOCK_DAY_DATA : null
+  );
+  const [scheduleList, setScheduleList] = useState(
+    urlState.view === 'dayTimeline' ? MOCK_SCHEDULE_LIST : []
+  );
+
+  /**
+   * navigateTo — single source of truth for ALL page changes.
+   * Updates React state AND pushes ?view=<page> into the browser URL bar.
+   */
+  const navigateTo = (page, extra = {}) => {
+    setCurrentPage(page);
+    const params = new URLSearchParams();
+    params.set('view', page);
+    Object.entries(extra).forEach(([k, v]) => params.set(k, v));
+    window.history.pushState({}, '', `?${params.toString()}`);
+  };
+
+  // Navigate to ActivitiesPage with a specific filter in one atomic step
+  const navigateToActivities = (filter) => {
+    setActivitiesFilter(filter);
+    setCurrentPage('activities');
+    const params = new URLSearchParams();
+    params.set('view', 'activities');
+    window.history.pushState({}, '', `?${params.toString()}`);
+  };
+=======
+>>>>>>> parent of f359df4 (Competitions change)
 
   const handleNotificationClick = (page, tabIndexOrFilter = 0) => {
+<<<<<<< HEAD
+    if (page === 'coaching') {
+      navigateToActivities('Coaching');
+=======
     setCurrentPage(page);
     if (page === 'requests') {
       setRequestsTab(tabIndexOrFilter);
     } else if (page === 'activities') {
       setActivitiesFilter(tabIndexOrFilter);
+>>>>>>> fd0f6baee8b068cfb6340cd9bb2fe737188e1707
+    } else if (page === 'evaluations') {
+      navigateToActivities('Evaluations');
+    } else if (page === 'requests') {
+=======
+  const [selectedDayData, setSelectedDayData] = useState(null);
+  const [scheduleList, setScheduleList] = useState([]);
+>>>>>>> 15c05d1f88003ff72f4d465781c28d18c9888bb0
+
+  const handleNotificationClick = (page, tabIndexOrFilter = 0) => {
+    setCurrentPage(page);
+    if (page === 'requests') {
+>>>>>>> parent of 06e16e3 (Will revert this commit)
+      setRequestsTab(tabIndexOrFilter);
+    } else if (page === 'activities') {
+      setActivitiesFilter(tabIndexOrFilter);
+    } else if (page === 'coaching') {
+      setCurrentPage('activities'); // Redirect to Activities
+      setActivitiesFilter('Coaching');
     } else if (page === 'evaluations') {
       setCurrentPage('activities');
       setActivitiesFilter('Evaluations');
@@ -111,11 +179,33 @@ function App() {
         {currentPage === 'performance' && <PerformancePage onKPIClick={handleKPIClick} />}
         {currentPage === 'performanceDetails' && <PerformancePage selectedKPI={selectedKPI} onBack={handleBackFromKPI} />}
         {currentPage === 'activities' && <ActivitiesPage initialFilter={activitiesFilter} />}
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
         {currentPage === 'coaching' && <CoachingPage />}
+
+>>>>>>> fd0f6baee8b068cfb6340cd9bb2fe737188e1707
+        {currentPage === 'requests' && <RequestsPage defaultTab={requestsTab} />}
+<<<<<<< HEAD
+        {currentPage === 'rewards' && (
+          <GamificationDashboard
+            initialTab={urlState.tab || urlState.view}
+            initialOverlay={urlState.overlay}
+            isUrlDriven={urlState.isUrlDriven}
+          />
+        )}
+        {currentPage === 'coaching' && <ActivitiesPage initialFilter="Coaching" />}
+        {currentPage === 'evaluations' && <EvaluationsPage />}
+=======
+        {currentPage === 'rewards' && <RewardsPage />}
+        {currentPage === 'evaluations' && <ActivitiesPage initialFilter="Evaluations" />}
+>>>>>>> parent of f359df4 (Competitions change)
+=======
 
         {currentPage === 'requests' && <RequestsPage defaultTab={requestsTab} />}
         {currentPage === 'rewards' && <GamificationDashboard />}
         {currentPage === 'evaluations' && <ActivitiesPage initialFilter="Evaluations" />}
+>>>>>>> parent of 06e16e3 (Will revert this commit)
         {currentPage === 'disputes' && <RequestsPage defaultTab={4} />}
         {currentPage === 'events' && <ActivitiesPage initialFilter="Events" />}
         {currentPage === 'logs' && <ActivitiesPage initialFilter="Logs" />}
