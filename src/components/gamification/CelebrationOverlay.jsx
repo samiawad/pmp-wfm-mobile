@@ -6,6 +6,11 @@ const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
+// No-op transition for static/URL-driven capture (Figma scraper)
+const NoTransition = React.forwardRef(function NoTransition({ children }, ref) {
+    return React.cloneElement(children, { ref });
+});
+
 // Particle Effect CSS handled via styled component animations
 const CelebrationBox = styled(Box)(({ theme }) => ({
     background: 'linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%)',
@@ -18,17 +23,17 @@ const CelebrationBox = styled(Box)(({ theme }) => ({
     color: '#FFFFFF',
 }));
 
-const GlowIcon = styled(PremiumIcon)({
+const GlowIcon = styled(PremiumIcon)(({ staticmode }) => ({
     fontSize: 100,
     color: '#FFF',
     filter: 'drop-shadow(0 0 20px rgba(255, 255, 255, 0.8))',
-    animation: 'pulse 2s infinite',
+    animation: staticmode ? 'none' : 'pulse 2s infinite',
     '@keyframes pulse': {
         '0%': { transform: 'scale(1)', filter: 'drop-shadow(0 0 20px rgba(255, 255, 255, 0.8))' },
         '50%': { transform: 'scale(1.1)', filter: 'drop-shadow(0 0 30px rgba(255, 255, 255, 1))' },
         '100%': { transform: 'scale(1)', filter: 'drop-shadow(0 0 20px rgba(255, 255, 255, 0.8))' }
     }
-});
+}));
 
 const Particle = styled('div')(({ tx, ty, duration, delay, color }) => ({
     position: 'absolute',
@@ -67,11 +72,11 @@ const ParticlesContainer = () => {
     return <Box sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>{particles}</Box>;
 };
 
-const CelebrationOverlay = ({ open, onClose, title, message }) => {
+const CelebrationOverlay = ({ open, onClose, title, message, staticMode = false }) => {
     return (
         <Dialog
             open={open}
-            TransitionComponent={Transition}
+            TransitionComponent={staticMode ? NoTransition : Transition}
             keepMounted
             onClose={onClose}
             PaperProps={{
@@ -84,7 +89,7 @@ const CelebrationOverlay = ({ open, onClose, title, message }) => {
         >
             <CelebrationBox>
                 <ParticlesContainer />
-                <GlowIcon sx={{ mb: 2 }} />
+                <GlowIcon sx={{ mb: 2 }} staticmode={staticMode ? 1 : 0} />
                 <Typography variant="h3" sx={{ fontWeight: 900, textTransform: 'uppercase', letterSpacing: 2, mb: 1, textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
                     {title}
                 </Typography>

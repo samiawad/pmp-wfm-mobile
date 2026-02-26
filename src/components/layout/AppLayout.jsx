@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import {
     Box, IconButton, AppBar, Toolbar, Typography,
@@ -170,7 +170,7 @@ const NotificationItem = styled(ListItem)(({ theme, unread }) => ({
     },
 }));
 
-const AppLayout = ({ children, currentPage, onPageChange }) => {
+const AppLayout = ({ children, currentPage, onPageChange, urlState = {} }) => {
     const [moreDrawerOpen, setMoreDrawerOpen] = useState(false);
     const [disputeModalOpen, setDisputeModalOpen] = useState(false);
     const [vacationModalOpen, setVacationModalOpen] = useState(false);
@@ -178,6 +178,16 @@ const AppLayout = ({ children, currentPage, onPageChange }) => {
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [notificationDrawerOpen, setNotificationDrawerOpen] = useState(false);
+
+    // URL-driven overlay: open immediately on mount with no animation
+    useEffect(() => {
+        if (urlState.overlay === 'more_menu') {
+            setMoreDrawerOpen(true);
+        }
+        if (urlState.overlay === 'notifications') {
+            setNotificationDrawerOpen(true);
+        }
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleBottomNavChange = (event, newValue) => {
         if (newValue === 'more') {
@@ -314,6 +324,7 @@ const AppLayout = ({ children, currentPage, onPageChange }) => {
                 onClose={handleMoreDrawerClose}
                 onOpen={handleMoreDrawerOpen}
                 disableSwipeToOpen
+                transitionDuration={urlState.isUrlDriven ? 0 : undefined}
                 PaperProps={{
                     sx: {
                         borderRadius: '20px 20px 0 0',

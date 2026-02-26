@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import {
     Box,
@@ -7,22 +7,25 @@ import {
     Typography,
     Chip,
     Divider,
-    Select,
-    MenuItem,
-    FormControl,
     Tooltip,
     IconButton,
+    SwipeableDrawer,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemText,
+    Radio,
 } from '@mui/material';
 import {
     AccessTime as ClockIcon,
     CheckCircle as CheckIcon,
-    EventAvailable as EventIcon,
     ViewModule as CardViewIcon,
     Timeline as TimelineIcon,
     TaskAlt as CompletedIcon,
     CalendarMonth as CalendarIcon,
     ChevronLeft as ChevronLeftIcon,
     ChevronRight as ChevronRightIcon,
+    ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material';
 
 // ============================================
@@ -250,20 +253,20 @@ const PageTitle = styled(Typography)({
     flexShrink: 0,
 });
 
-const FilterChipSelect = styled(FormControl)({
-    width: 'fit-content',
+const PeriodTriggerChip = styled(Box)({
+    height: 32,
+    borderRadius: 20,
+    border: '1px solid #e0e0e0',
+    backgroundColor: '#fff',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 4,
+    padding: '0 10px 0 12px',
+    cursor: 'pointer',
     flexShrink: 0,
-    '& .MuiOutlinedInput-root': {
-        height: 32,
-        borderRadius: 20,
-        backgroundColor: '#fff',
-        fontSize: '0.75rem',
-        '& fieldset': { borderColor: '#e0e0e0' },
-    },
-    '& .MuiSelect-select': {
-        padding: '4px 28px 4px 12px !important',
-        fontSize: '0.75rem',
-    },
+    whiteSpace: 'nowrap',
+    userSelect: 'none',
+    '&:active': { backgroundColor: '#f5f5f5' },
 });
 
 const FilterChip = styled(Chip)(({ selected }) => ({
@@ -467,9 +470,12 @@ const HourHeaderCell = styled(Box)(({ theme }) => ({
 // Component
 // ============================================
 
-const SchedulePage = ({ onDayClick }) => {
+const SchedulePage = ({ onDayClick, initialSubview = null, initialOverlay = null, isUrlDriven = false }) => {
     const [selectedWeek, setSelectedWeek] = useState('current');
-    const [viewMode, setViewMode] = useState('calendar'); // 'calendar', 'cards', or 'timeline'
+    const [viewMode, setViewMode] = useState(
+        initialSubview === 'cards' ? 'cards' : 'calendar'
+    ); // 'calendar', 'cards', or 'timeline'
+    const [periodSheetOpen, setPeriodSheetOpen] = useState(false);
 
     const MONTH_NAMES = useMemo(() => ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'], []);
 
@@ -487,8 +493,44 @@ const SchedulePage = ({ onDayClick }) => {
         }
     };
 
-    const handleWeekChange = (event) => {
-        setSelectedWeek(event.target.value);
+    const handleWeekChange = (weekKey) => {
+        setSelectedWeek(weekKey);
+        setPeriodSheetOpen(false);
+    };
+
+    // Open period selector immediately if URL-driven
+    useEffect(() => {
+        if (initialOverlay === 'period_selector') {
+            // Switch to cards view first (period selector only makes sense there)
+            setViewMode('cards');
+            setPeriodSheetOpen(true);
+        }
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    // Keep URL in sync when view mode changes
+    const switchViewMode = (mode) => {
+        setViewMode(mode);
+        const params = new URLSearchParams();
+        params.set('view', 'schedule');
+        if (mode !== 'calendar') params.set('subview', mode);
+        window.history.replaceState({}, '', `?${params.toString()}`);
+    };
+
+    const openPeriodSheet = () => {
+        setPeriodSheetOpen(true);
+        const params = new URLSearchParams();
+        params.set('view', 'schedule');
+        params.set('subview', 'cards');
+        params.set('overlay', 'period_selector');
+        window.history.replaceState({}, '', `?${params.toString()}`);
+    };
+
+    const closePeriodSheet = () => {
+        setPeriodSheetOpen(false);
+        const params = new URLSearchParams();
+        params.set('view', 'schedule');
+        params.set('subview', 'cards');
+        window.history.replaceState({}, '', `?${params.toString()}`);
     };
 
 
@@ -1050,30 +1092,25 @@ const SchedulePage = ({ onDayClick }) => {
                         {MONTH_NAMES[calendarMonth]} {calendarYear}
                     </Box>
                 ) : (
-                    <FilterChipSelect size="small">
-                        <Select
-                            value={selectedWeek}
-                            onChange={handleWeekChange}
-                            displayEmpty
-                        >
-                            <MenuItem value="prev1">{scheduleData.prev1.label}</MenuItem>
-                            <MenuItem value="current">{scheduleData.current.label}</MenuItem>
-                            <MenuItem value="next">{scheduleData.next.label}</MenuItem>
-                        </Select>
-                    </FilterChipSelect>
+                    <PeriodTriggerChip onClick={openPeriodSheet}>
+                        <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: '#333' }}>
+                            {currentSchedule.label.split(' (')[0]}
+                        </Typography>
+                        <ExpandMoreIcon sx={{ fontSize: 16, color: '#666' }} />
+                    </PeriodTriggerChip>
                 )}
 
                 <FilterChip
                     label="Calendar"
                     icon={<CalendarIcon />}
                     selected={viewMode === 'calendar'}
-                    onClick={() => setViewMode('calendar')}
+                    onClick={() => switchViewMode('calendar')}
                 />
                 <FilterChip
                     label="Cards"
                     icon={<CardViewIcon />}
                     selected={viewMode === 'cards'}
-                    onClick={() => setViewMode('cards')}
+                    onClick={() => switchViewMode('cards')}
                 />
                 {/* Timeline view (hidden, code retained) */}
                 {false && (
@@ -1081,7 +1118,7 @@ const SchedulePage = ({ onDayClick }) => {
                         label="Timeline"
                         icon={<TimelineIcon />}
                         selected={viewMode === 'timeline'}
-                        onClick={() => setViewMode('timeline')}
+                        onClick={() => switchViewMode('timeline')}
                     />
                 )}
             </FilterRow>
@@ -1090,6 +1127,39 @@ const SchedulePage = ({ onDayClick }) => {
             {viewMode === 'calendar' && renderCalendarView()}
             {viewMode === 'timeline' && renderTimelineView()}
             {viewMode === 'cards' && renderCardView()}
+
+            {/* Period Selector Bottom Sheet */}
+            <SwipeableDrawer
+                anchor="bottom"
+                open={periodSheetOpen}
+                onClose={closePeriodSheet}
+                onOpen={openPeriodSheet}
+                disableSwipeToOpen
+                transitionDuration={isUrlDriven ? 0 : undefined}
+                PaperProps={{ sx: { borderRadius: '20px 20px 0 0', paddingBottom: 'env(safe-area-inset-bottom, 16px)' } }}
+            >
+                <Box sx={{ width: 36, height: 4, borderRadius: 2, backgroundColor: '#d0d0d0', mx: 'auto', mt: 1.5, mb: 0.5 }} />
+                <Typography sx={{ fontWeight: 700, fontSize: '1rem', px: 2.5, pt: 1, pb: 1, color: '#1a1a1a' }}>
+                    Select Period
+                </Typography>
+                <List disablePadding sx={{ pb: 2 }}>
+                    {[{ key: 'prev1', ...scheduleData.prev1 }, { key: 'current', ...scheduleData.current }, { key: 'next', ...scheduleData.next }].map(({ key, label }) => (
+                        <ListItem disablePadding key={key}>
+                            <ListItemButton onClick={() => handleWeekChange(key)} sx={{ px: 3 }}>
+                                <Radio
+                                    checked={selectedWeek === key}
+                                    size="small"
+                                    sx={{ color: '#667eea', '&.Mui-checked': { color: '#667eea' }, mr: 1 }}
+                                />
+                                <ListItemText
+                                    primary={label}
+                                    primaryTypographyProps={{ fontWeight: selectedWeek === key ? 700 : 400, fontSize: '0.9rem' }}
+                                />
+                            </ListItemButton>
+                        </ListItem>
+                    ))}
+                </List>
+            </SwipeableDrawer>
         </ScheduleContainer>
     );
 };

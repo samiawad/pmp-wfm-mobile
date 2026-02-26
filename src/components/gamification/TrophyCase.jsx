@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Typography, styled, Grid, Avatar } from '@mui/material';
 import BadgeGrid from './BadgeGrid';
 import FeaturedInventory from './FeaturedInventory';
+import { PRODUCT_MANAGER_USER } from '../../data/mockUser';
 
 const ProfileHeader = styled(Box)(({ theme }) => ({
     display: 'flex',
@@ -37,13 +38,9 @@ const InnerHexagon = styled(Box)({
     position: 'relative',
 });
 
-// Default self mock user data
+// Default self mock user data — Level 4, Mythic Champion (Product Manager profile)
 const selfUserData = {
-    name: "Alex Mercer",
-    lifetimeLevel: 42,
-    title: "Grand Marshal",
-    joinDate: "2024",
-    avatarUrl: "https://i.pravatar.cc/150?u=a042581f4e29026704d"
+    ...PRODUCT_MANAGER_USER,
 };
 
 const TrophyCase = ({ viewedUser }) => {

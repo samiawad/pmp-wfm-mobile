@@ -4,8 +4,19 @@ import CompetitionDashboard from './CompetitionDashboard';
 import TrophyCase from './TrophyCase';
 import HallOfFame from './HallOfFame';
 
-const GamificationDashboard = () => {
-    const [currentTab, setCurrentTab] = useState(0);
+// Maps URL ?view= / ?tab= values → tab index
+const TAB_MAP = {
+    competitions: 0,
+    rewards: 0,
+    trophies: 1,
+    leaderboard: 2,
+    halloffame: 2,
+};
+
+const GamificationDashboard = ({ initialTab = null, initialOverlay = null, isUrlDriven = false }) => {
+    // Resolve initial tab from URL string, defaulting to 0 (Competitions)
+    const resolvedInitialTab = (initialTab && TAB_MAP[initialTab.toLowerCase()]) ?? 0;
+    const [currentTab, setCurrentTab] = useState(resolvedInitialTab);
     const [selectedUser, setSelectedUser] = useState(null); // Used to pass user from Hall of Fame to Trophy Case
 
     const handleTabChange = (event, newValue) => {
@@ -66,13 +77,13 @@ const GamificationDashboard = () => {
                     }}
                 >
                     <Tab label="Competitions" />
-                    <Tab label="Trophy Case" />
-                    <Tab label="Hall of Fame" />
+                    <Tab label="Collection" />
+                    <Tab label="Leaderboard" />
                 </Tabs>
             </Box>
 
             <Box sx={{ flexGrow: 1, p: 3, overflowY: 'auto' }}>
-                {currentTab === 0 && <CompetitionDashboard />}
+                {currentTab === 0 && <CompetitionDashboard initialOverlay={initialOverlay} isUrlDriven={isUrlDriven} />}
                 {currentTab === 1 && <TrophyCase viewedUser={selectedUser} />}
                 {currentTab === 2 && <HallOfFame onViewUser={handleViewUserTrophies} />}
             </Box>
