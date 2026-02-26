@@ -255,15 +255,15 @@ const HomeDashboard = ({ onAction, onPageChange, onDayClick }) => {
     const heroSlideKeys = ['shifts', 'scorecards', 'rewards'];
     const getInitialHeroSlide = () => {
         const params = new URLSearchParams(window.location.search);
-        const card = params.get('carousel');
-        const idx = heroSlideKeys.indexOf(card);
+        const c = params.get('carousel');
+        const idx = heroSlideKeys.indexOf(c);
         return idx >= 0 ? idx : 0;
     };
     const [currentHeroSlide, setCurrentHeroSlide] = useState(getInitialHeroSlide);
 
     // Keep URL in sync whenever hero slide changes
     useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
+        const params = new URLSearchParams();
         params.set('page', 'home');
         params.set('carousel', heroSlideKeys[currentHeroSlide]);
         window.history.replaceState(null, '', '?' + params.toString());
@@ -376,7 +376,12 @@ const HomeDashboard = ({ onAction, onPageChange, onDayClick }) => {
 
                                     <Box sx={{ display: 'flex', gap: 0.5 }}>
                                         {announcementList.map((_, idx) => (
-                                            <BannerDot key={idx} active={idx === currentAnnouncement} onClick={() => setCurrentAnnouncement(idx)} sx={{ cursor: 'pointer' }} />
+                                            <BannerDot
+                                                key={idx}
+                                                active={idx === currentAnnouncement}
+                                                onClick={() => setCurrentAnnouncement(idx)}
+                                                sx={{ cursor: 'pointer' }}
+                                            />
                                         ))}
                                     </Box>
                                 </Box>

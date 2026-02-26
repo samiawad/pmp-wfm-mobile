@@ -3,46 +3,6 @@ import { Box, Typography, Avatar, Grid, styled } from '@mui/material';
 import BadgeGrid from './BadgeGrid';
 import FeaturedInventory from './FeaturedInventory';
 
-<<<<<<< HEAD
-const ProfileHeader = styled(Box)(({ theme }) => ({
-    display: 'flex',
-    alignItems: 'center',
-    padding: theme.spacing(4),
-    background: 'var(--surface-color)',
-    borderLeft: '4px solid var(--primary-color)',
-    borderRadius: 12,
-    marginBottom: theme.spacing(4),
-    position: 'relative',
-    overflow: 'hidden',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-}));
-
-const HexagonAvatar = styled(Box)({
-    width: 120,
-    height: 120,
-    background: 'var(--primary-color)',
-    clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-});
-
-const InnerHexagon = styled(Box)({
-    width: 112,
-    height: 112,
-    background: 'var(--bg-color)',
-    clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'relative',
-});
-
-// Default self mock user data
-const selfUserData = {
-<<<<<<< HEAD
-    ...PRODUCT_MANAGER_USER,
-=======
 // Default self mock user data
 const selfUserData = {
     name: 'Alex Mercer',
@@ -52,14 +12,6 @@ const selfUserData = {
     avatarUrl: 'https://i.pravatar.cc/150?u=a042581f4e29026704d',
     trophiesEarned: 4,
     trophiesTotal: 6,
->>>>>>> fd0f6baee8b068cfb6340cd9bb2fe737188e1707
-=======
-    name: "Alex Mercer",
-    lifetimeLevel: 42,
-    title: "Grand Marshal",
-    joinDate: "2024",
-    avatarUrl: "https://i.pravatar.cc/150?u=a042581f4e29026704d"
->>>>>>> parent of 06e16e3 (Will revert this commit)
 };
 
 const TrophyCase = ({ viewedUser }) => {

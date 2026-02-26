@@ -248,6 +248,8 @@ const PageTitle = styled(Typography)({
     flexShrink: 0,
 });
 
+
+
 const FilterChip = styled(Chip)(({ selected }) => ({
     height: 32,
     borderRadius: 20,
@@ -450,19 +452,18 @@ const HourHeaderCell = styled(Box)(({ theme }) => ({
 // ============================================
 
 const SchedulePage = ({ onDayClick }) => {
-    // Read view from URL on mount so copy-pasted URLs restore the correct view
     const getInitialView = () => {
         const params = new URLSearchParams(window.location.search);
         const v = params.get('view');
         if (v === 'cards') return 'cards';
-        return 'calendar'; // default
+        return 'calendar';
     };
 
     const [selectedWeek, setSelectedWeek] = useState('current');
     const [viewMode, setViewMode] = useState(getInitialView);
     const [periodSheetOpen, setPeriodSheetOpen] = useState(false);
 
-    // Sync page=schedule and view= with URL
+    // Sync page=schedule and view= with URL whenever viewMode changes
     useEffect(() => {
         const params = new URLSearchParams();
         params.set('page', 'schedule');
@@ -809,10 +810,6 @@ const SchedulePage = ({ onDayClick }) => {
                                     if (cell.shift && onDayClick) {
                                         const allSchedules = Object.values(scheduleData).flatMap(p => p.schedule);
                                         const matchIdx = allSchedules.findIndex(s => s.date === cell.shift.date);
-                                        const params = new URLSearchParams();
-                                        params.set('page', 'schedule');
-                                        params.set('view', 'dailyTimeline');
-                                        window.history.replaceState(null, '', '?' + params.toString());
                                         onDayClick(cell.shift, matchIdx >= 0 ? matchIdx : 0, allSchedules);
                                     }
                                 }}
@@ -991,15 +988,7 @@ const SchedulePage = ({ onDayClick }) => {
                             key={index}
                             isOffDay={shift.isOffDay}
                             isToday={shift.isToday}
-                            onClick={() => {
-                                if (onDayClick) {
-                                    const params = new URLSearchParams();
-                                    params.set('page', 'schedule');
-                                    params.set('view', 'dailyTimeline');
-                                    window.history.replaceState(null, '', '?' + params.toString());
-                                    onDayClick(shift, index, currentSchedule.schedule);
-                                }
-                            }}
+                            onClick={() => onDayClick && onDayClick(shift, index, currentSchedule.schedule)}
                             sx={{ cursor: 'pointer' }}
                         >
                             <CardContent>
@@ -1129,19 +1118,14 @@ const SchedulePage = ({ onDayClick }) => {
             {viewMode === 'timeline' && renderTimelineView()}
             {viewMode === 'cards' && renderCardView()}
 
-            {/* Period Selector Bottom Sheet (Cards view only) */}
+            {/* Period Selector Bottom Sheet */}
             <SwipeableDrawer
                 anchor="bottom"
                 open={periodSheetOpen}
                 onClose={closePeriodSheet}
                 onOpen={openPeriodSheet}
                 disableSwipeToOpen
-                PaperProps={{
-                    sx: {
-                        borderRadius: '20px 20px 0 0',
-                        backgroundColor: '#ffffff',
-                    },
-                }}
+                PaperProps={{ sx: { borderRadius: '20px 20px 0 0', backgroundColor: '#ffffff' } }}
             >
                 <Box sx={{ pb: 3 }}>
                     <Box sx={{ width: 36, height: 4, borderRadius: 2, backgroundColor: '#d0d0d0', margin: '12px auto 8px' }} />
@@ -1151,12 +1135,8 @@ const SchedulePage = ({ onDayClick }) => {
                             key={key}
                             onClick={() => selectPeriod(key)}
                             sx={{
-                                px: 2.5,
-                                py: 1.5,
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
+                                px: 2.5, py: 1.5, cursor: 'pointer',
+                                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                                 borderBottom: '1px solid #f0f0f0',
                                 '&:last-child': { borderBottom: 'none' },
                                 '&:active': { backgroundColor: '#f5f5f5' },

@@ -91,7 +91,7 @@ const calculateBreaks = (startTime, endTime) => {
 // Constants
 // ============================================
 
-const HOUR_HEIGHT = 96; // px per hour — gives 24px per 15-min slot
+const HOUR_HEIGHT = 96; // px per hour — gives 24px per 15-min slot (min break size)
 const TOTAL_HOURS = 24;
 const TIMELINE_HEIGHT = HOUR_HEIGHT * TOTAL_HOURS;
 const TIME_GUTTER_WIDTH = 56;
@@ -411,7 +411,7 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
     const isOffDay = dayData?.isOffDay;
     const [selectedActivity, setSelectedActivity] = useState(null);
 
-    // Set page=schedule&view=dailyTimeline on mount (fixes URL bug when navigating from SchedulePage)
+    // Set page=schedule&view=dailyTimeline on mount
     useEffect(() => {
         const params = new URLSearchParams();
         params.set('page', 'schedule');
@@ -419,7 +419,7 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
         window.history.replaceState(null, '', '?' + params.toString());
     }, []);
 
-    // Sync shift= URL param when an activity is selected/deselected
+    // Sync shift= when an activity is selected/deselected
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         if (selectedActivity) {
@@ -572,7 +572,6 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
         params.set('requestType', type.id.replace(/_/g, '-'));
         window.history.replaceState(null, '', '?' + params.toString());
         if (type.isSwap) {
-            // Swap types go to agent selection
             setShowAgentPicker(true);
         } else {
             if (!type.needsTime) {
