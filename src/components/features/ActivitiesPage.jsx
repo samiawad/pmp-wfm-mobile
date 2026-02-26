@@ -507,6 +507,7 @@ const ActivitiesPage = ({ initialFilter = 'All' }) => {
                                     sx={{ mr: 1 }}
                                 />
 <<<<<<< HEAD
+<<<<<<< HEAD
                                 <ListItemText
                                     primary={cat}
                                     primaryTypographyProps={{ fontWeight: filterCategory === cat ? 700 : 400 }}
@@ -516,6 +517,9 @@ const ActivitiesPage = ({ initialFilter = 'All' }) => {
                                     {cat}
                                 </Typography>
 >>>>>>> fd0f6baee8b068cfb6340cd9bb2fe737188e1707
+=======
+
+>>>>>>> parent of 06e16e3 (Will revert this commit)
                             </ListItemButton>
                         </ListItem>
                     ))}

@@ -3,81 +3,33 @@ import HomeDashboard from './components/features/HomeDashboard';
 import SchedulePage from './components/features/SchedulePage';
 import PerformancePage from './components/features/PerformancePage';
 import ActivitiesPage from './components/features/ActivitiesPage';
+import CoachingPage from './components/features/CoachingPage';
 import RequestsPage from './components/features/RequestsPage';
 import EvaluationsPage from './components/features/EvaluationsPage';
 <<<<<<< HEAD
 import GamificationDashboard from './components/gamification/GamificationDashboard';
+<<<<<<< HEAD
 =======
 import RewardsPage from './components/features/RewardsPage';
 import DisputesPage from './components/features/DisputesPage';
 import LogsPage from './components/features/LogsPage';
 import EventsPage from './components/features/EventsPage';
 >>>>>>> parent of f359df4 (Competitions change)
+=======
+import DisputesPage from './components/features/DisputesPage';
+import LogsPage from './components/features/LogsPage';
+import EventsPage from './components/features/EventsPage';
+>>>>>>> parent of 06e16e3 (Will revert this commit)
 import DayTimelinePage from './components/features/DayTimelinePage';
 import AppLayout from './components/layout/AppLayout';
-import useUrlState from './hooks/useUrlState';
 import './App.css';
 
-// Maps ?view= values to internal page keys
-const VIEW_TO_PAGE = {
-  home: 'home',
-  schedule: 'schedule',
-  dayTimeline: 'dayTimeline',
-  performance: 'performance',
-  rewards: 'rewards',
-  trophies: 'rewards',
-  leaderboard: 'rewards',
-  activities: 'activities',
-  requests: 'requests',
-  disputes: 'disputes',
-  events: 'events',
-  logs: 'logs',
-  coaching: 'coaching',
-  evaluations: 'evaluations',
-};
-
-// -------------------------------------------------------
-// Mock day data for ?view=dayTimeline deep-link
-// (Tuesday Feb 4 — "Today" shift from current period)
-// -------------------------------------------------------
-const MOCK_DAY_DATA = {
-  day: 'Tuesday',
-  date: 'Feb 4',
-  isToday: true,
-  isOffDay: false,
-  startTime: '2:00 PM',
-  endTime: '10:00 PM',
-  duration: '8 hours',
-};
-
-// Full current-period schedule used as the schedule list for day navigation
-const MOCK_SCHEDULE_LIST = [
-  { day: 'Monday', date: 'Feb 3', isToday: false, isOffDay: false, startTime: '7:00 AM', endTime: '3:00 PM', duration: '8 hours' },
-  { day: 'Tuesday', date: 'Feb 4', isToday: true, isOffDay: false, startTime: '2:00 PM', endTime: '10:00 PM', duration: '8 hours' },
-  { day: 'Wednesday', date: 'Feb 5', isToday: false, isOffDay: false, startTime: '9:00 AM', endTime: '5:00 PM', duration: '8 hours' },
-  { day: 'Thursday', date: 'Feb 6', isToday: false, isOffDay: false, startTime: '11:00 AM', endTime: '8:00 PM', duration: '9 hours' },
-  { day: 'Friday', date: 'Feb 7', isToday: false, isOffDay: true },
-  { day: 'Saturday', date: 'Feb 8', isToday: false, isOffDay: false, startTime: '10:00 AM', endTime: '4:00 PM', duration: '6 hours' },
-  { day: 'Sunday', date: 'Feb 9', isToday: false, isOffDay: true },
-  { day: 'Monday', date: 'Feb 10', isToday: false, isOffDay: false, startTime: '3:00 PM', endTime: '11:00 PM', duration: '8 hours' },
-  { day: 'Tuesday', date: 'Feb 11', isToday: false, isOffDay: false, startTime: '8:00 AM', endTime: '4:00 PM', duration: '8 hours' },
-  { day: 'Wednesday', date: 'Feb 12', isToday: false, isOffDay: false, startTime: '12:00 PM', endTime: '8:00 PM', duration: '8 hours' },
-  { day: 'Thursday', date: 'Feb 13', isToday: false, isOffDay: true },
-  { day: 'Friday', date: 'Feb 14', isToday: false, isOffDay: false, startTime: '6:00 AM', endTime: '2:00 PM', duration: '8 hours' },
-  { day: 'Saturday', date: 'Feb 15', isToday: false, isOffDay: false, startTime: '9:00 AM', endTime: '6:00 PM', duration: '9 hours' },
-  { day: 'Sunday', date: 'Feb 16', isToday: false, isOffDay: true },
-];
-
 function App() {
-  const urlState = useUrlState();
-
-  // Initialise from ?view= URL param, fall back to 'home'
-  const initialPage = (urlState.view && VIEW_TO_PAGE[urlState.view]) || 'home';
-
-  const [currentPage, setCurrentPage] = useState(initialPage);
+  const [currentPage, setCurrentPage] = useState('home');
   const [requestsTab, setRequestsTab] = useState(0);
   const [activitiesFilter, setActivitiesFilter] = useState('All');
   const [selectedKPI, setSelectedKPI] = useState(null);
+<<<<<<< HEAD
 <<<<<<< HEAD
 
   // For dayTimeline: use URL-injected mock data if driven by ?view=dayTimeline
@@ -125,35 +77,46 @@ function App() {
     } else if (page === 'evaluations') {
       navigateToActivities('Evaluations');
     } else if (page === 'requests') {
+=======
+  const [selectedDayData, setSelectedDayData] = useState(null);
+  const [scheduleList, setScheduleList] = useState([]);
+
+  const handleNotificationClick = (page, tabIndexOrFilter = 0) => {
+    setCurrentPage(page);
+    if (page === 'requests') {
+>>>>>>> parent of 06e16e3 (Will revert this commit)
       setRequestsTab(tabIndexOrFilter);
-      navigateTo('requests');
     } else if (page === 'activities') {
-      navigateToActivities(tabIndexOrFilter || 'All');
-    } else {
-      navigateTo(page);
+      setActivitiesFilter(tabIndexOrFilter);
+    } else if (page === 'coaching') {
+      setCurrentPage('activities'); // Redirect to Activities
+      setActivitiesFilter('Coaching');
+    } else if (page === 'evaluations') {
+      setCurrentPage('activities'); // Redirect to Activities
+      setActivitiesFilter('Evaluations');
     }
   };
 
   const handleKPIClick = (kpi) => {
     setSelectedKPI(kpi);
-    navigateTo('performanceDetails');
+    setCurrentPage('performanceDetails');
   };
 
   const handleBackFromKPI = () => {
     setSelectedKPI(null);
-    navigateTo('performance');
+    setCurrentPage('performance');
   };
 
   const handleDayClick = (dayData, index, schedule) => {
     setSelectedDayData(dayData);
     setScheduleList(schedule);
-    navigateTo('dayTimeline');
+    setCurrentPage('dayTimeline');
   };
 
   const handleBackFromDayTimeline = () => {
+    setCurrentPage('schedule');
     setSelectedDayData(null);
     setScheduleList([]);
-    navigateTo('schedule');
   };
 
   const handleDayChange = (newDayData) => {
@@ -161,38 +124,22 @@ function App() {
   };
 
   return (
-    <AppLayout currentPage={currentPage} onPageChange={navigateTo} urlState={urlState}>
+    <AppLayout currentPage={currentPage} onPageChange={setCurrentPage}>
       <div className="app-container">
-        {currentPage === 'home' && (
-          <HomeDashboard
-            onAction={handleNotificationClick}
-            onPageChange={navigateTo}
-            onDayClick={handleDayClick}
-            initialSlide={urlState.slide}
-            isUrlDriven={urlState.isUrlDriven}
-          />
-        )}
-        {currentPage === 'schedule' && (
-          <SchedulePage
-            onDayClick={handleDayClick}
-            initialSubview={urlState.subview}
-            initialOverlay={urlState.overlay}
-            isUrlDriven={urlState.isUrlDriven}
-          />
-        )}
+        {currentPage === 'home' && <HomeDashboard onAction={handleNotificationClick} onPageChange={setCurrentPage} onDayClick={handleDayClick} />}
+        {currentPage === 'schedule' && <SchedulePage onDayClick={handleDayClick} />}
         {currentPage === 'dayTimeline' && (
           <DayTimelinePage
             dayData={selectedDayData}
             scheduleList={scheduleList}
             onDayChange={handleDayChange}
             onBack={handleBackFromDayTimeline}
-            initialOverlay={urlState.overlay}
-            isUrlDriven={urlState.isUrlDriven}
           />
         )}
         {currentPage === 'performance' && <PerformancePage onKPIClick={handleKPIClick} />}
         {currentPage === 'performanceDetails' && <PerformancePage selectedKPI={selectedKPI} onBack={handleBackFromKPI} />}
         {currentPage === 'activities' && <ActivitiesPage initialFilter={activitiesFilter} />}
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
         {currentPage === 'coaching' && <CoachingPage />}
@@ -213,6 +160,12 @@ function App() {
         {currentPage === 'rewards' && <RewardsPage />}
         {currentPage === 'evaluations' && <ActivitiesPage initialFilter="Evaluations" />}
 >>>>>>> parent of f359df4 (Competitions change)
+=======
+
+        {currentPage === 'requests' && <RequestsPage defaultTab={requestsTab} />}
+        {currentPage === 'rewards' && <GamificationDashboard />}
+        {currentPage === 'evaluations' && <ActivitiesPage initialFilter="Evaluations" />}
+>>>>>>> parent of 06e16e3 (Will revert this commit)
         {currentPage === 'disputes' && <RequestsPage defaultTab={4} />}
         {currentPage === 'events' && <ActivitiesPage initialFilter="Events" />}
         {currentPage === 'logs' && <ActivitiesPage initialFilter="Logs" />}
@@ -222,3 +175,5 @@ function App() {
 }
 
 export default App;
+
+

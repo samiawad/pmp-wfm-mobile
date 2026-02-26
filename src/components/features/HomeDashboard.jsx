@@ -205,7 +205,7 @@ const HeroDot = styled(Box)(({ active }) => ({
 // Component
 // ============================================
 
-const HomeDashboard = ({ onAction, onPageChange, onDayClick, initialSlide = 0, isUrlDriven = false }) => {
+const HomeDashboard = ({ onAction, onPageChange, onDayClick }) => {
     // Mock shifts for navigation
     const mockShifts = [
         { day: 'Tuesday', date: 'Feb 4', isToday: true, isOffDay: false, startTime: '09:00 AM', endTime: '05:00 PM', duration: '8 hours' }, // Current
@@ -251,10 +251,8 @@ const HomeDashboard = ({ onAction, onPageChange, onDayClick, initialSlide = 0, i
     ]);
     const [currentAnnouncement, setCurrentAnnouncement] = useState(0);
 
-    // Hero Carousel State — initialised from URL ?slide= param for Figma scraper
-    const [currentHeroSlide, setCurrentHeroSlide] = useState(
-        Math.min(Math.max(initialSlide, 0), 2) // clamp to 0-2
-    );
+    // Hero Carousel State
+    const [currentHeroSlide, setCurrentHeroSlide] = useState(0);
 
     // Touch Handling (Universal for both carousels)
     const [touchStart, setTouchStart] = useState(null);
@@ -378,8 +376,7 @@ const HomeDashboard = ({ onAction, onPageChange, onDayClick, initialSlide = 0, i
                 <Box sx={{
                     height: '100%',
                     position: 'relative',
-                    // Disable transition when URL-driven so scraper captures the static frame
-                    transition: isUrlDriven ? 'none' : 'all 0.3s ease',
+                    transition: 'all 0.3s ease',
                 }}
                     onTouchStart={(e) => onTouchStart(e)}
                     onTouchMove={onTouchMove}

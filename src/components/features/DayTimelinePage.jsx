@@ -407,7 +407,7 @@ const SelectionHighlight = styled(Box)({
 // Component
 // ============================================
 
-const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack, initialOverlay = null, isUrlDriven = false }) => {
+const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) => {
     const isOffDay = dayData?.isOffDay;
     const [selectedActivity, setSelectedActivity] = useState(null);
 
@@ -756,40 +756,6 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack, init
         return now.getHours() * 60 + now.getMinutes();
     }, [dayData]);
 
-    // ---- URL-driven initial overlay ----
-    // Must run AFTER activities is computed so shift_detail can reference activities[0].
-    // We use a plain effect with an empty dep array so it only fires on first mount.
-    useEffect(() => {
-        if (!initialOverlay) return;
-
-        if (initialOverlay === 'shift_detail') {
-            // Open the Shift block detail sheet
-            if (activities.length > 0) {
-                setSelectedActivity(activities[0]); // activities[0] is always the shift block
-            }
-            return;
-        }
-
-        if (initialOverlay === 'request_sheet') {
-            setShowTypePicker(true);
-            return;
-        }
-
-        // Handles request_day_off, request_personal_leave, request_sick_leave, etc.
-        if (initialOverlay.startsWith('request_')) {
-            const typeId = initialOverlay.replace('request_', '');
-            const match = REQUEST_TYPES.find(t => t.id === typeId);
-            if (match) {
-                setSelectedRequestType(match);
-                if (match.isSwap) {
-                    setShowAgentPicker(true);
-                } else {
-                    setShowRequestForm(true);
-                }
-            }
-        }
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
     // Generate hour labels
     const hours = Array.from({ length: 24 }, (_, i) => {
         if (i === 0) return '12 AM';
@@ -1026,7 +992,6 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack, init
                 onClose={() => setSelectedActivity(null)}
                 onOpen={() => { }}
                 disableSwipeToOpen
-                transitionDuration={isUrlDriven ? 0 : undefined}
                 PaperProps={{
                     sx: {
                         borderRadius: '20px 20px 0 0',
@@ -1114,7 +1079,6 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack, init
                 onClose={() => { setShowTypePicker(false); setSelectionStart(null); setSelectionEnd(null); }}
                 onOpen={() => { }}
                 disableSwipeToOpen
-                transitionDuration={isUrlDriven ? 0 : undefined}
                 PaperProps={{
                     sx: {
                         borderRadius: '20px 20px 0 0',
@@ -1167,7 +1131,6 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack, init
                 onClose={() => { setShowAgentPicker(false); closeRequestForm(); }}
                 onOpen={() => { }}
                 disableSwipeToOpen
-                transitionDuration={isUrlDriven ? 0 : undefined}
                 PaperProps={{
                     sx: {
                         borderRadius: '20px 20px 0 0',
@@ -1265,7 +1228,6 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack, init
                 onClose={closeRequestForm}
                 onOpen={() => { }}
                 disableSwipeToOpen
-                transitionDuration={isUrlDriven ? 0 : undefined}
                 PaperProps={{
                     sx: {
                         borderRadius: '20px 20px 0 0',
@@ -1390,7 +1352,6 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack, init
                 onClose={closeRequestForm}
                 onOpen={() => { }}
                 disableSwipeToOpen
-                transitionDuration={isUrlDriven ? 0 : undefined}
                 PaperProps={{
                     sx: {
                         borderRadius: '20px 20px 0 0',

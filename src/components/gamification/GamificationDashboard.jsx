@@ -5,6 +5,7 @@ import TrophyCase from './TrophyCase';
 import HallOfFame from './HallOfFame';
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 // Maps URL ?view= / ?tab= values → tab index
 const TAB_MAP = {
     competitions: 0,
@@ -18,6 +19,10 @@ const GamificationDashboard = ({ initialTab = null, initialOverlay = null, isUrl
     // Resolve initial tab from URL string, defaulting to 0 (Competitions)
     const resolvedInitialTab = (initialTab && TAB_MAP[initialTab.toLowerCase()]) ?? 0;
     const [currentTab, setCurrentTab] = useState(resolvedInitialTab);
+=======
+const GamificationDashboard = () => {
+    const [currentTab, setCurrentTab] = useState(0);
+>>>>>>> parent of 06e16e3 (Will revert this commit)
     const [selectedUser, setSelectedUser] = useState(null); // Used to pass user from Hall of Fame to Trophy Case
 =======
 // ── Activities-style header: title + pills on the same scrolling row ──────────
@@ -139,12 +144,13 @@ const GamificationDashboard = () => {
                     }}
                 >
                     <Tab label="Competitions" />
-                    <Tab label="Collection" />
-                    <Tab label="Leaderboard" />
+                    <Tab label="Trophy Case" />
+                    <Tab label="Hall of Fame" />
                 </Tabs>
             </Box>
 
             <Box sx={{ flexGrow: 1, p: 3, overflowY: 'auto' }}>
+<<<<<<< HEAD
                 {currentTab === 0 && <CompetitionDashboard initialOverlay={initialOverlay} isUrlDriven={isUrlDriven} />}
 =======
         <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', minHeight: '100vh', bgcolor: '#f5f5f5' }}>
@@ -152,6 +158,9 @@ const GamificationDashboard = () => {
             <Box sx={{ flexGrow: 1, px: 2, pb: 2, overflowY: 'auto' }}>
                 {currentTab === 0 && <CompetitionDashboard />}
 >>>>>>> fd0f6baee8b068cfb6340cd9bb2fe737188e1707
+=======
+                {currentTab === 0 && <CompetitionDashboard />}
+>>>>>>> parent of 06e16e3 (Will revert this commit)
                 {currentTab === 1 && <TrophyCase viewedUser={selectedUser} />}
                 {currentTab === 2 && <HallOfFame onViewUser={handleViewUserTrophies} />}
             </Box>

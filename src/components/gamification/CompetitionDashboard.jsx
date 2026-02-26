@@ -119,7 +119,7 @@ const competitionsData = [
     }
 ];
 
-const CompetitionDashboard = ({ initialOverlay = null, isUrlDriven = false }) => {
+const CompetitionDashboard = () => {
     const [showCelebration, setShowCelebration] = useState(false);
     const [selectedCompId, setSelectedCompId] = useState(competitionsData[0].id);
     const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
@@ -127,16 +127,6 @@ const CompetitionDashboard = ({ initialOverlay = null, isUrlDriven = false }) =>
 
     const currentCompetition = competitionsData.find(c => c.id === selectedCompId) || competitionsData[0];
     const [currentXP, setCurrentXP] = useState(currentCompetition.currentXP);
-
-    // URL-driven overlays: open immediately on mount for Figma scraper
-    useEffect(() => {
-        if (initialOverlay === 'filter_sheet') {
-            setIsBottomSheetOpen(true);
-        }
-        if (initialOverlay === 'level_up_celebration') {
-            setShowCelebration(true);
-        }
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Update currentXP when competition changes
     useEffect(() => {
@@ -228,7 +218,6 @@ const CompetitionDashboard = ({ initialOverlay = null, isUrlDriven = false }) =>
                 onClose={() => setShowCelebration(false)}
                 title="Milestone Reached!"
                 message={nextMilestone ? `You unlocked ${nextMilestone.title}!` : "Max Level Reached!"}
-                staticMode={isUrlDriven && initialOverlay === 'level_up_celebration'}
             />
 
             {/* Bottom Sheet for Competition Selection */}
@@ -237,7 +226,6 @@ const CompetitionDashboard = ({ initialOverlay = null, isUrlDriven = false }) =>
                 open={isBottomSheetOpen}
                 onClose={() => setIsBottomSheetOpen(false)}
                 onOpen={() => setIsBottomSheetOpen(true)}
-                transitionDuration={isUrlDriven && initialOverlay === 'filter_sheet' ? 0 : undefined}
                 PaperProps={{
                     sx: {
                         borderTopLeftRadius: '24px',
