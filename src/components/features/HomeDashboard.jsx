@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import {
     Box,
@@ -251,8 +251,23 @@ const HomeDashboard = ({ onAction, onPageChange, onDayClick }) => {
     ]);
     const [currentAnnouncement, setCurrentAnnouncement] = useState(0);
 
-    // Hero Carousel State
-    const [currentHeroSlide, setCurrentHeroSlide] = useState(0);
+    // Hero Carousel State — synced with ?carousel= URL param
+    const heroSlideKeys = ['shifts', 'scorecards', 'rewards'];
+    const getInitialHeroSlide = () => {
+        const params = new URLSearchParams(window.location.search);
+        const card = params.get('carousel');
+        const idx = heroSlideKeys.indexOf(card);
+        return idx >= 0 ? idx : 0;
+    };
+    const [currentHeroSlide, setCurrentHeroSlide] = useState(getInitialHeroSlide);
+
+    // Keep URL in sync whenever hero slide changes
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        params.set('page', 'home');
+        params.set('carousel', heroSlideKeys[currentHeroSlide]);
+        window.history.replaceState(null, '', '?' + params.toString());
+    }, [currentHeroSlide]);
 
     // Touch Handling (Universal for both carousels)
     const [touchStart, setTouchStart] = useState(null);
@@ -361,7 +376,7 @@ const HomeDashboard = ({ onAction, onPageChange, onDayClick }) => {
 
                                     <Box sx={{ display: 'flex', gap: 0.5 }}>
                                         {announcementList.map((_, idx) => (
-                                            <BannerDot key={idx} active={idx === currentAnnouncement} />
+                                            <BannerDot key={idx} active={idx === currentAnnouncement} onClick={() => setCurrentAnnouncement(idx)} sx={{ cursor: 'pointer' }} />
                                         ))}
                                     </Box>
                                 </Box>

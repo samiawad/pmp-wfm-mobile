@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import {
     Box,
@@ -7,11 +7,9 @@ import {
     Typography,
     Chip,
     Divider,
-    Select,
-    MenuItem,
-    FormControl,
     Tooltip,
     IconButton,
+    SwipeableDrawer,
 } from '@mui/material';
 import {
     AccessTime as ClockIcon,
@@ -250,22 +248,6 @@ const PageTitle = styled(Typography)({
     flexShrink: 0,
 });
 
-const FilterChipSelect = styled(FormControl)({
-    width: 'fit-content',
-    flexShrink: 0,
-    '& .MuiOutlinedInput-root': {
-        height: 32,
-        borderRadius: 20,
-        backgroundColor: '#fff',
-        fontSize: '0.75rem',
-        '& fieldset': { borderColor: '#e0e0e0' },
-    },
-    '& .MuiSelect-select': {
-        padding: '4px 28px 4px 12px !important',
-        fontSize: '0.75rem',
-    },
-});
-
 const FilterChip = styled(Chip)(({ selected }) => ({
     height: 32,
     borderRadius: 20,
@@ -468,8 +450,47 @@ const HourHeaderCell = styled(Box)(({ theme }) => ({
 // ============================================
 
 const SchedulePage = ({ onDayClick }) => {
+    // Read view from URL on mount so copy-pasted URLs restore the correct view
+    const getInitialView = () => {
+        const params = new URLSearchParams(window.location.search);
+        const v = params.get('view');
+        if (v === 'cards') return 'cards';
+        return 'calendar'; // default
+    };
+
     const [selectedWeek, setSelectedWeek] = useState('current');
-    const [viewMode, setViewMode] = useState('calendar'); // 'calendar', 'cards', or 'timeline'
+    const [viewMode, setViewMode] = useState(getInitialView);
+    const [periodSheetOpen, setPeriodSheetOpen] = useState(false);
+
+    // Sync page=schedule and view= with URL
+    useEffect(() => {
+        const params = new URLSearchParams();
+        params.set('page', 'schedule');
+        params.set('view', viewMode);
+        window.history.replaceState(null, '', '?' + params.toString());
+    }, [viewMode]);
+
+    const openPeriodSheet = () => {
+        const params = new URLSearchParams();
+        params.set('page', 'schedule');
+        params.set('view', 'cards');
+        params.set('period', 'selector');
+        window.history.replaceState(null, '', '?' + params.toString());
+        setPeriodSheetOpen(true);
+    };
+
+    const closePeriodSheet = () => {
+        const params = new URLSearchParams();
+        params.set('page', 'schedule');
+        params.set('view', 'cards');
+        window.history.replaceState(null, '', '?' + params.toString());
+        setPeriodSheetOpen(false);
+    };
+
+    const selectPeriod = (weekKey) => {
+        setSelectedWeek(weekKey);
+        closePeriodSheet();
+    };
 
     const MONTH_NAMES = useMemo(() => ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'], []);
 
@@ -788,6 +809,10 @@ const SchedulePage = ({ onDayClick }) => {
                                     if (cell.shift && onDayClick) {
                                         const allSchedules = Object.values(scheduleData).flatMap(p => p.schedule);
                                         const matchIdx = allSchedules.findIndex(s => s.date === cell.shift.date);
+                                        const params = new URLSearchParams();
+                                        params.set('page', 'schedule');
+                                        params.set('view', 'dailyTimeline');
+                                        window.history.replaceState(null, '', '?' + params.toString());
                                         onDayClick(cell.shift, matchIdx >= 0 ? matchIdx : 0, allSchedules);
                                     }
                                 }}
@@ -966,7 +991,15 @@ const SchedulePage = ({ onDayClick }) => {
                             key={index}
                             isOffDay={shift.isOffDay}
                             isToday={shift.isToday}
-                            onClick={() => onDayClick && onDayClick(shift, index, currentSchedule.schedule)}
+                            onClick={() => {
+                                if (onDayClick) {
+                                    const params = new URLSearchParams();
+                                    params.set('page', 'schedule');
+                                    params.set('view', 'dailyTimeline');
+                                    window.history.replaceState(null, '', '?' + params.toString());
+                                    onDayClick(shift, index, currentSchedule.schedule);
+                                }
+                            }}
                             sx={{ cursor: 'pointer' }}
                         >
                             <CardContent>
@@ -1050,17 +1083,22 @@ const SchedulePage = ({ onDayClick }) => {
                         {MONTH_NAMES[calendarMonth]} {calendarYear}
                     </Box>
                 ) : (
-                    <FilterChipSelect size="small">
-                        <Select
-                            value={selectedWeek}
-                            onChange={handleWeekChange}
-                            displayEmpty
-                        >
-                            <MenuItem value="prev1">{scheduleData.prev1.label}</MenuItem>
-                            <MenuItem value="current">{scheduleData.current.label}</MenuItem>
-                            <MenuItem value="next">{scheduleData.next.label}</MenuItem>
-                        </Select>
-                    </FilterChipSelect>
+                    <Chip
+                        label={scheduleData[selectedWeek].label}
+                        onClick={openPeriodSheet}
+                        sx={{
+                            height: 32,
+                            borderRadius: 20,
+                            border: '1px solid #e0e0e0',
+                            backgroundColor: '#fff',
+                            fontSize: '0.75rem',
+                            fontWeight: 600,
+                            color: '#667eea',
+                            cursor: 'pointer',
+                            flexShrink: 0,
+                            '&:hover': { opacity: 0.85 },
+                        }}
+                    />
                 )}
 
                 <FilterChip
@@ -1090,6 +1128,54 @@ const SchedulePage = ({ onDayClick }) => {
             {viewMode === 'calendar' && renderCalendarView()}
             {viewMode === 'timeline' && renderTimelineView()}
             {viewMode === 'cards' && renderCardView()}
+
+            {/* Period Selector Bottom Sheet (Cards view only) */}
+            <SwipeableDrawer
+                anchor="bottom"
+                open={periodSheetOpen}
+                onClose={closePeriodSheet}
+                onOpen={openPeriodSheet}
+                disableSwipeToOpen
+                PaperProps={{
+                    sx: {
+                        borderRadius: '20px 20px 0 0',
+                        backgroundColor: '#ffffff',
+                    },
+                }}
+            >
+                <Box sx={{ pb: 3 }}>
+                    <Box sx={{ width: 36, height: 4, borderRadius: 2, backgroundColor: '#d0d0d0', margin: '12px auto 8px' }} />
+                    <Typography sx={{ fontWeight: 700, fontSize: '1.1rem', px: 2.5, pb: 1.5 }}>Select Period</Typography>
+                    {['prev1', 'current', 'next'].map((key) => (
+                        <Box
+                            key={key}
+                            onClick={() => selectPeriod(key)}
+                            sx={{
+                                px: 2.5,
+                                py: 1.5,
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                borderBottom: '1px solid #f0f0f0',
+                                '&:last-child': { borderBottom: 'none' },
+                                '&:active': { backgroundColor: '#f5f5f5' },
+                            }}
+                        >
+                            <Typography sx={{
+                                fontSize: '0.95rem',
+                                fontWeight: selectedWeek === key ? 700 : 400,
+                                color: selectedWeek === key ? '#667eea' : '#1a1a1a',
+                            }}>
+                                {scheduleData[key].label}
+                            </Typography>
+                            {selectedWeek === key && (
+                                <Box sx={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#667eea' }} />
+                            )}
+                        </Box>
+                    ))}
+                </Box>
+            </SwipeableDrawer>
         </ScheduleContainer>
     );
 };
