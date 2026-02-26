@@ -102,8 +102,16 @@ function App() {
   };
 
   const handleNotificationClick = (page, tabIndexOrFilter = 0) => {
+<<<<<<< HEAD
     if (page === 'coaching') {
       navigateToActivities('Coaching');
+=======
+    setCurrentPage(page);
+    if (page === 'requests') {
+      setRequestsTab(tabIndexOrFilter);
+    } else if (page === 'activities') {
+      setActivitiesFilter(tabIndexOrFilter);
+>>>>>>> fd0f6baee8b068cfb6340cd9bb2fe737188e1707
     } else if (page === 'evaluations') {
       navigateToActivities('Evaluations');
     } else if (page === 'requests') {
@@ -175,6 +183,11 @@ function App() {
         {currentPage === 'performance' && <PerformancePage onKPIClick={handleKPIClick} />}
         {currentPage === 'performanceDetails' && <PerformancePage selectedKPI={selectedKPI} onBack={handleBackFromKPI} />}
         {currentPage === 'activities' && <ActivitiesPage initialFilter={activitiesFilter} />}
+<<<<<<< HEAD
+=======
+        {currentPage === 'coaching' && <CoachingPage />}
+
+>>>>>>> fd0f6baee8b068cfb6340cd9bb2fe737188e1707
         {currentPage === 'requests' && <RequestsPage defaultTab={requestsTab} />}
         {currentPage === 'rewards' && (
           <GamificationDashboard

@@ -4,8 +4,11 @@ import { EmojiEvents } from '@mui/icons-material';
 
 const GridContainer = styled(Box)(({ theme }) => ({
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))',
-    gap: theme.spacing(3),
+    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', // Ensures equal distribution of space
+    gap: theme.spacing(2),
+    marginBottom: theme.spacing(4),
+    width: '100%',
+    boxSizing: 'border-box'
 }));
 
 const TrophyCard = styled(Box)(({ theme, tier, active }) => {
@@ -24,6 +27,9 @@ const TrophyCard = styled(Box)(({ theme, tier, active }) => {
     }
 
     return {
+        width: '100%',
+        height: '100%',
+        boxSizing: 'border-box',
         background: bgColor,
         border: `2px solid ${borderColor}`,
         borderRadius: 16,
@@ -72,28 +78,68 @@ const badgesData = [
     { id: 6, name: "Resolution King", tier: 'Gold', active: false, multiplier: 0, desc: "Highest first call resolution." },
 ];
 
+const SectionTitle = styled(Typography)(({ theme }) => ({
+    fontSize: '1.2rem',
+    fontWeight: 700,
+    color: 'var(--text-primary)',
+    marginBottom: theme.spacing(2),
+    borderBottom: '2px solid var(--border-color)',
+    paddingBottom: theme.spacing(1)
+}));
+
 const BadgeGrid = () => {
+    const earnedBadges = badgesData.filter(b => b.active);
+    const availableBadges = badgesData.filter(b => !b.active);
+
     return (
-        <GridContainer>
-            {badgesData.map(badge => (
-                <Tooltip key={badge.id} title={`${badge.name} - ${badge.desc}`} placement="top" arrow>
-                    <TrophyCard tier={badge.tier} active={badge.active}>
-                        {badge.active && badge.multiplier > 1 && (
-                            <MultiplierBadge>x{badge.multiplier}</MultiplierBadge>
-                        )}
+        <Box>
+            {earnedBadges.length > 0 && (
+                <>
+                    <SectionTitle>Earned</SectionTitle>
+                    <GridContainer>
+                        {earnedBadges.map(badge => (
+                            <Tooltip key={badge.id} title={`${badge.name} - ${badge.desc}`} placement="top" arrow>
+                                <TrophyCard tier={badge.tier} active={badge.active}>
+                                    {badge.active && badge.multiplier > 1 && (
+                                        <MultiplierBadge>x{badge.multiplier}</MultiplierBadge>
+                                    )}
 
-                        <EmojiEvents className="trophy-icon" />
+                                    <EmojiEvents className="trophy-icon" />
 
-                        <Typography variant="caption" sx={{ fontWeight: 700, textAlign: 'center', lineHeight: 1.2, color: 'var(--text-primary)' }}>
-                            {badge.name}
-                        </Typography>
-                        <Typography variant="caption" sx={{ fontSize: '0.65rem', color: 'var(--text-secondary)', mt: 0.5 }}>
-                            {badge.tier}
-                        </Typography>
-                    </TrophyCard>
-                </Tooltip>
-            ))}
-        </GridContainer>
+                                    <Typography variant="caption" sx={{ fontWeight: 700, textAlign: 'center', lineHeight: 1.2, color: 'var(--text-primary)' }}>
+                                        {badge.name}
+                                    </Typography>
+                                    <Typography variant="caption" sx={{ fontSize: '0.65rem', color: 'var(--text-secondary)', mt: 0.5 }}>
+                                        {badge.tier}
+                                    </Typography>
+                                </TrophyCard>
+                            </Tooltip>
+                        ))}
+                    </GridContainer>
+                </>
+            )}
+
+            {availableBadges.length > 0 && (
+                <>
+                    <SectionTitle>Available</SectionTitle>
+                    <GridContainer>
+                        {availableBadges.map(badge => (
+                            <Tooltip key={badge.id} title={`${badge.name} - ${badge.desc}`} placement="top" arrow>
+                                <TrophyCard tier={badge.tier} active={badge.active}>
+                                    <EmojiEvents className="trophy-icon" />
+                                    <Typography variant="caption" sx={{ fontWeight: 700, textAlign: 'center', lineHeight: 1.2, color: 'var(--text-primary)' }}>
+                                        {badge.name}
+                                    </Typography>
+                                    <Typography variant="caption" sx={{ fontSize: '0.65rem', color: 'var(--text-secondary)', mt: 0.5 }}>
+                                        {badge.tier}
+                                    </Typography>
+                                </TrophyCard>
+                            </Tooltip>
+                        ))}
+                    </GridContainer>
+                </>
+            )}
+        </Box>
     );
 };
 
