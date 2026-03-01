@@ -1,4 +1,4 @@
-import { useMemo, useState, useRef, useCallback } from 'react';
+import { useMemo, useState, useRef, useCallback, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import {
     Box,
@@ -404,6 +404,267 @@ const SelectionHighlight = styled(Box)({
 });
 
 // ============================================
+// Date Picker Field Component (click to open)
+// ============================================
+
+const CALENDAR_BLUE = '#1976d2';
+
+
+// ---- iOS drum constants ----
+const DRUM_ITEM_H = 44;
+const DRUM_VISIBLE = 5;
+
+const IOS_MONTHS = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December',
+];
+const DRUM_BASE_YEAR = new Date().getFullYear();
+const IOS_YEARS = Array.from({ length: 4 }, (_, i) => String(DRUM_BASE_YEAR + i));
+
+const getDrumDays = (monthIdx, year) => {
+    const count = new Date(year, monthIdx + 1, 0).getDate();
+    return Array.from({ length: count }, (_, i) => String(i + 1));
+};
+
+// ---- Single drum column ----
+const IOSDrumColumn = ({ items, selectedIndex, onChange }) => {
+    const scrollRef = useRef(null);
+    const [liveScrollTop, setLiveScrollTop] = useState(selectedIndex * DRUM_ITEM_H);
+
+    useEffect(() => {
+        if (scrollRef.current) {
+            scrollRef.current.scrollTop = selectedIndex * DRUM_ITEM_H;
+            setLiveScrollTop(selectedIndex * DRUM_ITEM_H);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const handleScroll = useCallback((e) => {
+        const st = e.target.scrollTop;
+        setLiveScrollTop(st);
+        const idx = Math.round(st / DRUM_ITEM_H);
+        const clamped = Math.max(0, Math.min(idx, items.length - 1));
+        onChange(clamped);
+    }, [items.length, onChange]);
+
+    const SPACER = DRUM_ITEM_H * Math.floor(DRUM_VISIBLE / 2);
+    const CONTAINER_H = DRUM_ITEM_H * DRUM_VISIBLE;
+
+    return (
+        <Box sx={{ flex: 1, position: 'relative', height: CONTAINER_H }}>
+            <Box
+                ref={scrollRef}
+                onScroll={handleScroll}
+                sx={{
+                    height: CONTAINER_H,
+                    overflowY: 'scroll',
+                    scrollSnapType: 'y mandatory',
+                    '&::-webkit-scrollbar': { display: 'none' },
+                    scrollbarWidth: 'none',
+                }}
+            >
+                <Box sx={{ height: SPACER, scrollSnapAlign: 'none' }} />
+                {items.map((item, i) => {
+                    const itemCenter = SPACER + i * DRUM_ITEM_H + DRUM_ITEM_H / 2;
+                    const viewCenter = liveScrollTop + CONTAINER_H / 2;
+                    const dist = Math.abs(itemCenter - viewCenter) / DRUM_ITEM_H;
+                    const opacity = Math.max(0.12, 1 - dist * 0.42);
+                    const scaleY = Math.max(0.68, 1 - dist * 0.1);
+                    const isCentered = dist < 0.5;
+                    return (
+                        <Box key={i} sx={{
+                            height: DRUM_ITEM_H,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            scrollSnapAlign: 'center',
+                            opacity,
+                            transform: `scaleY(${scaleY})`,
+                            userSelect: 'none',
+                            cursor: 'default',
+                        }}>
+                            <Typography sx={{
+                                fontSize: '1.1rem',
+                                fontWeight: isCentered ? 600 : 400,
+                                color: isCentered ? '#111' : '#777',
+                                letterSpacing: '-0.01em',
+                                lineHeight: 1,
+                                whiteSpace: 'nowrap',
+                            }}>
+                                {item}
+                            </Typography>
+                        </Box>
+                    );
+                })}
+                <Box sx={{ height: SPACER, scrollSnapAlign: 'none' }} />
+            </Box>
+        </Box>
+    );
+};
+
+// ---- Full date picker (trigger + drum) ----
+const InlineDatePicker = ({ value, onChange }) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const selectedDate = value ? new Date(value + 'T00:00:00') : today;
+    const [open, setOpen] = useState(false);
+
+    const [monthIdx, setMonthIdx] = useState(selectedDate.getMonth());
+    const [dayIdx, setDayIdx] = useState(selectedDate.getDate() - 1);
+    const [yearIdx, setYearIdx] = useState(
+        Math.max(0, IOS_YEARS.indexOf(String(selectedDate.getFullYear())))
+    );
+
+    const year = parseInt(IOS_YEARS[yearIdx]);
+    const drumDays = getDrumDays(monthIdx, year);
+    const clampedDayIdx = Math.min(dayIdx, drumDays.length - 1);
+
+    useEffect(() => {
+        const d = new Date(year, monthIdx, clampedDayIdx + 1);
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        onChange(`${yyyy}-${mm}-${dd}`);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [monthIdx, clampedDayIdx, yearIdx]);
+
+    const displayLabel = selectedDate.toLocaleDateString('en-US', {
+        weekday: 'short', month: 'short', day: 'numeric', year: 'numeric',
+    });
+
+    const CONTAINER_H = DRUM_ITEM_H * DRUM_VISIBLE;
+
+    return (
+        <Box>
+            {/* Trigger row */}
+            <Box
+                onClick={() => setOpen(true)}
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1.5,
+                    px: 2,
+                    py: 1.4,
+                    borderRadius: '12px',
+                    border: `1.5px solid ${open ? CALENDAR_BLUE : '#d0d0d0'}`,
+                    cursor: 'pointer',
+                    backgroundColor: '#fff',
+                    transition: 'border-color 0.2s',
+                    userSelect: 'none',
+                }}
+            >
+                <RequestDateIcon sx={{ fontSize: 20, color: open ? CALENDAR_BLUE : '#888' }} />
+                <Box sx={{ flex: 1 }}>
+                    <Typography sx={{ fontSize: '0.65rem', color: open ? CALENDAR_BLUE : '#888', fontWeight: 600, lineHeight: 1, mb: 0.25 }}>
+                        Date
+                    </Typography>
+                    <Typography sx={{ fontSize: '0.9rem', fontWeight: 600, color: '#1a1a1a', lineHeight: 1.2 }}>
+                        {displayLabel}
+                    </Typography>
+                </Box>
+                <RequestDateIcon sx={{ fontSize: 18, color: '#bbb' }} />
+            </Box>
+
+            {/* iOS-style bottom sheet drum picker */}
+            <SwipeableDrawer
+                anchor="bottom"
+                open={open}
+                onClose={() => setOpen(false)}
+                onOpen={() => { }}
+                disableSwipeToOpen
+                PaperProps={{
+                    sx: {
+                        borderRadius: '20px 20px 0 0',
+                        backgroundColor: '#ffffff',
+                        pb: 2,
+                    },
+                }}
+                ModalProps={{ keepMounted: false }}
+            >
+                {/* Drag handle */}
+                <Box sx={{ width: 36, height: 4, borderRadius: 2, backgroundColor: '#d0d0d0', margin: '12px auto 4px' }} />
+
+                {/* Header row: title + Done */}
+                <Box sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    px: 2.5,
+                    pt: 1,
+                    pb: 1.5,
+                    borderBottom: '1px solid #f0f0f0',
+                }}>
+                    <Typography sx={{ fontSize: '1rem', fontWeight: 700, color: '#1a1a1a' }}>
+                        Select Date
+                    </Typography>
+                    <Typography
+                        onClick={() => setOpen(false)}
+                        sx={{ color: CALENDAR_BLUE, fontWeight: 700, fontSize: '0.95rem', cursor: 'pointer' }}
+                    >
+                        Done
+                    </Typography>
+                </Box>
+
+                {/* Selected date display */}
+                <Box sx={{ textAlign: 'center', py: 1.5, borderBottom: '1px solid #f5f5f5' }}>
+                    <Typography sx={{ fontSize: '1.1rem', fontWeight: 600, color: '#444' }}>
+                        {displayLabel}
+                    </Typography>
+                </Box>
+
+                {/* Drum wheels */}
+                <Box sx={{ position: 'relative', display: 'flex', height: CONTAINER_H, mx: 1 }}>
+                    {/* Selection highlight bar */}
+                    <Box sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: 4, right: 4,
+                        height: DRUM_ITEM_H,
+                        transform: 'translateY(-50%)',
+                        borderTop: '1px solid #d8d8d8',
+                        borderBottom: '1px solid #d8d8d8',
+                        borderRadius: '8px',
+                        backgroundColor: 'rgba(0,0,0,0.04)',
+                        pointerEvents: 'none',
+                        zIndex: 10,
+                    }} />
+
+                    {/* Top fade mask */}
+                    <Box sx={{
+                        position: 'absolute',
+                        top: 0, left: 0, right: 0,
+                        height: '38%',
+                        background: 'linear-gradient(to bottom, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 100%)',
+                        pointerEvents: 'none',
+                        zIndex: 5,
+                    }} />
+
+                    {/* Bottom fade mask */}
+                    <Box sx={{
+                        position: 'absolute',
+                        bottom: 0, left: 0, right: 0,
+                        height: '38%',
+                        background: 'linear-gradient(to top, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 100%)',
+                        pointerEvents: 'none',
+                        zIndex: 5,
+                    }} />
+
+                    <IOSDrumColumn items={IOS_MONTHS} selectedIndex={monthIdx} onChange={setMonthIdx} />
+                    <IOSDrumColumn
+                        key={`day-${drumDays.length}-${monthIdx}-${yearIdx}`}
+                        items={drumDays}
+                        selectedIndex={clampedDayIdx}
+                        onChange={setDayIdx}
+                    />
+                    <IOSDrumColumn items={IOS_YEARS} selectedIndex={yearIdx} onChange={setYearIdx} />
+                </Box>
+            </SwipeableDrawer>
+        </Box>
+    );
+};
+
+// ============================================
 // Component
 // ============================================
 
@@ -418,6 +679,10 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
     const [requestFromTime, setRequestFromTime] = useState('');
     const [requestToTime, setRequestToTime] = useState('');
     const [requestReason, setRequestReason] = useState('');
+    const [requestDate, setRequestDate] = useState(() => {
+        const today = new Date();
+        return today.toISOString().split('T')[0]; // 'YYYY-MM-DD'
+    });
     const [snackbarOpen, setSnackbarOpen] = useState(false);
 
     // ---- Swap agent selection state ----
@@ -566,6 +831,9 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
         setRequestReason('');
         setSelectionStart(null);
         setSelectionEnd(null);
+        // Reset date to today on close
+        const today = new Date();
+        setRequestDate(today.toISOString().split('T')[0]);
     }, []);
 
     const submitRequest = useCallback(() => {
@@ -1259,7 +1527,14 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
                                 </Box>
                             </SheetBanner>
 
+
                             <Box sx={{ px: 2.5, pt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                {/* Date picker */}
+                                <InlineDatePicker
+                                    value={requestDate}
+                                    onChange={setRequestDate}
+                                />
+
                                 {/* Swap summary */}
                                 <Box sx={{
                                     p: 2,
@@ -1273,7 +1548,9 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
                                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}>
                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem' }}>
                                             <Typography sx={{ fontSize: '0.8rem', color: '#666' }}>Day</Typography>
-                                            <Typography sx={{ fontSize: '0.8rem', fontWeight: 600 }}>{dayData?.day}, {dayData?.date}</Typography>
+                                            <Typography sx={{ fontSize: '0.8rem', fontWeight: 600 }}>
+                                                {requestDate ? new Date(requestDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) : `${dayData?.day}, ${dayData?.date}`}
+                                            </Typography>
                                         </Box>
                                         {selectedRequestType.id === 'shift_swap' && (
                                             <>
@@ -1379,11 +1656,16 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
                                 </Box>
                                 <Box>
                                     <SheetBannerTitle>{selectedRequestType.label}</SheetBannerTitle>
-                                    <SheetBannerSub>{dayData?.day}, {dayData?.date}</SheetBannerSub>
                                 </Box>
                             </SheetBanner>
 
                             <Box sx={{ px: 2.5, pt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                {/* Date picker */}
+                                <InlineDatePicker
+                                    value={requestDate}
+                                    onChange={setRequestDate}
+                                />
+
                                 {/* Time pickers (only for leave types) */}
                                 {selectedRequestType.needsTime && (
                                     <Box sx={{ display: 'flex', gap: 1.5 }}>

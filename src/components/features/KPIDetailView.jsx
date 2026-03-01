@@ -4,9 +4,11 @@ import {
     Box,
     Typography,
     IconButton,
-    Select,
-    MenuItem,
-    FormControl,
+    SwipeableDrawer,
+    List,
+    ListItemButton,
+    ListItemText,
+    Divider,
     Card,
     CardContent,
     ToggleButtonGroup,
@@ -22,6 +24,8 @@ import {
     TrendingDown as TrendingDownIcon,
     Flag as GoalIcon,
     BarChart as BreakdownIcon,
+    Check as CheckIcon,
+    ExpandMore as ExpandMoreIcon,
 } from '@mui/icons-material';
 import { AreaChart, Area, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, LineChart, Line, Cell } from 'recharts';
 import DisputeModal from '../common/DisputeModal';
@@ -118,15 +122,6 @@ const ContentCard = styled(Card)(({ theme }) => ({
     boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
 }));
 
-const IntervalSelector = styled(FormControl)(({ theme }) => ({
-    minWidth: 150,
-    backgroundColor: 'white',
-    borderRadius: '12px',
-    marginBottom: theme.spacing(2),
-    '& .MuiOutlinedInput-root': {
-        borderRadius: '12px',
-    },
-}));
 
 const ChartTitle = styled(Typography)(({ theme }) => ({
     fontSize: '1rem',
@@ -298,6 +293,7 @@ const KPIDetailView = ({ kpi, onBack, dateRange }) => {
     const [interval, setInterval] = useState(kpi.id === 'aht' || kpi.id === 'hold' ? '1hour' : 'daily');
     const [selectedInterval, setSelectedInterval] = useState(null);
     const [disputeModalOpen, setDisputeModalOpen] = useState(false);
+    const [intervalSheetOpen, setIntervalSheetOpen] = useState(false);
 
     const handleViewChange = (event, newView) => {
         if (newView !== null) {
@@ -305,9 +301,10 @@ const KPIDetailView = ({ kpi, onBack, dateRange }) => {
         }
     };
 
-    const handleIntervalChange = (event) => {
-        setInterval(event.target.value);
-        setSelectedInterval(null); // Reset selection when interval changes
+    const handleIntervalChange = (newValue) => {
+        setInterval(newValue);
+        setSelectedInterval(null);
+        setIntervalSheetOpen(false);
     };
 
     const handleBarClick = (data, index) => {
@@ -365,23 +362,95 @@ const KPIDetailView = ({ kpi, onBack, dateRange }) => {
         return null;
     };
 
-    // Render Breakdown View
     const renderBreakdownView = () => {
+        const currentIntervalLabel = availableIntervals.find(i => i.value === interval)?.label || interval;
         return (
             <Box>
-                <IntervalSelector size="small">
-                    <Select value={interval} onChange={handleIntervalChange}>
-                        {availableIntervals.map(int => (
-                            <MenuItem key={int.value} value={int.value}>
-                                {int.label}
-                            </MenuItem>
+                {/* Interval trigger chip */}
+                <Box
+                    onClick={() => setIntervalSheetOpen(true)}
+                    sx={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 0.75,
+                        px: 2,
+                        py: 1,
+                        mb: 2,
+                        borderRadius: '20px',
+                        backgroundColor: '#fff',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
+                        cursor: 'pointer',
+                        userSelect: 'none',
+                        border: '1.5px solid #e0e0e0',
+                        transition: 'box-shadow 0.15s',
+                        '&:hover': { boxShadow: '0 4px 14px rgba(0,0,0,0.14)' },
+                    }}
+                >
+                    <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: '#333' }}>
+                        {currentIntervalLabel}
+                    </Typography>
+                    <ExpandMoreIcon sx={{ fontSize: 18, color: '#888' }} />
+                </Box>
+
+                {/* Interval bottom sheet */}
+                <SwipeableDrawer
+                    anchor="bottom"
+                    open={intervalSheetOpen}
+                    onClose={() => setIntervalSheetOpen(false)}
+                    onOpen={() => { }}
+                    disableSwipeToOpen
+                    PaperProps={{
+                        sx: {
+                            borderRadius: '20px 20px 0 0',
+                            backgroundColor: '#fff',
+                            pb: 2,
+                        },
+                    }}
+                >
+                    {/* Handle */}
+                    <Box sx={{ width: 36, height: 4, borderRadius: 2, backgroundColor: '#d0d0d0', margin: '12px auto 4px' }} />
+
+                    <Typography sx={{ fontWeight: 700, fontSize: '1rem', px: 2.5, pt: 1, pb: 1.5 }}>
+                        Select Interval
+                    </Typography>
+                    <Divider />
+
+                    <List sx={{ pt: 0.5 }}>
+                        {availableIntervals.map((opt, idx) => (
+                            <Box key={opt.value}>
+                                <ListItemButton
+                                    onClick={() => handleIntervalChange(opt.value)}
+                                    sx={{
+                                        px: 2.5,
+                                        py: 1.5,
+                                        borderRadius: '12px',
+                                        mx: 1,
+                                        backgroundColor: interval === opt.value ? 'rgba(102,126,234,0.08)' : 'transparent',
+                                    }}
+                                >
+                                    <ListItemText
+                                        primary={opt.label}
+                                        primaryTypographyProps={{
+                                            fontWeight: interval === opt.value ? 700 : 500,
+                                            fontSize: '0.95rem',
+                                            color: interval === opt.value ? '#667eea' : '#222',
+                                        }}
+                                    />
+                                    {interval === opt.value && (
+                                        <CheckIcon sx={{ fontSize: 20, color: '#667eea' }} />
+                                    )}
+                                </ListItemButton>
+                                {idx < availableIntervals.length - 1 && (
+                                    <Divider sx={{ mx: 3 }} />
+                                )}
+                            </Box>
                         ))}
-                    </Select>
-                </IntervalSelector>
+                    </List>
+                </SwipeableDrawer>
 
                 <ContentCard>
                     <CardContent>
-                        <ChartTitle>Performance Breakdown by {availableIntervals.find(i => i.value === interval)?.label}</ChartTitle>
+                        <ChartTitle>Performance Breakdown by {currentIntervalLabel}</ChartTitle>
                         <Box sx={{ height: 300, ml: -2 }}>
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={breakdownData} margin={{ top: 10, right: 10, left: -20, bottom: 10 }} onClick={(data) => {

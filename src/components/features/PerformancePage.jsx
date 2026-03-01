@@ -405,11 +405,7 @@ const KPICard = styled(Card)(({ theme, performanceColor }) => ({
     borderRadius: '12px',
     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
     border: `2px solid ${performanceColor}20`,
-    cursor: 'pointer',
-    '&:active': {
-        transform: 'scale(0.97)',
-        transition: 'transform 0.1s ease',
-    },
+    cursor: 'default',
 }));
 
 const KPICardContent = styled(CardContent)(({ theme }) => ({
@@ -587,7 +583,7 @@ const PerformancePage = ({ selectedKPI, onKPIClick, onBack }) => {
                     };
 
                     return (
-                        <KPICard key={kpi.id} performanceColor={performanceColor} onClick={() => handleKPIClick(kpi)}>
+                        <KPICard key={kpi.id} performanceColor={performanceColor}>
                             <KPICardContent>
                                 <KPIHeader>
                                     <KPIName>{kpi.name}</KPIName>
