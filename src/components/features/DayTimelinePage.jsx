@@ -503,7 +503,7 @@ const IOSDrumColumn = ({ items, selectedIndex, onChange }) => {
 };
 
 // ---- Full date picker (trigger + drum) ----
-const InlineDatePicker = ({ value, onChange }) => {
+const InlineDatePicker = ({ value, onChange, label = 'Date' }) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -557,7 +557,7 @@ const InlineDatePicker = ({ value, onChange }) => {
                 <RequestDateIcon sx={{ fontSize: 20, color: open ? CALENDAR_BLUE : '#888' }} />
                 <Box sx={{ flex: 1 }}>
                     <Typography sx={{ fontSize: '0.65rem', color: open ? CALENDAR_BLUE : '#888', fontWeight: 600, lineHeight: 1, mb: 0.25 }}>
-                        Date
+                        {label}
                     </Typography>
                     <Typography sx={{ fontSize: '0.9rem', fontWeight: 600, color: '#1a1a1a', lineHeight: 1.2 }}>
                         {displayLabel}
@@ -691,6 +691,11 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
     const [requestDate, setRequestDate] = useState(() => {
         const today = new Date();
         return today.toISOString().split('T')[0]; // 'YYYY-MM-DD'
+    });
+    const [expiryDate, setExpiryDate] = useState(() => {
+        const d = new Date();
+        d.setDate(d.getDate() + 30); // default: 30 days from today
+        return d.toISOString().split('T')[0];
     });
     const [snackbarOpen, setSnackbarOpen] = useState(false);
 
@@ -826,15 +831,12 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
         params.set('view', 'request');
         params.set('requestType', type.id.replace(/_/g, '-'));
         window.history.replaceState(null, '', '?' + params.toString());
-        if (type.isSwap) {
-            setShowAgentPicker(true);
-        } else {
-            if (!type.needsTime) {
-                setRequestFromTime('');
-                setRequestToTime('');
-            }
-            setShowRequestForm(true);
+        // All types (swap or not) start with the request form
+        if (!type.needsTime) {
+            setRequestFromTime('');
+            setRequestToTime('');
         }
+        setShowRequestForm(true);
     }, []);
 
     const closeRequestForm = useCallback(() => {
@@ -1027,6 +1029,34 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
         if (!selectedRequestType?.isSwap || !dayData) return [];
         const myBreaks = activities.filter(a => a.id.startsWith('break'));
 
+        // For break_swap: expand each agent into one record per break
+        if (selectedRequestType.id === 'break_swap') {
+            return MOCK_AGENTS.flatMap((agent) => {
+                if (agent.isOff || agent.breaks.length === 0) {
+                    return [{
+                        ...agent,
+                        breaks: [],
+                        eligible: false,
+                        reason: agent.isOff ? 'Off day' : 'No breaks scheduled',
+                    }];
+                }
+                return agent.breaks.map((brk, idx) => {
+                    const conflict = myBreaks.some(
+                        myBrk => brk.start === myBrk.startMin && brk.end === myBrk.endMin
+                    );
+                    return {
+                        ...agent,
+                        id: `${agent.id}_b${idx}`,
+                        breaks: [brk],
+                        eligible: !conflict,
+                        reason: conflict
+                            ? 'Break time conflict'
+                            : `${brk.label} · ${formatMinutesToTime(brk.start)}-${formatMinutesToTime(brk.end)}`,
+                    };
+                });
+            });
+        }
+
         return MOCK_AGENTS.map((agent) => {
             let eligible = true;
             let reason = '';
@@ -1038,23 +1068,6 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
                         eligible = false; reason = 'Same shift';
                     } else {
                         reason = `${agent.shift?.start} - ${agent.shift?.end}`;
-                    }
-                    break;
-                case 'break_swap':
-                    if (agent.isOff) { eligible = false; reason = 'Off day'; }
-                    else {
-                        const hasConflict = myBreaks.some(myBrk =>
-                            agent.breaks.some(ab => ab.start === myBrk.startMin && ab.end === myBrk.endMin)
-                        );
-                        if (hasConflict) {
-                            eligible = false;
-                            reason = 'Break time conflict';
-                        } else if (agent.breaks.length === 0) {
-                            eligible = false;
-                            reason = 'No breaks scheduled';
-                        } else {
-                            reason = agent.breaks.map(b => `${formatMinutesToTime(b.start)}-${formatMinutesToTime(b.end)}`).join(', ');
-                        }
                     }
                     break;
                 case 'day_off_swap':
@@ -1605,27 +1618,22 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
 
 
                             <Box sx={{ px: 2.5, pt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                {/* Date picker */}
-                                <InlineDatePicker
-                                    value={requestDate}
-                                    onChange={setRequestDate}
-                                />
-
-                                {/* Swap summary */}
-                                <Box sx={{
-                                    p: 2,
-                                    borderRadius: '12px',
-                                    backgroundColor: '#f8f9fa',
-                                    border: '1px solid #e9ecef',
-                                }}>
+                                {/* Swap confirmation summary */}
+                                <Box sx={{ p: 2, borderRadius: '12px', backgroundColor: '#f8f9fa', border: '1px solid #e9ecef' }}>
                                     <Typography sx={{ fontWeight: 600, fontSize: '0.85rem', mb: 1, color: '#333' }}>
                                         Swap Summary
                                     </Typography>
                                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}>
-                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem' }}>
+                                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                             <Typography sx={{ fontSize: '0.8rem', color: '#666' }}>Day</Typography>
                                             <Typography sx={{ fontSize: '0.8rem', fontWeight: 600 }}>
                                                 {requestDate ? new Date(requestDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) : `${dayData?.day}, ${dayData?.date}`}
+                                            </Typography>
+                                        </Box>
+                                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                            <Typography sx={{ fontSize: '0.8rem', color: '#666' }}>Expires</Typography>
+                                            <Typography sx={{ fontSize: '0.8rem', fontWeight: 600 }}>
+                                                {expiryDate ? new Date(expiryDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) : '—'}
                                             </Typography>
                                         </Box>
                                         {selectedRequestType.id === 'shift_swap' && (
@@ -1642,9 +1650,9 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
                                         )}
                                         {selectedRequestType.id === 'break_swap' && (
                                             <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                <Typography sx={{ fontSize: '0.8rem', color: '#666' }}>Their Breaks</Typography>
+                                                <Typography sx={{ fontSize: '0.8rem', color: '#666' }}>Their Break</Typography>
                                                 <Typography sx={{ fontSize: '0.8rem', fontWeight: 600 }}>
-                                                    {selectedAgent.breaks.map(b => `${formatMinutesToTime(b.start)}-${formatMinutesToTime(b.end)}`).join(', ')}
+                                                    {selectedAgent.breaks[0] ? `${formatMinutesToTime(selectedAgent.breaks[0].start)}-${formatMinutesToTime(selectedAgent.breaks[0].end)}` : '—'}
                                                 </Typography>
                                             </Box>
                                         )}
@@ -1652,24 +1660,14 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
                                             <Typography sx={{ fontSize: '0.8rem', color: '#666' }}>Agent</Typography>
                                             <Typography sx={{ fontSize: '0.8rem', fontWeight: 600 }}>{selectedAgent.name}</Typography>
                                         </Box>
+                                        {requestReason ? (
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                <Typography sx={{ fontSize: '0.8rem', color: '#666' }}>Reason</Typography>
+                                                <Typography sx={{ fontSize: '0.8rem', fontWeight: 600, maxWidth: '60%', textAlign: 'right' }}>{requestReason}</Typography>
+                                            </Box>
+                                        ) : null}
                                     </Box>
                                 </Box>
-
-                                {/* Reason */}
-                                <TextField
-                                    label="Reason (optional)"
-                                    multiline
-                                    rows={2}
-                                    value={requestReason}
-                                    onChange={(e) => setRequestReason(e.target.value)}
-                                    size="small"
-                                    fullWidth
-                                    sx={{
-                                        '& .MuiOutlinedInput-root': {
-                                            borderRadius: '12px',
-                                        },
-                                    }}
-                                />
 
                                 {/* Submit */}
                                 <Button
@@ -1792,27 +1790,81 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
                                     }}
                                 />
 
-                                {/* Submit button */}
-                                <Button
-                                    variant="contained"
-                                    fullWidth
-                                    onClick={submitRequest}
-                                    sx={{
-                                        mt: 1,
-                                        py: 1.3,
-                                        borderRadius: '14px',
-                                        fontWeight: 700,
-                                        fontSize: '0.95rem',
-                                        textTransform: 'none',
-                                        background: `linear-gradient(135deg, ${selectedRequestType.color}, ${selectedRequestType.color}cc)`,
-                                        boxShadow: `0 4px 14px ${selectedRequestType.color}40`,
-                                        '&:hover': {
-                                            background: `linear-gradient(135deg, ${selectedRequestType.color}dd, ${selectedRequestType.color}aa)`,
-                                        },
-                                    }}
-                                >
-                                    Submit Request
-                                </Button>
+                                {/* Expiry Date picker */}
+                                <InlineDatePicker
+                                    value={expiryDate}
+                                    onChange={setExpiryDate}
+                                    label="Expiry Date"
+                                />
+
+                                {/* Remaining Balance — only for non-swap */}
+                                {!selectedRequestType.isSwap && (
+                                    <Box sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        px: 2,
+                                        py: 1.5,
+                                        borderRadius: '12px',
+                                        backgroundColor: '#f0f7ff',
+                                        border: '1.5px solid #c8e0ff',
+                                    }}>
+                                        <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: '#1565c0' }}>
+                                            Remaining Balance
+                                        </Typography>
+                                        <Typography sx={{ fontSize: '1rem', fontWeight: 800, color: '#1976d2' }}>
+                                            8 Days
+                                        </Typography>
+                                    </Box>
+                                )}
+
+                                {/* Submit / Next button */}
+                                {selectedRequestType.isSwap ? (
+                                    <Button
+                                        variant="contained"
+                                        fullWidth
+                                        onClick={() => {
+                                            setShowRequestForm(false);
+                                            setShowAgentPicker(true);
+                                        }}
+                                        sx={{
+                                            mt: 1,
+                                            py: 1.3,
+                                            borderRadius: '14px',
+                                            fontWeight: 700,
+                                            fontSize: '0.95rem',
+                                            textTransform: 'none',
+                                            background: `linear-gradient(135deg, ${selectedRequestType.color}, ${selectedRequestType.color}cc)`,
+                                            boxShadow: `0 4px 14px ${selectedRequestType.color}40`,
+                                            '&:hover': {
+                                                background: `linear-gradient(135deg, ${selectedRequestType.color}dd, ${selectedRequestType.color}aa)`,
+                                            },
+                                        }}
+                                    >
+                                        Next: Select Agent →
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        variant="contained"
+                                        fullWidth
+                                        onClick={submitRequest}
+                                        sx={{
+                                            mt: 1,
+                                            py: 1.3,
+                                            borderRadius: '14px',
+                                            fontWeight: 700,
+                                            fontSize: '0.95rem',
+                                            textTransform: 'none',
+                                            background: `linear-gradient(135deg, ${selectedRequestType.color}, ${selectedRequestType.color}cc)`,
+                                            boxShadow: `0 4px 14px ${selectedRequestType.color}40`,
+                                            '&:hover': {
+                                                background: `linear-gradient(135deg, ${selectedRequestType.color}dd, ${selectedRequestType.color}aa)`,
+                                            },
+                                        }}
+                                    >
+                                        Submit Request
+                                    </Button>
+                                )}
                             </Box>
                         </>
                     )}
