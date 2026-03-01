@@ -14,13 +14,39 @@ import DayTimelinePage from './components/features/DayTimelinePage';
 import AppLayout from './components/layout/AppLayout';
 import './App.css';
 
+// Fallback day used when navigating directly to dailyTimeline via URL paste
+const FALLBACK_DAY = {
+  day: 'Tuesday', date: 'Feb 4', isToday: true, isOffDay: false,
+  startTime: '2:00 PM', endTime: '10:00 PM', duration: '8 hours',
+};
+
+const readInitialState = () => {
+  const p = new URLSearchParams(window.location.search);
+  const page = p.get('page') || 'home';
+  const view = p.get('view') || '';
+  switch (page) {
+    case 'schedule':
+      if (view === 'dailyTimeline' || view === 'request')
+        return { currentPage: 'dayTimeline', selectedDayData: FALLBACK_DAY, scheduleList: [FALLBACK_DAY] };
+      return { currentPage: 'schedule' };
+    case 'performance': return { currentPage: 'performance' };
+    case 'rewards': return { currentPage: 'rewards' };
+    case 'requests': return { currentPage: 'requests' };
+    case 'coaching': return { currentPage: 'coaching' };
+    case 'disputes': return { currentPage: 'disputes' };
+    case 'home':
+    default: return { currentPage: 'home' };
+  }
+};
+
 function App() {
-  const [currentPage, setCurrentPage] = useState('home');
+  const initial = readInitialState();
+  const [currentPage, setCurrentPage] = useState(initial.currentPage);
   const [requestsTab, setRequestsTab] = useState(0);
   const [activitiesFilter, setActivitiesFilter] = useState('All');
   const [selectedKPI, setSelectedKPI] = useState(null);
-  const [selectedDayData, setSelectedDayData] = useState(null);
-  const [scheduleList, setScheduleList] = useState([]);
+  const [selectedDayData, setSelectedDayData] = useState(initial.selectedDayData || null);
+  const [scheduleList, setScheduleList] = useState(initial.scheduleList || []);
 
   const handleNotificationClick = (page, tabIndexOrFilter = 0) => {
     setCurrentPage(page);

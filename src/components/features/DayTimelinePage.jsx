@@ -91,7 +91,7 @@ const calculateBreaks = (startTime, endTime) => {
 // Constants
 // ============================================
 
-const HOUR_HEIGHT = 64; // px per hour
+const HOUR_HEIGHT = 96; // px per hour — gives 24px per 15-min slot (min break size)
 const TOTAL_HOURS = 24;
 const TIMELINE_HEIGHT = HOUR_HEIGHT * TOTAL_HOURS;
 const TIME_GUTTER_WIDTH = 56;
@@ -671,11 +671,20 @@ const InlineDatePicker = ({ value, onChange }) => {
 const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) => {
     const isOffDay = dayData?.isOffDay;
     const [selectedActivity, setSelectedActivity] = useState(null);
+    const urlRestoredRef = useRef(false); // prevent re-running on every activities change
 
     // ---- Request creation state ----
-    const [showTypePicker, setShowTypePicker] = useState(false);
+    const [showTypePicker, setShowTypePicker] = useState(() => {
+        const p = new URLSearchParams(window.location.search);
+        return p.get('view') === 'request' && !p.get('requestType');
+    });
     const [showRequestForm, setShowRequestForm] = useState(false);
-    const [selectedRequestType, setSelectedRequestType] = useState(null);
+    const [selectedRequestType, setSelectedRequestType] = useState(() => {
+        const p = new URLSearchParams(window.location.search);
+        const rt = p.get('requestType');
+        if (!rt) return null;
+        return REQUEST_TYPES.find(t => t.id.replace(/_/g, '-') === rt) || null;
+    });
     const [requestFromTime, setRequestFromTime] = useState('');
     const [requestToTime, setRequestToTime] = useState('');
     const [requestReason, setRequestReason] = useState('');
@@ -802,14 +811,22 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
 
     // ---- Request creation helpers ----
     const openTypePicker = useCallback(() => {
+        const params = new URLSearchParams();
+        params.set('page', 'schedule');
+        params.set('view', 'request');
+        window.history.replaceState(null, '', '?' + params.toString());
         setShowTypePicker(true);
     }, []);
 
     const selectRequestType = useCallback((type) => {
         setSelectedRequestType(type);
         setShowTypePicker(false);
+        const params = new URLSearchParams();
+        params.set('page', 'schedule');
+        params.set('view', 'request');
+        params.set('requestType', type.id.replace(/_/g, '-'));
+        window.history.replaceState(null, '', '?' + params.toString());
         if (type.isSwap) {
-            // Swap types go to agent selection
             setShowAgentPicker(true);
         } else {
             if (!type.needsTime) {
@@ -831,9 +848,6 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
         setRequestReason('');
         setSelectionStart(null);
         setSelectionEnd(null);
-        // Reset date to today on close
-        const today = new Date();
-        setRequestDate(today.toISOString().split('T')[0]);
     }, []);
 
     const submitRequest = useCallback(() => {
@@ -965,6 +979,48 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
 
         return items;
     }, [dayData, isOffDay]);
+
+    // After activities are computed, open the correct bottom sheet from URL params (runs once)
+    useEffect(() => {
+        if (urlRestoredRef.current || activities.length === 0) return;
+        urlRestoredRef.current = true;
+
+        const p = new URLSearchParams(window.location.search);
+        const view = p.get('view');
+        const shiftParam = p.get('shift');
+        const rtParam = p.get('requestType');
+
+        // Write the base dailyTimeline URL so back-navigation is clean
+        const base = new URLSearchParams();
+        base.set('page', 'schedule');
+        base.set('view', 'dailyTimeline');
+
+        if (shiftParam) {
+            // Find the matching activity by its slugified label
+            const match = activities.find(
+                a => a.label.replace(/[\s()]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').toLowerCase() === shiftParam
+            );
+            if (match) {
+                setSelectedActivity(match);
+                base.set('shift', shiftParam);
+            }
+        } else if (view === 'request' && rtParam) {
+            // Open the specific request form
+            const type = REQUEST_TYPES.find(t => t.id.replace(/_/g, '-') === rtParam);
+            if (type) {
+                setSelectedRequestType(type);
+                if (type.isSwap) setShowAgentPicker(true);
+                else setShowRequestForm(true);
+                base.set('view', 'request');
+                base.set('requestType', rtParam);
+            }
+        } else if (view === 'request') {
+            // Just open the type picker (already initialized via useState)
+            base.set('view', 'request');
+        }
+
+        window.history.replaceState(null, '', '?' + base.toString());
+    }, [activities]);
 
     // ---- Swap agent eligibility (must be after activities) ----
     const eligibleAgents = useMemo(() => {
@@ -1190,7 +1246,15 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
                                     <ActivityBlock
                                         key={act.id}
                                         gradient={act.gradient}
-                                        onClick={(e) => { e.stopPropagation(); setSelectedActivity(act); }}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setSelectedActivity(act);
+                                            const params = new URLSearchParams();
+                                            params.set('page', 'schedule');
+                                            params.set('view', 'dailyTimeline');
+                                            params.set('shift', act.label.replace(/[\s()]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').toLowerCase());
+                                            window.history.replaceState(null, '', '?' + params.toString());
+                                        }}
                                         sx={{
                                             top,
                                             height,
@@ -1257,7 +1321,13 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
             <SwipeableDrawer
                 anchor="bottom"
                 open={!!selectedActivity}
-                onClose={() => setSelectedActivity(null)}
+                onClose={() => {
+                    setSelectedActivity(null);
+                    const params = new URLSearchParams();
+                    params.set('page', 'schedule');
+                    params.set('view', 'dailyTimeline');
+                    window.history.replaceState(null, '', '?' + params.toString());
+                }}
                 onOpen={() => { }}
                 disableSwipeToOpen
                 PaperProps={{
@@ -1277,7 +1347,13 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', px: 1, pt: 0.5 }}>
                         <IconButton
                             size="small"
-                            onClick={() => setSelectedActivity(null)}
+                            onClick={() => {
+                                setSelectedActivity(null);
+                                const params = new URLSearchParams();
+                                params.set('page', 'schedule');
+                                params.set('view', 'dailyTimeline');
+                                window.history.replaceState(null, '', '?' + params.toString());
+                            }}
                             sx={{ color: '#aaa' }}
                         >
                             <CloseIcon fontSize="small" />
