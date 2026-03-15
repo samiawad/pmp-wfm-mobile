@@ -345,13 +345,13 @@ const DetailValue = styled(Typography)({
 // ============================================
 
 const REQUEST_TYPES = [
-    { id: 'day_off', label: 'Day Off', icon: <DayOffIcon />, color: '#e91e63', needsTime: false, isSwap: false },
-    { id: 'personal_leave', label: 'Personal Leave', icon: <PersonalLeaveIcon />, color: '#667eea', needsTime: true, isSwap: false },
-    { id: 'sick_leave', label: 'Sick Leave', icon: <SickLeaveIcon />, color: '#ff9800', needsTime: true, isSwap: false },
-    { id: 'sick_day_off', label: 'Sick Day Off', icon: <SickDayOffIcon />, color: '#f44336', needsTime: false, isSwap: false },
-    { id: 'shift_swap', label: 'Shift Swap', icon: <SwapIcon />, color: '#2196f3', needsTime: false, isSwap: true },
-    { id: 'break_swap', label: 'Break Swap', icon: <SwapIcon />, color: '#009688', needsTime: true, isSwap: true },
-    { id: 'day_off_swap', label: 'Day Off Swap', icon: <SwapIcon />, color: '#795548', needsTime: false, isSwap: true },
+    { id: 'day_off', label: 'Day Off', icon: <DayOffIcon />, color: '#e91e63', needsTime: false, isSwap: false, multiDay: true },
+    { id: 'personal_leave', label: 'Personal Leave', icon: <PersonalLeaveIcon />, color: '#667eea', needsTime: true, isSwap: false, multiDay: false },
+    { id: 'sick_leave', label: 'Sick Leave', icon: <SickLeaveIcon />, color: '#ff9800', needsTime: true, isSwap: false, multiDay: false },
+    { id: 'sick_day_off', label: 'Sick Day Off', icon: <SickDayOffIcon />, color: '#f44336', needsTime: false, isSwap: false, multiDay: true },
+    { id: 'shift_swap', label: 'Shift Swap', icon: <SwapIcon />, color: '#2196f3', needsTime: false, isSwap: true, multiDay: false },
+    { id: 'break_swap', label: 'Break Swap', icon: <SwapIcon />, color: '#009688', needsTime: true, isSwap: true, multiDay: false },
+    { id: 'day_off_swap', label: 'Day Off Swap', icon: <SwapIcon />, color: '#795548', needsTime: false, isSwap: true, multiDay: false },
 ];
 
 // ============================================
@@ -690,7 +690,11 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
     const [requestReason, setRequestReason] = useState('');
     const [requestDate, setRequestDate] = useState(() => {
         const today = new Date();
-        return today.toISOString().split('T')[0]; // 'YYYY-MM-DD'
+        return today.toISOString().split('T')[0];
+    });
+    const [requestToDate, setRequestToDate] = useState(() => {
+        const today = new Date();
+        return today.toISOString().split('T')[0]; // same as from by default
     });
     const [expiryDate, setExpiryDate] = useState(() => {
         const d = new Date();
@@ -1734,11 +1738,30 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
                             </SheetBanner>
 
                             <Box sx={{ px: 2.5, pt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                {/* Date picker */}
-                                <InlineDatePicker
-                                    value={requestDate}
-                                    onChange={setRequestDate}
-                                />
+                                {/* Date picker(s) */}
+                                {selectedRequestType.multiDay ? (
+                                    <Box sx={{ display: 'flex', gap: 1.5 }}>
+                                        <Box sx={{ flex: 1 }}>
+                                            <InlineDatePicker
+                                                value={requestDate}
+                                                onChange={setRequestDate}
+                                                label="From"
+                                            />
+                                        </Box>
+                                        <Box sx={{ flex: 1 }}>
+                                            <InlineDatePicker
+                                                value={requestToDate}
+                                                onChange={setRequestToDate}
+                                                label="To"
+                                            />
+                                        </Box>
+                                    </Box>
+                                ) : (
+                                    <InlineDatePicker
+                                        value={requestDate}
+                                        onChange={setRequestDate}
+                                    />
+                                )}
 
                                 {/* Time pickers (only for leave types) */}
                                 {selectedRequestType.needsTime && (

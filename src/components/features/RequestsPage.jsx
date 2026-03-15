@@ -149,12 +149,14 @@ const mockRequests = [
     {
         id: 1, type: 'Annual Leave', category: 'Time Off',
         fromDate: 'Jul 10', toDate: 'Jul 15',
+        expiryDate: 'Aug 15',
         comment: 'Summer vacation with family', created: '2 days ago',
         status: 'Pending', iconType: 'vacation'
     },
     {
         id: 2, type: 'Shift Swap', category: 'Swap',
         date: 'Jun 28', swapWith: 'Ahmed Al-Sayed',
+        expiryDate: 'Jul 5',
         comment: 'Family event in the evening', created: '1 week ago',
         status: 'Approved', iconType: 'swap'
     },
@@ -168,6 +170,7 @@ const mockRequests = [
     {
         id: 4, type: 'Break Swap', category: 'Swap',
         date: 'May 05', swapWith: 'Sara Hassan',
+        expiryDate: 'May 12',
         comment: 'Doctor appointment', created: '1 month ago',
         status: 'Rejected', iconType: 'break'
     },
@@ -251,7 +254,10 @@ const RequestsPage = ({ defaultTab = 0 }) => {
     React.useEffect(() => {
         try {
             const storedRequests = JSON.parse(localStorage.getItem('userRequests') || '[]');
-            if (storedRequests.length === 0 || !storedRequests[0].iconType) {
+            // Refresh if old cache is missing expiryDate
+            const needsRefresh = storedRequests.length === 0 || !storedRequests[0].iconType ||
+                storedRequests.some(r => r.category !== 'Dispute' && r.expiryDate === undefined);
+            if (needsRefresh) {
                 localStorage.setItem('userRequests', JSON.stringify(mockRequests));
                 setRequests(mockRequests);
             } else {
@@ -799,6 +805,21 @@ const RequestsPage = ({ defaultTab = 0 }) => {
                                     <Typography variant="caption" color="text.secondary" fontWeight={600}>CREATED</Typography>
                                     <Typography variant="body1" fontWeight={600} mt={0.5}>{selectedRequest.created}</Typography>
                                 </Box>
+                                {selectedRequest.expiryDate && (
+                                    <Box sx={{
+                                        p: 2,
+                                        bgcolor: '#fff8e1',
+                                        borderRadius: '12px',
+                                        border: '1px solid #ffe082',
+                                        gridColumn: '1 / -1',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                    }}>
+                                        <Typography variant="caption" color="#e65100" fontWeight={700} sx={{ letterSpacing: '0.06em' }}>EXPIRY DATE</Typography>
+                                        <Typography variant="body1" fontWeight={700} color="#e65100">{selectedRequest.expiryDate}</Typography>
+                                    </Box>
+                                )}
                             </Box>
 
                             {/* Additional Info */}
