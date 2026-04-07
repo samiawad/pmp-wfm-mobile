@@ -142,13 +142,13 @@ const ActionItemBox = styled(Box)({
 });
 
 const BannerCard = styled(Card)(({ theme }) => ({
-    background: 'linear-gradient(135deg, #FF512F 0%, #DD2476 100%)',
+    background: 'linear-gradient(135deg, #00c6ff 0%, #0072ff 100%)',
     borderRadius: 16,
     color: 'white',
     marginBottom: 20,
     position: 'relative',
     overflow: 'hidden',
-    boxShadow: '0 8px 24px rgba(221, 36, 118, 0.25)',
+    boxShadow: '0 8px 24px rgba(0, 114, 255, 0.25)',
     border: 'none',
 }));
 
@@ -162,43 +162,32 @@ const BannerDot = styled(Box)(({ active }) => ({
 
 // New Hero Carousel Styles
 const HeroCarouselWrapper = styled(Box)({
-    height: '45vh',
-    maxHeight: '320px',
+    height: '240px',
     marginBottom: 20,
     position: 'relative',
     width: '100%',
 });
 
-const HeroSlide = styled(Card)(({ theme, gradient }) => ({
+const HeroSlide = styled(Card)(({ theme }) => ({
     height: '100%',
-    borderRadius: 16,
-    background: gradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    borderRadius: 22,
+    background: '#1C1C1E',
     color: 'white',
     boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
     position: 'relative',
     overflow: 'hidden',
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'row',
 }));
 
-const UpcomingShiftRow = styled(Box)({
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '8px 0',
-    borderBottom: '1px solid rgba(255,255,255,0.15)',
-    '&:last-child': {
-        borderBottom: 'none',
-    },
-});
-
 const HeroDot = styled(Box)(({ active }) => ({
-    width: 8,
-    height: 8,
-    borderRadius: '50%',
-    backgroundColor: active ? '#fff' : 'rgba(255,255,255,0.4)',
-    margin: '0 4px',
+    width: active ? 16 : 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: active ? '#ffffff' : 'rgba(255,255,255,0.3)',
+    margin: '0 3px',
     cursor: 'pointer',
+    transition: 'all 0.3s ease',
 }));
 
 // ============================================
@@ -361,7 +350,7 @@ const HomeDashboard = ({ onAction, onPageChange, onDayClick }) => {
                                         }}
                                         sx={{
                                             backgroundColor: '#fff',
-                                            color: '#DD2476',
+                                            color: '#0072ff',
                                             fontWeight: 700,
                                             fontSize: '0.7rem',
                                             textTransform: 'none',
@@ -404,94 +393,184 @@ const HomeDashboard = ({ onAction, onPageChange, onDayClick }) => {
                 >
                     {/* Slide 1: Shift Highlights */}
                     {currentHeroSlide === 0 && (
-                        <HeroSlide gradient="linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)">
-                            <CardContent sx={{ p: 2.5, height: '100%', display: 'flex' }}>
-                                <Box
-                                    onClick={() => navigateToShift(mockShifts[0])}
-                                    sx={{
-                                        flex: 1,
-                                        borderRight: '1px solid rgba(255,255,255,0.2)',
-                                        pr: 2,
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        justifyContent: 'center',
-                                        cursor: 'pointer',
-                                        '&:active': { opacity: 0.7 }
-                                    }}
-                                >
-                                    <Typography sx={{ fontSize: '0.8rem', opacity: 0.8, mb: 0.5 }}>Current Shift</Typography>
-                                    <Typography sx={{ fontSize: '1.4rem', fontWeight: 800, lineHeight: 1.2 }}>{mockShifts[0].startTime}</Typography>
-                                    <Typography sx={{ fontSize: '1.4rem', fontWeight: 800, mb: 1 }}>{mockShifts[0].endTime}</Typography>
-                                    <ModernChip
-                                        label="In Progress"
-                                        size="small"
-                                        chipColor="linear-gradient(135deg, #11998e 0%, #38ef7d 100%)"
-                                        sx={{ width: 'fit-content' }}
-                                    />
+                        <HeroSlide>
+                            <Box
+                                onClick={() => navigateToShift(mockShifts[0])}
+                                sx={{
+                                    flex: 0.45,
+                                    p: 2.5,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    justifyContent: 'space-between',
+                                    cursor: 'pointer',
+                                    '&:active': { opacity: 0.7 }
+                                }}
+                            >
+                                <Box>
+                                    <Typography sx={{ color: '#FF453A', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                        {mockShifts[0].day}
+                                    </Typography>
+                                    <Typography sx={{ fontSize: '4rem', fontWeight: 400, lineHeight: 1.1, mt: 0.5, mb: 1 }}>
+                                        {mockShifts[0].date.split(' ')[1]}
+                                    </Typography>
                                 </Box>
-                                <Box sx={{ flex: 1, pl: 2, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                                    <UpcomingShiftRow
-                                        onClick={() => navigateToShift(mockShifts[1])}
-                                        sx={{ cursor: 'pointer', '&:active': { opacity: 0.7 } }}
-                                    >
-                                        <Typography sx={{ fontSize: '0.7rem', fontWeight: 600 }}>Tomorrow</Typography>
-                                        <Typography sx={{ fontSize: '0.7rem' }}>{mockShifts[1].startTime} - {mockShifts[1].endTime.split(' ')[0]}</Typography>
-                                    </UpcomingShiftRow>
-                                    <UpcomingShiftRow
-                                        onClick={() => navigateToShift(mockShifts[2])}
-                                        sx={{ cursor: 'pointer', '&:active': { opacity: 0.7 } }}
-                                    >
-                                        <Typography sx={{ fontSize: '0.7rem', fontWeight: 600 }}>Friday</Typography>
-                                        <Typography sx={{ fontSize: '0.7rem' }}>{mockShifts[2].startTime} - {mockShifts[2].endTime.split(' ')[0]}</Typography>
-                                    </UpcomingShiftRow>
-                                    <UpcomingShiftRow
-                                        onClick={() => navigateToShift(mockShifts[3])}
-                                        sx={{ cursor: 'pointer', '&:active': { opacity: 0.7 } }}
-                                    >
-                                        <Typography sx={{ fontSize: '0.7rem', fontWeight: 600 }}>Saturday</Typography>
-                                        <Typography sx={{ fontSize: '0.7rem', color: '#ffccbc' }}>OFF DAY</Typography>
-                                    </UpcomingShiftRow>
+                                <Typography sx={{ color: '#98989D', fontSize: '1rem', fontWeight: 500, lineHeight: 1.3 }}>
+                                    Current Shift<br/>
+                                    <span style={{ fontSize: '0.85rem' }}>{mockShifts[0].startTime}</span>
+                                </Typography>
+                            </Box>
+                            
+                            <Box sx={{ flex: 0.55, p: 2.5, pl: 0, display: 'flex', flexDirection: 'column' }}>
+                                <Typography sx={{ color: '#98989D', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', mb: 1.5 }}>
+                                    Upcoming Shifts
+                                </Typography>
+                                <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                    {/* Item 1 */}
+                                    <Box sx={{ display: 'flex', alignItems: 'center', backgroundColor: '#2C2C2E', borderRadius: '8px', p: 1.25 }}>
+                                        <Box sx={{ width: 22, height: 22, borderRadius: '50%', backgroundColor: '#30D158', display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 1.5, flexShrink: 0 }}>
+                                            <CalendarIcon sx={{ fontSize: 13, color: '#1C1C1E' }} />
+                                        </Box>
+                                        <Box>
+                                            <Typography sx={{ fontSize: '0.9rem', fontWeight: 500 }}>Tomorrow</Typography>
+                                        </Box>
+                                    </Box>
+                                    {/* Item 2 */}
+                                    <Box sx={{ display: 'flex', alignItems: 'center', backgroundColor: '#2C2C2E', borderRadius: '8px', p: 1.25 }}>
+                                        <Box sx={{ width: 22, height: 22, borderRadius: '50%', border: '2px solid #30D158', display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 1.5, flexShrink: 0 }}>
+                                        </Box>
+                                        <Box>
+                                            <Typography sx={{ fontSize: '0.9rem', fontWeight: 500 }}>Friday</Typography>
+                                            <Typography sx={{ fontSize: '0.75rem', color: '#98989D' }}>{mockShifts[2].startTime}</Typography>
+                                        </Box>
+                                    </Box>
+                                    {/* Item 3 */}
+                                    <Box sx={{ display: 'flex', alignItems: 'center', backgroundColor: '#2C2C2E', borderRadius: '8px', p: 1.25 }}>
+                                        <Box sx={{ width: 22, height: 22, borderRadius: '50%', border: '2px solid #30D158', display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 1.5, flexShrink: 0 }}>
+                                        </Box>
+                                        <Box>
+                                            <Typography sx={{ fontSize: '0.9rem', fontWeight: 500 }}>Saturday</Typography>
+                                            <Typography sx={{ fontSize: '0.75rem', color: '#98989D' }}>OFF DAY</Typography>
+                                        </Box>
+                                    </Box>
                                 </Box>
-                            </CardContent>
+                            </Box>
                         </HeroSlide>
                     )}
 
                     {/* Slide 2: Scorecard */}
                     {currentHeroSlide === 1 && (
-                        <HeroSlide gradient="linear-gradient(135deg, #FF0080 0%, #7928CA 100%)">
-                            <CardContent sx={{ p: 3, display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%' }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                                    <StyledAvatar bgGradient="rgba(255,255,255,0.2)">
-                                        <TrendingUpIcon sx={{ color: 'white' }} />
-                                    </StyledAvatar>
-                                    <Typography sx={{ fontWeight: 700, fontSize: '1.2rem' }}>Quality Score</Typography>
+                        <HeroSlide>
+                            <Box
+                                sx={{
+                                    flex: 0.45,
+                                    p: 2.5,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    justifyContent: 'space-between',
+                                }}
+                            >
+                                <Box>
+                                    <Typography sx={{ color: '#0A84FF', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                        QUALITY
+                                    </Typography>
+                                    <Typography sx={{ fontSize: '4rem', fontWeight: 400, lineHeight: 1.1, mt: 0.5, mb: 1 }}>
+                                        85<span style={{fontSize: '2rem'}}>%</span>
+                                    </Typography>
                                 </Box>
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 1 }}>
-                                    <Typography sx={{ fontSize: '3rem', fontWeight: 900, lineHeight: 1 }}>85%</Typography>
-                                    <Box sx={{ textAlign: 'right' }}>
-                                        <Typography sx={{ fontSize: '0.8rem', fontWeight: 600 }}>Goal: 90%</Typography>
-                                        <Typography sx={{ fontSize: '0.7rem', opacity: 0.8 }}>Last updated 2h ago</Typography>
+                                <Typography sx={{ color: '#98989D', fontSize: '1rem', fontWeight: 500, lineHeight: 1.3 }}>
+                                    Performance<br/>
+                                    <span style={{ fontSize: '0.85rem' }}>Updated 2h ago</span>
+                                </Typography>
+                            </Box>
+                            
+                            <Box sx={{ flex: 0.55, p: 2.5, pl: 0, display: 'flex', flexDirection: 'column' }}>
+                                <Typography sx={{ color: '#98989D', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', mb: 1.5 }}>
+                                    METRICS
+                                </Typography>
+                                <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                    {/* Item 1 */}
+                                    <Box sx={{ display: 'flex', alignItems: 'center', backgroundColor: '#2C2C2E', borderRadius: '8px', p: 1.25 }}>
+                                        <Box sx={{ width: 22, height: 22, borderRadius: '50%', backgroundColor: '#0A84FF', display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 1.5, flexShrink: 0 }}>
+                                            <TrendingUpIcon sx={{ fontSize: 13, color: '#1C1C1E' }} />
+                                        </Box>
+                                        <Box>
+                                            <Typography sx={{ fontSize: '0.9rem', fontWeight: 500 }}>Goal: 90%</Typography>
+                                        </Box>
+                                    </Box>
+                                    {/* Item 2 */}
+                                    <Box sx={{ display: 'flex', alignItems: 'center', backgroundColor: '#2C2C2E', borderRadius: '8px', p: 1.25 }}>
+                                        <Box sx={{ width: 22, height: 22, borderRadius: '50%', border: '2px solid #0A84FF', display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 1.5, flexShrink: 0 }}>
+                                        </Box>
+                                        <Box>
+                                            <Typography sx={{ fontSize: '0.9rem', fontWeight: 500 }}>On Track</Typography>
+                                            <Typography sx={{ fontSize: '0.75rem', color: '#98989D' }}>Keep training</Typography>
+                                        </Box>
                                     </Box>
                                 </Box>
-                                <StyledLinearProgress variant="determinate" value={85} sx={{ height: 10, borderRadius: 5 }} />
-                            </CardContent>
+                            </Box>
                         </HeroSlide>
                     )}
 
                     {/* Slide 3: Competition */}
                     {currentHeroSlide === 2 && (
-                        <HeroSlide gradient="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)" onClick={() => onPageChange('rewards')}>
-                            <CardContent sx={{ p: 3, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%', textAlign: 'center' }}>
-                                <TrophyOutlinedIcon sx={{ fontSize: 60, mb: 1, opacity: 0.9 }} />
-                                <Typography sx={{ fontSize: '1.5rem', fontWeight: 800 }}>Top 3 Salesman</Typography>
-                                <Typography sx={{ fontSize: '0.9rem', opacity: 0.9, mb: 2 }}>Current Competition: Spring Sprint</Typography>
-                                <Button
-                                    variant="outlined"
-                                    sx={{ color: 'white', borderColor: 'rgba(255,255,255,0.5)', textTransform: 'none', borderRadius: '20px' }}
-                                >
-                                    View Leaderboard
-                                </Button>
-                            </CardContent>
+                        <HeroSlide onClick={() => onPageChange('rewards')} sx={{ cursor: 'pointer', '&:active': { opacity: 0.7 } }}>
+                            <Box
+                                sx={{
+                                    flex: 0.45,
+                                    p: 2.5,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    justifyContent: 'space-between',
+                                }}
+                            >
+                                <Box>
+                                    <Typography sx={{ color: '#FFD60A', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                        RANKING
+                                    </Typography>
+                                    <Typography sx={{ fontSize: '4rem', fontWeight: 400, lineHeight: 1.1, mt: 0.5, mb: 1 }}>
+                                        #1
+                                    </Typography>
+                                </Box>
+                                <Typography sx={{ color: '#98989D', fontSize: '1rem', fontWeight: 500, lineHeight: 1.3 }}>
+                                    Spring Sprint<br/>
+                                    <span style={{ fontSize: '0.85rem' }}>Top Salesman</span>
+                                </Typography>
+                            </Box>
+                            
+                            <Box sx={{ flex: 0.55, p: 2.5, pl: 0, display: 'flex', flexDirection: 'column' }}>
+                                <Typography sx={{ color: '#98989D', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', mb: 1.5 }}>
+                                    LEADERBOARD
+                                </Typography>
+                                <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                    {/* Item 1 */}
+                                    <Box sx={{ display: 'flex', alignItems: 'center', backgroundColor: '#2C2C2E', borderRadius: '8px', p: 1.25 }}>
+                                        <Box sx={{ width: 22, height: 22, borderRadius: '50%', backgroundColor: '#FFD60A', display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 1.5, flexShrink: 0 }}>
+                                            <TrophyIcon sx={{ fontSize: 13, color: '#1C1C1E' }} />
+                                        </Box>
+                                        <Box>
+                                            <Typography sx={{ fontSize: '0.9rem', fontWeight: 500 }}>Omar Jabri</Typography>
+                                        </Box>
+                                    </Box>
+                                    {/* Item 2 */}
+                                    <Box sx={{ display: 'flex', alignItems: 'center', backgroundColor: '#2C2C2E', borderRadius: '8px', p: 1.25 }}>
+                                        <Box sx={{ width: 22, height: 22, borderRadius: '50%', border: '2px solid #FFD60A', display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 1.5, flexShrink: 0 }}>
+                                            <Typography sx={{fontSize: '0.6rem', color: '#FFD60A', fontWeight: 800}}>2</Typography>
+                                        </Box>
+                                        <Box>
+                                            <Typography sx={{ fontSize: '0.9rem', fontWeight: 500 }}>Sara Ahmed</Typography>
+                                        </Box>
+                                    </Box>
+                                    {/* Item 3 */}
+                                    <Box sx={{ display: 'flex', alignItems: 'center', backgroundColor: '#2C2C2E', borderRadius: '8px', p: 1.25 }}>
+                                        <Box sx={{ width: 22, height: 22, borderRadius: '50%', border: '2px solid #FFD60A', display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 1.5, flexShrink: 0 }}>
+                                            <Typography sx={{fontSize: '0.6rem', color: '#FFD60A', fontWeight: 800}}>3</Typography>
+                                        </Box>
+                                        <Box>
+                                            <Typography sx={{ fontSize: '0.9rem', fontWeight: 500 }}>Ali Hasan</Typography>
+                                        </Box>
+                                    </Box>
+                                </Box>
+                            </Box>
                         </HeroSlide>
                     )}
                 </Box>
@@ -602,10 +681,10 @@ const HomeDashboard = ({ onAction, onPageChange, onDayClick }) => {
 
             {/* Pending Actions */}
             <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1.5, color: '#333' }}>Team Updates</Typography>
-            <ModernCard gradient="linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)">
+            <ModernCard gradient="linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)">
                 <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 1.5 }}>
-                        <StyledAvatar bgGradient="linear-gradient(135deg, #ff9a56 0%, #ff6a00 100%)">
+                        <StyledAvatar bgGradient="linear-gradient(135deg, #667eea 0%, #764ba2 100%)">
                             <WarningIcon sx={{ fontSize: 20 }} />
                         </StyledAvatar>
                         <Box>

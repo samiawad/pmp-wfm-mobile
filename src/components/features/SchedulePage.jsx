@@ -827,18 +827,11 @@ const SchedulePage = ({ onDayClick }) => {
                                     cursor: cell.shift ? 'pointer' : 'default',
                                     transition: 'all 0.15s ease',
                                     position: 'relative',
-                                    border: '1.5px solid #e8e8e8',
+                                    border: '1.5px solid transparent',
+                                    backgroundColor: 'transparent',
                                     ...(cell.isToday && {
                                         background: 'linear-gradient(135deg, #667eea, #764ba2)',
                                         boxShadow: '0 3px 10px rgba(102,126,234,0.4)',
-                                        border: '1.5px solid transparent',
-                                    }),
-                                    ...(isOff && !cell.isToday && {
-                                        backgroundColor: '#fff5f5',
-                                        border: '1.5px solid #ffcdd2',
-                                    }),
-                                    ...(noData && !cell.isToday && {
-                                        backgroundColor: '#fafafa',
                                     }),
                                     '&:active': cell.shift ? {
                                         transform: 'scale(0.9)',

@@ -36,6 +36,7 @@ import {
     NotificationImportant as AlertIcon,
     Description as LogIcon,
     ExpandMore as DropdownIcon,
+    ChevronRight as ChevronRightIcon,
 } from '@mui/icons-material';
 
 // ============================================
@@ -412,63 +413,34 @@ const ActivitiesPage = ({ initialFilter = 'All' }) => {
             {Object.keys(groupedActivities).length > 0 ? (
                 Object.keys(groupedActivities).map((date) => (
                     <TimelineGroup key={date}>
-                        <GroupDate>{date}</GroupDate>
-                        <TableContainer component={Paper} sx={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
-                            <Table size="small">
-                                <TableHead sx={{ backgroundColor: '#f9f9f9' }}>
-                                    <TableRow>
-                                        <TableCell sx={{ fontWeight: 700, width: '80px' }}>Time</TableCell>
-                                        {filterCategory === 'All' && <TableCell sx={{ fontWeight: 700 }}>Type</TableCell>}
-                                        <TableCell sx={{ fontWeight: 700 }}>Activity</TableCell>
-                                        <TableCell sx={{ fontWeight: 700 }} align="right">Status</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {groupedActivities[date].map((activity) => (
-                                        <TableRow
-                                            key={activity.id}
-                                            hover
-                                            onClick={() => setSelectedActivity(activity)}
-                                            sx={{ cursor: 'pointer' }}
-                                        >
-                                            <TableCell sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
-                                                {activity.time}
-                                            </TableCell>
-                                            {filterCategory === 'All' && (
-                                                <TableCell>
-                                                    <Chip
-                                                        label={activity.category}
-                                                        size="small"
-                                                        sx={{
-                                                            fontSize: '0.65rem',
-                                                            height: 20,
-                                                            backgroundColor: `${activity.color}15`,
-                                                            color: activity.color,
-                                                            fontWeight: 600,
-                                                            border: `1px solid ${activity.color}30`
-                                                        }}
-                                                    />
-                                                </TableCell>
-                                            )}
-                                            <TableCell>
-                                                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                                                    <Typography sx={{ fontWeight: 600, fontSize: '0.85rem' }}>{activity.title}</Typography>
-                                                    <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>{activity.description}</Typography>
-                                                </Box>
-                                            </TableCell>
-                                            <TableCell align="right">
-                                                <Chip
-                                                    label={activity.status}
-                                                    size="small"
-                                                    color={getStatusColor(activity.status)}
-                                                    sx={{ textTransform: 'capitalize', fontWeight: 600, height: 22, fontSize: '0.7rem' }}
-                                                />
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
+                        <GroupDate sx={{ pl: 1.5, mb: 1, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.5px' }}>{date}</GroupDate>
+                        <Box sx={{ backgroundColor: '#fff', borderRadius: '12px', overflow: 'hidden' }}>
+                            {groupedActivities[date].map((activity, index) => (
+                                <Box
+                                    key={activity.id}
+                                    onClick={() => setSelectedActivity(activity)}
+                                    sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        px: 2,
+                                        py: 1.5,
+                                        cursor: 'pointer',
+                                        borderBottom: index !== groupedActivities[date].length - 1 ? '1px solid #f0f0f0' : 'none',
+                                        '&:active': { backgroundColor: '#f2f2f7' }
+                                    }}
+                                >
+                                    <Box sx={{ width: '80px', flexShrink: 0 }}>
+                                        <Typography sx={{ fontSize: '0.85rem', fontWeight: 400, color: '#000' }}>
+                                            {activity.time}
+                                        </Typography>
+                                    </Box>
+                                    <Typography sx={{ flex: 1, fontSize: '0.9rem', fontWeight: 400, color: '#000' }}>
+                                        {filterCategory === 'All' ? activity.category : activity.title}
+                                    </Typography>
+                                    <ChevronRightIcon sx={{ color: '#c7c7cc', fontSize: 20 }} />
+                                </Box>
+                            ))}
+                        </Box>
                     </TimelineGroup>
                 ))
             ) : (
