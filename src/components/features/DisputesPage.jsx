@@ -14,9 +14,6 @@ import {
     Button,
 } from '@mui/material';
 import {
-    FilterList as FilterIcon,
-    Search as SearchIcon,
-    CalendarToday as DateBaseIcon,
     CheckCircle as ApprovedIcon,
     Cancel as RejectedIcon,
     HourglassEmpty as PendingIcon,
@@ -49,7 +46,7 @@ const FilterRow = styled(Box)(({ theme }) => ({
 const PageTitle = styled(Typography)({
     fontWeight: 700,
     fontSize: '1rem',
-    color: 'var(--color-on-background)',
+    color: '#1a1a1a',
     whiteSpace: 'nowrap',
     flexShrink: 0,
 });
@@ -220,7 +217,7 @@ const DisputesPage = () => {
                                         {dispute.date}
                                     </Typography>
                                 </Box>
-                                <Typography variant="body2" color="var(--text-primary)" sx={{ mb: 2 }}>
+                                <Typography variant="body2" sx={{ mb: 2, color: '#1a1a1a' }}>
                                     Reason: {dispute.reason}
                                 </Typography>
 

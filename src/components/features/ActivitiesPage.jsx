@@ -3,39 +3,23 @@ import { styled } from '@mui/material/styles';
 import {
     Box,
     Typography,
-    Card,
-    CardContent,
     Chip,
     TextField,
     InputAdornment,
     IconButton,
-    Avatar,
-    InputLabel,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Paper,
     SwipeableDrawer,
-    List,
-    ListItem,
-    ListItemText,
-    ListItemButton,
-    Radio,
+    Divider,
+    Paper,
 } from '@mui/material';
 import {
     Search as SearchIcon,
     EmojiEvents as RecognitionIcon,
     Gavel as DisciplinaryIcon,
     Close as CloseIcon,
-    List as FilterIcon,
     School as CoachingIcon,
     Assignment as EvaluationIcon,
     NotificationImportant as AlertIcon,
     Description as LogIcon,
-    ExpandMore as DropdownIcon,
 } from '@mui/icons-material';
 
 // ============================================
@@ -47,112 +31,90 @@ const PageContainer = styled(Box)(({ theme }) => ({
     width: '100%',
     padding: '16px',
     boxSizing: 'border-box',
-    paddingBottom: theme.spacing(2),
+    paddingBottom: theme.spacing(10),
+    display: 'flex',
+    flexDirection: 'column',
+    gap: theme.spacing(2),
 }));
 
-const FilterRow = styled(Box)(({ theme }) => ({
+// Full-width pill search bar
+const SearchBar = styled(TextField)({
+    width: '100%',
+    '& .MuiOutlinedInput-root': {
+        height: 44,
+        borderRadius: 24,
+        backgroundColor: '#ffffff',
+        fontSize: '0.875rem',
+        '& fieldset': { borderColor: '#e0e0e0' },
+        '&:hover fieldset': { borderColor: '#bdbdbd' },
+        '&.Mui-focused fieldset': { borderColor: 'var(--primary-color)' },
+    },
+});
+
+// Horizontally scrollable chip row — no title, no dropdown
+const ChipsRow = styled(Box)({
     display: 'flex',
-    alignItems: 'center',
     gap: 8,
     overflowX: 'auto',
-    paddingBottom: theme.spacing(1.5),
-    marginBottom: theme.spacing(1),
     scrollbarWidth: 'none',
     '&::-webkit-scrollbar': { display: 'none' },
     flexWrap: 'nowrap',
-}));
-
-const PageTitle = styled(Typography)({
-    fontWeight: 700,
-    fontSize: '1rem',
-    color: 'var(--color-on-background)',
-    whiteSpace: 'nowrap',
-    flexShrink: 0,
 });
 
-const FilterSearchField = styled(TextField)({
-    width: 'fit-content',
-    flexShrink: 0,
-    '& .MuiOutlinedInput-root': {
-        height: 32,
-        borderRadius: 20,
-        backgroundColor: '#fff',
-        fontSize: '0.75rem',
-        '& fieldset': { borderColor: '#e0e0e0' },
-    },
-    minWidth: 120,
-});
-
-const TimelineGroup = styled(Box)(({ theme }) => ({
-    marginBottom: theme.spacing(3),
-}));
-
-const GroupDate = styled(Typography)(({ theme }) => ({
-    fontSize: '0.875rem',
+// Pill filter chip — selected = solid blue, unselected = white outlined
+// IONIC MIGRATION: replace with IonSegment / IonSegmentButton
+const FilterChip = styled(Chip, {
+    shouldForwardProp: (prop) => prop !== 'isSelected',
+})(({ isSelected }) => ({
+    height: 34,
+    borderRadius: 17,
     fontWeight: 600,
-    color: 'var(--text-secondary)',
-    marginBottom: theme.spacing(1.5),
-    paddingLeft: theme.spacing(1),
-}));
-
-const ActivityTitle = styled(Typography)(({ theme }) => ({
-    fontWeight: 600,
-    fontSize: '1rem',
-    color: 'var(--text-primary)',
-}));
-
-const ActivityMeta = styled(Typography)(({ theme }) => ({
-    fontSize: '0.875rem',
-    color: 'var(--text-secondary)',
-}));
-
-const FilterChip = styled(Chip)(({ theme, active, selected }) => ({
-    height: 32,
-    borderRadius: 20,
-    backgroundColor: (active || selected) ? undefined : '#fff',
-    background: (active || selected) ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : undefined,
-    color: (active || selected) ? '#fff' : 'var(--text-primary)',
-    fontWeight: 500,
-    fontSize: '0.75rem',
-    border: (active || selected) ? 'none' : '1px solid #e0e0e0',
+    fontSize: '0.8rem',
     cursor: 'pointer',
-    whiteSpace: 'nowrap',
     flexShrink: 0,
-    '& .MuiChip-icon': {
-        color: (active || selected) ? '#fff' : 'inherit',
-        fontSize: 16,
-        marginLeft: '8px',
-    },
+    backgroundColor: isSelected ? 'var(--primary-color)' : '#ffffff',
+    color: isSelected ? '#ffffff' : '#555',
+    border: isSelected ? '1.5px solid var(--primary-color)' : '1.5px solid #e0e0e0',
+    transition: 'all 0.15s ease',
     '&:hover': {
+        backgroundColor: isSelected ? 'var(--primary-color)' : '#f5f5f5',
+        border: isSelected ? '1.5px solid var(--primary-color)' : '1.5px solid #bdbdbd',
+    },
+    '& .MuiChip-label': {
+        paddingLeft: 14,
+        paddingRight: 14,
+    },
+}));
+
+// Date section header — "Today", "Yesterday", "Oct 23, 2023"
+const DateHeader = styled(Typography)({
+    fontSize: '0.75rem',
+    fontWeight: 700,
+    color: '#9e9e9e',
+    textTransform: 'uppercase',
+    letterSpacing: '0.6px',
+    marginBottom: 8,
+    paddingLeft: 2,
+});
+
+// Activity feed card — left accent border, white bg, tap feedback
+const ActivityCard = styled(Box, {
+    shouldForwardProp: (prop) => prop !== 'accentColor',
+})(({ accentColor }) => ({
+    backgroundColor: '#ffffff',
+    borderRadius: '12px',
+    borderLeft: `4px solid ${accentColor}`,
+    boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+    padding: '14px 14px 12px 14px',
+    marginBottom: 8,
+    cursor: 'pointer',
+    transition: 'opacity 0.1s ease',
+    '&:active': {
         opacity: 0.85,
     },
 }));
 
-const DropdownTrigger = styled(Box)(({ theme }) => ({
-    height: 32,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 8,
-    padding: '0 12px 0 8px',
-    borderRadius: 20,
-    backgroundColor: '#fff',
-    border: '1px solid #c4c4c4',
-    cursor: 'pointer',
-    color: 'var(--text-primary)',
-    fontWeight: 500,
-    fontSize: '0.75rem',
-    whiteSpace: 'nowrap',
-    flexShrink: 0,
-    '&:hover': {
-        borderColor: '#212121',
-        backgroundColor: '#fafafa',
-    },
-    '&:active': {
-        backgroundColor: '#f5f5f5',
-    },
-}));
-
+// Sheet drag handle
 const DragHandle = styled(Box)({
     width: 36,
     height: 4,
@@ -166,160 +128,105 @@ const DragHandle = styled(Box)({
 // ============================================
 
 const activities = [
-    // --- Coaching ---
+    // Today
     {
-        id: 101,
-        category: 'Coaching',
-        type: 'coaching',
+        id: 101, category: 'Coaching', type: 'coaching',
         title: 'Coaching on AHT',
-        description: 'Status: Completed',
-        time: '10:00 AM',
-        date: 'Today',
-        status: 'completed',
-        icon: <CoachingIcon />,
-        color: '#2196f3',
+        description: 'Session completed with supervisor',
+        time: '10:00 AM', date: 'Today', status: 'completed',
+        icon: <CoachingIcon />, color: '#1565c0',
     },
     {
-        id: 102,
-        category: 'Coaching',
-        type: 'coaching',
-        title: 'Coaching on Quality Score',
-        description: 'Status: Scheduled',
-        time: '02:00 PM',
-        date: 'Tomorrow',
-        status: 'scheduled',
-        icon: <CoachingIcon />,
-        color: '#ff9800',
-    },
-
-    // --- Evaluations ---
-    {
-        id: 201,
-        category: 'Evaluations',
-        type: 'evaluation',
-        title: 'Call Quality Audit',
-        description: 'Score: 92% (Excellent)',
-        time: '04:30 PM',
-        date: 'Yesterday',
-        status: 'reviewed',
-        icon: <EvaluationIcon />,
-        color: '#9c27b0',
-    },
-    {
-        id: 202,
-        category: 'Evaluations',
-        type: 'evaluation',
-        title: 'Email Etiquette Check',
-        description: 'Score: 88% (Good)',
-        time: '11:15 AM',
-        date: 'Oct 23, 2023',
-        status: 'reviewed',
-        icon: <EvaluationIcon />,
-        color: '#673ab7',
-    },
-
-    // --- Alerts ---
-    {
-        id: 301,
-        category: 'Alerts',
-        type: 'alert',
+        id: 301, category: 'Alerts', type: 'alert',
         title: 'Sudden Drop in Quality',
         description: 'Quality score dropped below 85%',
-        time: '09:00 AM',
-        date: 'Today',
-        status: 'critical',
-        icon: <AlertIcon />,
-        color: '#f44336',
+        time: '09:00 AM', date: 'Today', status: 'critical',
+        icon: <AlertIcon />, color: '#e53935',
     },
     {
-        id: 302,
-        category: 'Alerts',
-        type: 'alert',
-        title: 'Adherence Warning',
-        description: 'Out of adherence for > 15 mins',
-        time: '01:45 PM',
-        date: 'Yesterday',
-        status: 'warning',
-        icon: <AlertIcon />,
-        color: '#ff9800',
-    },
-
-    // --- Events (Disciplinary & Recognition) ---
-    {
-        id: 401,
-        category: 'Events',
-        type: 'disciplinary',
-        title: 'Disciplinary Action',
-        description: 'Severe customer mishandling (-15 Points)',
-        time: '09:15 AM',
-        date: 'Yesterday',
-        status: 'warning',
-        icon: <DisciplinaryIcon />,
-        color: '#f44336',
-    },
-    {
-        id: 402,
-        category: 'Events',
-        type: 'disciplinary',
-        title: 'Disciplinary Action',
-        description: 'Sarcasm language during call (-5 Points)',
-        time: '02:30 PM',
-        date: 'Yesterday',
-        status: 'rejected',
-        icon: <DisciplinaryIcon />,
-        color: '#d32f2f',
-    },
-    {
-        id: 403,
-        category: 'Events',
-        type: 'disciplinary',
-        title: 'Security Compliance',
-        description: 'Sharing account with others (-50 Points)',
-        time: '04:00 PM',
-        date: 'Oct 24, 2023',
-        status: 'critical',
-        icon: <DisciplinaryIcon />,
-        color: '#b71c1c',
-    },
-    {
-        id: 404,
-        category: 'Events',
-        type: 'recognition',
-        title: 'Recognition',
+        id: 404, category: 'Events', type: 'recognition',
+        title: 'Recognition Awarded',
         description: 'Excellent Customer Feedback (+10 Points)',
-        time: '08:58 AM',
-        date: 'Today',
-        status: 'success',
-        icon: <RecognitionIcon />,
-        color: '#4caf50',
+        time: '08:58 AM', date: 'Today', status: 'success',
+        icon: <RecognitionIcon />, color: '#2e7d32',
     },
-
-    // --- Logs (System Events) ---
     {
-        id: 501,
-        category: 'Logs',
-        type: 'login',
+        id: 502, category: 'Logs', type: 'break',
+        title: 'Morning Break',
+        description: '15 min break ended on time',
+        time: '11:15 AM', date: 'Today', status: 'completed',
+        icon: <LogIcon />, color: '#607d8b',
+    },
+    {
+        id: 501, category: 'Logs', type: 'login',
         title: 'System Login',
         description: 'Logged in from Mobile App',
-        time: '08:55 AM',
-        date: 'Today',
-        status: 'success',
-        icon: <LogIcon />,
-        color: '#607d8b',
+        time: '08:55 AM', date: 'Today', status: 'success',
+        icon: <LogIcon />, color: '#607d8b',
+    },
+
+    // Yesterday
+    {
+        id: 201, category: 'Evaluations', type: 'evaluation',
+        title: 'Call Quality Audit',
+        description: 'Score: 92% — Excellent',
+        time: '04:30 PM', date: 'Yesterday', status: 'reviewed',
+        icon: <EvaluationIcon />, color: '#6a1b9a',
     },
     {
-        id: 502,
-        category: 'Logs',
-        type: 'break',
-        title: 'Morning Break',
-        description: '15 mins break ended',
-        time: '11:15 AM',
-        date: 'Today',
-        status: 'completed',
-        icon: <LogIcon />,
-        color: '#607d8b',
+        id: 302, category: 'Alerts', type: 'alert',
+        title: 'Adherence Warning',
+        description: 'Out of adherence for > 15 mins',
+        time: '01:45 PM', date: 'Yesterday', status: 'warning',
+        icon: <AlertIcon />, color: '#e65100',
+    },
+    {
+        id: 401, category: 'Events', type: 'disciplinary',
+        title: 'Disciplinary Action',
+        description: 'Severe customer mishandling (−15 Points)',
+        time: '09:15 AM', date: 'Yesterday', status: 'warning',
+        icon: <DisciplinaryIcon />, color: '#c62828',
+    },
+    {
+        id: 102, category: 'Coaching', type: 'coaching',
+        title: 'Coaching on Quality Score',
+        description: 'Session scheduled with team lead',
+        time: '02:00 PM', date: 'Yesterday', status: 'scheduled',
+        icon: <CoachingIcon />, color: '#1565c0',
+    },
+
+    // Older
+    {
+        id: 202, category: 'Evaluations', type: 'evaluation',
+        title: 'Email Etiquette Check',
+        description: 'Score: 88% — Good',
+        time: '11:15 AM', date: 'Oct 23, 2023', status: 'reviewed',
+        icon: <EvaluationIcon />, color: '#6a1b9a',
+    },
+    {
+        id: 403, category: 'Events', type: 'disciplinary',
+        title: 'Security Compliance',
+        description: 'Sharing account with others (−50 Points)',
+        time: '04:00 PM', date: 'Oct 24, 2023', status: 'critical',
+        icon: <DisciplinaryIcon />, color: '#c62828',
     },
 ];
+
+// ============================================
+// Status Config
+// ============================================
+
+const STATUS_CONFIG = {
+    completed: { label: 'Completed', color: '#2e7d32', bg: '#e8f5e9' },
+    success:   { label: 'Success',   color: '#2e7d32', bg: '#e8f5e9' },
+    reviewed:  { label: 'Reviewed',  color: '#6a1b9a', bg: '#f3e5f5' },
+    scheduled: { label: 'Scheduled', color: '#0277bd', bg: '#e1f5fe' },
+    warning:   { label: 'Warning',   color: '#e65100', bg: '#fff3e0' },
+    critical:  { label: 'Critical',  color: '#c62828', bg: '#ffebee' },
+    rejected:  { label: 'Rejected',  color: '#c62828', bg: '#ffebee' },
+};
+const getStatusConfig = (status) =>
+    STATUS_CONFIG[status] || { label: status, color: '#757575', bg: '#f5f5f5' };
 
 // ============================================
 // Component
@@ -328,284 +235,253 @@ const activities = [
 const ActivitiesPage = ({ initialFilter = 'All' }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterCategory, setFilterCategory] = useState(initialFilter);
-    const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
     const [selectedActivity, setSelectedActivity] = useState(null);
 
-    const categories = ['All', 'Coaching', 'Logs', 'Events', 'Evaluations', 'Alerts'];
-
-    const handleCategorySelect = (category) => {
-        setFilterCategory(category);
-        setIsBottomSheetOpen(false);
-    };
+    const categories = ['All', 'Coaching', 'Evaluations', 'Alerts', 'Events', 'Logs'];
 
     useEffect(() => {
         setFilterCategory(initialFilter);
     }, [initialFilter]);
 
-    const getStatusColor = (status) => {
-        switch (status) {
-            case 'approved': return 'success';
-            case 'success': return 'success';
-            case 'info': return 'info';
-            case 'completed': return 'success';
-            case 'reviewed': return 'secondary';
-            case 'pending': return 'warning';
-            case 'warning': return 'warning';
-            case 'scheduled': return 'info';
-            case 'rejected': return 'error';
-            case 'critical': return 'error';
-            default: return 'default';
-        }
-    };
-
-    const handleFilterChange = (event) => {
-        setFilterCategory(event.target.value);
-    };
-
-    // Filter Activities
-    const filteredActivities = activities.filter(activity => {
-        const matchesSearch = activity.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            activity.description.toLowerCase().includes(searchTerm.toLowerCase());
-
-        const matchesCategory = filterCategory === 'All' || activity.category === filterCategory;
-
+    const filteredActivities = activities.filter((a) => {
+        const matchesSearch =
+            a.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            a.description.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesCategory = filterCategory === 'All' || a.category === filterCategory;
         return matchesSearch && matchesCategory;
     });
 
-    // Group filtered activities by date
-    const groupedActivities = filteredActivities.reduce((groups, activity) => {
-        const date = activity.date;
-        if (!groups[date]) {
-            groups[date] = [];
-        }
-        groups[date].push(activity);
-        return groups;
+    // Group by date — order is preserved from mock data
+    const groupedActivities = filteredActivities.reduce((acc, a) => {
+        if (!acc[a.date]) acc[a.date] = [];
+        acc[a.date].push(a);
+        return acc;
     }, {});
 
     return (
         <PageContainer>
-            {/* Title + Filters in one horizontal scrolling row */}
-            <FilterRow>
-                <PageTitle>Activities</PageTitle>
-                <DropdownTrigger onClick={() => setIsBottomSheetOpen(true)}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        {/* <FilterIcon sx={{ fontSize: '1rem', color: '#757575' }} /> */}
-                        {filterCategory}
-                    </Box>
-                    <DropdownIcon sx={{ fontSize: '1.2rem', color: '#757575' }} />
-                </DropdownTrigger>
-                <FilterSearchField
-                    placeholder="Search..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    size="small"
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <SearchIcon sx={{ fontSize: 16 }} color="action" />
-                            </InputAdornment>
-                        ),
-                    }}
-                />
-            </FilterRow>
 
+            {/* ── Search Bar ─────────────────────────────── */}
+            <SearchBar
+                placeholder="Search activities..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                size="small"
+                InputProps={{
+                    startAdornment: (
+                        <InputAdornment position="start">
+                            <SearchIcon sx={{ fontSize: 18, color: '#9e9e9e' }} />
+                        </InputAdornment>
+                    ),
+                    endAdornment: searchTerm ? (
+                        <InputAdornment position="end">
+                            <IconButton size="small" onClick={() => setSearchTerm('')} edge="end">
+                                <CloseIcon sx={{ fontSize: 16, color: '#9e9e9e' }} />
+                            </IconButton>
+                        </InputAdornment>
+                    ) : null,
+                }}
+            />
+
+            {/* ── Category Filter Chips ──────────────────── */}
+            {/* IONIC MIGRATION: replace with IonSegment */}
+            <ChipsRow>
+                {categories.map((cat) => (
+                    <FilterChip
+                        key={cat}
+                        label={cat}
+                        isSelected={filterCategory === cat}
+                        onClick={() => setFilterCategory(cat)}
+                    />
+                ))}
+            </ChipsRow>
+
+            {/* ── Activity Feed ──────────────────────────── */}
             {Object.keys(groupedActivities).length > 0 ? (
                 Object.keys(groupedActivities).map((date) => (
-                    <TimelineGroup key={date}>
-                        <GroupDate>{date}</GroupDate>
-                        <TableContainer component={Paper} sx={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
-                            <Table size="small">
-                                <TableHead sx={{ backgroundColor: '#f9f9f9' }}>
-                                    <TableRow>
-                                        <TableCell sx={{ fontWeight: 700, width: '80px' }}>Time</TableCell>
-                                        {filterCategory === 'All' && <TableCell sx={{ fontWeight: 700 }}>Type</TableCell>}
-                                        <TableCell sx={{ fontWeight: 700 }}>Activity</TableCell>
-                                        <TableCell sx={{ fontWeight: 700 }} align="right">Status</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {groupedActivities[date].map((activity) => (
-                                        <TableRow
-                                            key={activity.id}
-                                            hover
-                                            onClick={() => setSelectedActivity(activity)}
-                                            sx={{ cursor: 'pointer' }}
-                                        >
-                                            <TableCell sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>
-                                                {activity.time}
-                                            </TableCell>
-                                            {filterCategory === 'All' && (
-                                                <TableCell>
-                                                    <Chip
-                                                        label={activity.category}
-                                                        size="small"
-                                                        sx={{
-                                                            fontSize: '0.65rem',
-                                                            height: 20,
-                                                            backgroundColor: `${activity.color}15`,
-                                                            color: activity.color,
-                                                            fontWeight: 600,
-                                                            border: `1px solid ${activity.color}30`
-                                                        }}
-                                                    />
-                                                </TableCell>
-                                            )}
-                                            <TableCell>
-                                                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                                                    <Typography sx={{ fontWeight: 600, fontSize: '0.85rem' }}>{activity.title}</Typography>
-                                                    <Typography sx={{ fontSize: '0.75rem', color: 'text.secondary' }}>{activity.description}</Typography>
-                                                </Box>
-                                            </TableCell>
-                                            <TableCell align="right">
-                                                <Chip
-                                                    label={activity.status}
-                                                    size="small"
-                                                    color={getStatusColor(activity.status)}
-                                                    sx={{ textTransform: 'capitalize', fontWeight: 600, height: 22, fontSize: '0.7rem' }}
-                                                />
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                    </TimelineGroup>
+                    <Box key={date}>
+                        <DateHeader>{date}</DateHeader>
+
+                        {groupedActivities[date].map((activity) => {
+                            const sc = getStatusConfig(activity.status);
+                            return (
+                                <ActivityCard
+                                    key={activity.id}
+                                    accentColor={activity.color}
+                                    onClick={() => setSelectedActivity(activity)}
+                                >
+                                    {/* Row 1: title + time */}
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 0.5 }}>
+                                        <Typography sx={{
+                                            fontWeight: 700,
+                                            fontSize: '0.925rem',
+                                            color: '#1a1a1a',
+                                            flex: 1,
+                                            pr: 1,
+                                            lineHeight: 1.3,
+                                        }}>
+                                            {activity.title}
+                                        </Typography>
+                                        <Typography sx={{ fontSize: '0.72rem', color: '#9e9e9e', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                                            {activity.time}
+                                        </Typography>
+                                    </Box>
+
+                                    {/* Row 2: description */}
+                                    <Typography sx={{ fontSize: '0.82rem', color: '#666', mb: 1.25, lineHeight: 1.4 }}>
+                                        {activity.description}
+                                    </Typography>
+
+                                    {/* Row 3: category chip + status chip */}
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <Chip
+                                            label={activity.category}
+                                            size="small"
+                                            sx={{
+                                                height: 20,
+                                                fontSize: '0.68rem',
+                                                fontWeight: 600,
+                                                backgroundColor: `${activity.color}18`,
+                                                color: activity.color,
+                                                border: `1px solid ${activity.color}35`,
+                                            }}
+                                        />
+                                        <Chip
+                                            label={sc.label}
+                                            size="small"
+                                            sx={{
+                                                height: 20,
+                                                fontSize: '0.68rem',
+                                                fontWeight: 700,
+                                                backgroundColor: sc.bg,
+                                                color: sc.color,
+                                            }}
+                                        />
+                                    </Box>
+                                </ActivityCard>
+                            );
+                        })}
+                    </Box>
                 ))
             ) : (
-                <Box sx={{ textAlign: 'center', mt: 5, color: 'text.secondary' }}>
-                    <Typography>No activities found for this filter.</Typography>
+                <Box sx={{ textAlign: 'center', mt: 8, color: '#bdbdbd' }}>
+                    <Typography variant="body2" fontWeight={500}>No activities found.</Typography>
                 </Box>
             )}
 
-            {/* Bottom Sheet for Category Filter */}
-            <SwipeableDrawer
-                anchor="bottom"
-                open={isBottomSheetOpen}
-                onClose={() => setIsBottomSheetOpen(false)}
-                onOpen={() => setIsBottomSheetOpen(true)}
-                PaperProps={{
-                    sx: {
-                        borderTopLeftRadius: '24px',
-                        borderTopRightRadius: '24px',
-                        paddingBottom: '20px',
-                        maxHeight: '60vh'
-                    }
-                }}
-            >
-                <DragHandle />
-                <Box sx={{ px: 3, pt: 1, pb: 2 }}>
-                    <Typography variant="h6" fontWeight={700} textAlign="center">Filter Category</Typography>
-                </Box>
-                <List sx={{ pt: 1 }}>
-                    {categories.map((cat) => (
-                        <ListItem disablePadding key={cat}>
-                            <ListItemButton onClick={() => handleCategorySelect(cat)} sx={{ px: 3 }}>
-                                <Radio
-                                    checked={filterCategory === cat}
-                                    onChange={() => handleCategorySelect(cat)}
-                                    size="small"
-                                    sx={{ mr: 1 }}
-                                />
-                                <Typography sx={{ fontWeight: filterCategory === cat ? 700 : 500 }}>
-                                    {cat}
-                                </Typography>
-                            </ListItemButton>
-                        </ListItem>
-                    ))}
-                </List>
-
-            </SwipeableDrawer>
-
-            {/* Activity Details Sheet */}
+            {/* ── Activity Detail Bottom Sheet ───────────── */}
+            {/* IONIC MIGRATION: replace with IonModal */}
             <SwipeableDrawer
                 anchor="bottom"
                 open={Boolean(selectedActivity)}
                 onClose={() => setSelectedActivity(null)}
-                onOpen={() => setSelectedActivity(selectedActivity)}
+                onOpen={() => {}}
                 PaperProps={{
                     sx: {
                         borderTopLeftRadius: '24px',
                         borderTopRightRadius: '24px',
-                        padding: '0',
-                        maxHeight: '85vh'
+                        maxHeight: '85vh',
+                        display: 'flex',
+                        flexDirection: 'column',
                     }
                 }}
             >
-                {selectedActivity && (
-                    <Box sx={{ pb: 4 }}>
-                        <DragHandle />
-                        {/* Header */}
-                        <Box sx={{ px: 3, pt: 1, pb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 0 }}>
-                            <Box sx={{ display: 'flex', gap: 2 }}>
-                                <Box
-                                    sx={{
-                                        p: 2,
-                                        borderRadius: '16px',
-                                        backgroundColor: `${selectedActivity.color}15`,
-                                        color: selectedActivity.color,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        width: 56,
-                                        height: 56,
-                                    }}
-                                >
-                                    {React.cloneElement(selectedActivity.icon, { sx: { fontSize: 32 } })}
-                                </Box>
-                                <Box>
-                                    <Typography variant="h6" fontWeight={700} sx={{ lineHeight: 1.2, mb: 0.5 }}>
+                {selectedActivity && (() => {
+                    const sc = getStatusConfig(selectedActivity.status);
+                    return (
+                        <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                            <DragHandle />
+
+                            {/* Sheet nav header */}
+                            <Box sx={{ display: 'flex', alignItems: 'center', px: 2, pb: 1.5 }}>
+                                <Box sx={{ width: 40 }} />
+                                <Box sx={{ flexGrow: 1, textAlign: 'center' }}>
+                                    <Typography sx={{ fontWeight: 700, fontSize: '1rem', color: '#1a1a1a' }}>
                                         {selectedActivity.category}
                                     </Typography>
+                                    <Typography sx={{ fontSize: '0.75rem', color: '#888' }}>
+                                        {selectedActivity.date} · {selectedActivity.time}
+                                    </Typography>
+                                </Box>
+                                <IconButton size="small" onClick={() => setSelectedActivity(null)}>
+                                    <CloseIcon fontSize="small" />
+                                </IconButton>
+                            </Box>
+                            <Divider sx={{ borderColor: '#f0f0f0' }} />
+
+                            {/* Scrollable body */}
+                            <Box sx={{ overflowY: 'auto', flex: 1, p: 3, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+
+                                {/* Icon + title block */}
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                    <Box sx={{
+                                        width: 52, height: 52, borderRadius: 3, flexShrink: 0,
+                                        backgroundColor: `${selectedActivity.color}15`,
+                                        color: selectedActivity.color,
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    }}>
+                                        {React.cloneElement(selectedActivity.icon, { sx: { fontSize: 28 } })}
+                                    </Box>
+                                    <Box sx={{ flexGrow: 1 }}>
+                                        <Typography variant="h6" fontWeight={700} sx={{ lineHeight: 1.2, color: '#1a1a1a' }}>
+                                            {selectedActivity.title}
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ mt: 0.25, color: '#666' }}>
+                                            {selectedActivity.description}
+                                        </Typography>
+                                    </Box>
+                                </Box>
+
+                                {/* Chips row */}
+                                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                                     <Chip
-                                        label={selectedActivity.status}
+                                        label={selectedActivity.category}
                                         size="small"
-                                        color={getStatusColor(selectedActivity.status)}
                                         sx={{
+                                            backgroundColor: `${selectedActivity.color}15`,
+                                            color: selectedActivity.color,
                                             fontWeight: 600,
-                                            textTransform: 'capitalize',
-                                            height: 24
+                                            border: `1px solid ${selectedActivity.color}30`,
+                                        }}
+                                    />
+                                    <Chip
+                                        label={sc.label}
+                                        size="small"
+                                        sx={{
+                                            backgroundColor: sc.bg,
+                                            color: sc.color,
+                                            fontWeight: 700,
                                         }}
                                     />
                                 </Box>
-                            </Box>
-                        </Box>
 
-                        <Box sx={{ px: 3 }}>
-                            {/* Details */}
-                            <Typography variant="h5" fontWeight={700} sx={{ mb: 1 }}>
-                                {selectedActivity.title}
-                            </Typography>
-
-                            <Typography variant="body1" color="text.secondary" sx={{ mb: 3, lineHeight: 1.6 }}>
-                                {selectedActivity.description}
-                            </Typography>
-
-                            <Paper
-                                elevation={0}
-                                sx={{
-                                    p: 2,
+                                {/* Details info box */}
+                                <Paper elevation={0} sx={{
                                     borderRadius: '12px',
                                     backgroundColor: '#f9fafb',
                                     border: '1px solid #eef2f6',
-                                    mb: 3
-                                }}
-                            >
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
-                                    <Typography variant="body2" color="text.secondary">Date</Typography>
-                                    <Typography variant="body2" fontWeight={600}>{selectedActivity.date}</Typography>
-                                </Box>
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                    <Typography variant="body2" color="text.secondary">Time</Typography>
-                                    <Typography variant="body2" fontWeight={600}>{selectedActivity.time}</Typography>
-                                </Box>
-                            </Paper>
-
-
+                                    overflow: 'hidden',
+                                }}>
+                                    {[
+                                        { label: 'Date', value: selectedActivity.date },
+                                        { label: 'Time', value: selectedActivity.time },
+                                        { label: 'Type', value: selectedActivity.type.charAt(0).toUpperCase() + selectedActivity.type.slice(1) },
+                                    ].map((row, i, arr) => (
+                                        <React.Fragment key={row.label}>
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', px: 2, py: 1.5 }}>
+                                                <Typography variant="body2" sx={{ color: '#9e9e9e', fontWeight: 500 }}>{row.label}</Typography>
+                                                <Typography variant="body2" sx={{ fontWeight: 600, color: '#1a1a1a' }}>{row.value}</Typography>
+                                            </Box>
+                                            {i < arr.length - 1 && <Divider sx={{ borderColor: '#f0f0f0' }} />}
+                                        </React.Fragment>
+                                    ))}
+                                </Paper>
+                            </Box>
                         </Box>
-                    </Box>
-                )}
+                    );
+                })()}
             </SwipeableDrawer>
-        </PageContainer >
+        </PageContainer>
     );
 };
 

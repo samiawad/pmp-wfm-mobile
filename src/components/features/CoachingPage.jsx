@@ -5,12 +5,7 @@ import {
     Typography,
     Card,
     CardContent,
-    List,
-    ListItem,
-    ListItemIcon,
-    ListItemText,
     Chip,
-    Avatar,
     Divider,
 } from '@mui/material';
 import {
@@ -62,7 +57,6 @@ const PageTitle = styled(Typography)(({ theme }) => ({
     marginBottom: theme.spacing(0.5),
 }));
 
-// A generic row container
 const RowContainer = styled(Box)(({ theme }) => ({
     width: '100%',
     display: 'flex',
@@ -91,11 +85,11 @@ const CardHeader = styled(Box)(({ theme }) => ({
     backgroundColor: '#fff',
 }));
 
-const CardTitle = styled(Typography)(({ theme }) => ({
+const CardTitle = styled(Typography)({
     fontWeight: 700,
     fontSize: '1.05rem',
     color: '#2c3e50',
-}));
+});
 
 const StatCardContent = styled(CardContent)(({ theme }) => ({
     display: 'flex',
@@ -106,22 +100,22 @@ const StatCardContent = styled(CardContent)(({ theme }) => ({
     padding: `${theme.spacing(4)} !important`,
 }));
 
-const StatValue = styled(Typography)(({ theme }) => ({
+const StatValue = styled(Typography)({
     fontWeight: 800,
     fontSize: '2.75rem',
-    color: theme.palette.primary.main,
+    color: 'var(--primary-color)',
     lineHeight: 1,
-    marginBottom: theme.spacing(1),
+    marginBottom: 8,
     letterSpacing: '-1px',
-}));
+});
 
-const StatLabel = styled(Typography)(({ theme }) => ({
+const StatLabel = styled(Typography)({
     fontSize: '0.9rem',
     fontWeight: 600,
     color: '#7f8c8d',
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
-}));
+});
 
 // ============================================
 // Mock Data
@@ -137,21 +131,42 @@ const performanceData = [
 ];
 
 const sessionFocusData = [
-    { name: 'Quality', value: 45, color: '#4facfe' },
-    { name: 'AHT', value: 30, color: '#00f2fe' },
-    { name: 'Compliance', value: 25, color: '#a18cd1' },
+    { name: 'Quality',    value: 45, color: 'var(--primary-color)' },
+    { name: 'AHT',        value: 30, color: '#4caf50' },
+    { name: 'Compliance', value: 25, color: '#ff9800' },
 ];
 
 const milestones = [
-    { id: 1, title: 'Quality Champion', desc: 'Achieved 95% Quality for 2 months', date: 'June 2026', icon: <TrophyIcon htmlColor="#fff" />, iconBg: '#ffb347' },
-    { id: 2, title: 'AHT Improver', desc: 'Reduced AHT by 15%', date: 'May 2026', icon: <ImprovementIcon htmlColor="#fff" />, iconBg: '#00c6ff' },
-    { id: 3, title: 'Newbie No More', desc: 'Completed 5 Coaching Sessions', date: 'April 2026', icon: <SessionIcon htmlColor="#fff" />, iconBg: '#b993d6' },
+    {
+        id: 1,
+        title: 'Quality Champion',
+        desc: 'Achieved 95% Quality for 2 months',
+        date: 'June 2026',
+        icon: <TrophyIcon />,
+        color: '#f57c00',
+    },
+    {
+        id: 2,
+        title: 'AHT Improver',
+        desc: 'Reduced AHT by 15%',
+        date: 'May 2026',
+        icon: <ImprovementIcon />,
+        color: 'var(--primary-color)',
+    },
+    {
+        id: 3,
+        title: 'Newbie No More',
+        desc: 'Completed 5 Coaching Sessions',
+        date: 'April 2026',
+        icon: <SessionIcon />,
+        color: '#7b1fa2',
+    },
 ];
 
 const sessions = [
-    { id: 101, title: 'Weekly Quality Review', date: 'June 15, 2026', status: 'Completed', kpi: 'Quality' },
-    { id: 102, title: 'AHT Optimization', date: 'June 22, 2026', status: 'Scheduled', kpi: 'AHT' },
-    { id: 103, title: 'Compliance Refresh', date: 'May 28, 2026', status: 'Completed', kpi: 'Compliance' },
+    { id: 101, title: 'Weekly Quality Review',  date: 'June 15, 2026',  status: 'Completed', kpi: 'Quality' },
+    { id: 102, title: 'AHT Optimization',       date: 'June 22, 2026',  status: 'Scheduled', kpi: 'AHT' },
+    { id: 103, title: 'Compliance Refresh',     date: 'May 28, 2026',   status: 'Completed', kpi: 'Compliance' },
 ];
 
 // ============================================
@@ -168,7 +183,7 @@ const CoachingPage = () => {
                 </Typography>
             </PageHeader>
 
-            {/* Row 1: Stats Cards (Split Row 50/50 using Flex) */}
+            {/* Row 1: Stats Cards */}
             <RowContainer>
                 <DashboardCard>
                     <StatCardContent>
@@ -184,13 +199,19 @@ const CoachingPage = () => {
                 </DashboardCard>
             </RowContainer>
 
-            {/* Row 2: Performance Trend (Full Width) */}
+            {/* Row 2: Performance Trend */}
             <RowContainer>
                 <DashboardCard>
                     <CardHeader>
-                        <Avatar sx={{ bgcolor: '#d4fc79', color: '#2ecc71' }}>
+                        {/* Icon box — tinted bg pattern */}
+                        <Box sx={{
+                            width: 42, height: 42, borderRadius: 2.5, flexShrink: 0,
+                            backgroundColor: '#4caf5015',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            color: '#4caf50',
+                        }}>
                             <ImprovementIcon />
-                        </Avatar>
+                        </Box>
                         <CardTitle>Performance Trend</CardTitle>
                     </CardHeader>
                     <Box sx={{ height: 300, width: '100%', p: 3 }}>
@@ -199,7 +220,7 @@ const CoachingPage = () => {
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ecf0f1" />
                                 <XAxis
                                     dataKey="month"
-                                    interval={0} // Forces all labels to be shown
+                                    interval={0}
                                     axisLine={false}
                                     tickLine={false}
                                     tick={{ fill: '#bdc3c7', fontSize: 12, fontWeight: 600 }}
@@ -213,10 +234,10 @@ const CoachingPage = () => {
                                 <Line
                                     type="monotone"
                                     dataKey="score"
-                                    stroke="#4facfe"
+                                    stroke="var(--primary-color)"
                                     strokeWidth={5}
-                                    dot={{ r: 6, strokeWidth: 3, fill: '#fff', stroke: '#4facfe' }}
-                                    activeDot={{ r: 8, strokeWidth: 0, fill: '#00f2fe' }}
+                                    dot={{ r: 6, strokeWidth: 3, fill: '#fff', stroke: 'var(--primary-color)' }}
+                                    activeDot={{ r: 8, strokeWidth: 0, fill: 'var(--primary-color)' }}
                                 />
                             </LineChart>
                         </ResponsiveContainer>
@@ -224,13 +245,18 @@ const CoachingPage = () => {
                 </DashboardCard>
             </RowContainer>
 
-            {/* Row 3: Training Focus (Full Width) */}
+            {/* Row 3: Training Focus */}
             <RowContainer>
                 <DashboardCard>
                     <CardHeader>
-                        <Avatar sx={{ bgcolor: '#ffecd2', color: '#ffb347' }}>
+                        <Box sx={{
+                            width: 42, height: 42, borderRadius: 2.5, flexShrink: 0,
+                            backgroundColor: '#f57c0015',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            color: '#f57c00',
+                        }}>
                             <SessionIcon />
-                        </Avatar>
+                        </Box>
                         <CardTitle>Training Focus</CardTitle>
                     </CardHeader>
                     <Box sx={{ height: 320, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', pb: 3 }}>
@@ -256,7 +282,11 @@ const CoachingPage = () => {
                                     verticalAlign="bottom"
                                     height={36}
                                     iconType="circle"
-                                    formatter={(value) => <span style={{ color: '#7f8c8d', fontWeight: 600, fontSize: '0.9rem', marginRight: 15 }}>{value}</span>}
+                                    formatter={(value) => (
+                                        <span style={{ color: '#7f8c8d', fontWeight: 600, fontSize: '0.9rem', marginRight: 15 }}>
+                                            {value}
+                                        </span>
+                                    )}
                                 />
                             </PieChart>
                         </ResponsiveContainer>
@@ -264,64 +294,82 @@ const CoachingPage = () => {
                 </DashboardCard>
             </RowContainer>
 
-            {/* Row 4: Achievements (Full Width) */}
+            {/* Row 4: Achievements */}
             <RowContainer>
                 <DashboardCard>
                     <CardHeader>
-                        <Avatar sx={{ bgcolor: '#e0c3fc', color: '#8ec5fc' }}>
-                            <MilestoneIcon htmlColor="#6a11cb" />
-                        </Avatar>
+                        <Box sx={{
+                            width: 42, height: 42, borderRadius: 2.5, flexShrink: 0,
+                            backgroundColor: '#7b1fa215',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            color: '#7b1fa2',
+                        }}>
+                            <MilestoneIcon />
+                        </Box>
                         <CardTitle>Achievements</CardTitle>
                     </CardHeader>
-                    <List sx={{ p: 0 }}>
+
+                    {/* Box-based rows — no List/ListItem */}
+                    <Box>
                         {milestones.map((milestone, index) => (
                             <React.Fragment key={milestone.id}>
-                                <ListItem alignItems="center" sx={{ py: 2.5, px: 3 }}>
-                                    <ListItemIcon sx={{ minWidth: 56 }}>
-                                        <Avatar sx={{ bgcolor: milestone.iconBg, borderRadius: '12px', width: 44, height: 44 }}>
-                                            {milestone.icon}
-                                        </Avatar>
-                                    </ListItemIcon>
-                                    <ListItemText
-                                        primary={
-                                            <Typography variant="subtitle1" fontWeight="700" color="#2c3e50">
-                                                {milestone.title}
-                                            </Typography>
-                                        }
-                                        secondary={
-                                            <Box mt={0.5}>
-                                                <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.4 }}>
-                                                    {milestone.desc}
-                                                </Typography>
-                                                <Typography variant="caption" color="primary" fontWeight="600" sx={{ mt: 0.5, display: 'block' }}>
-                                                    {milestone.date}
-                                                </Typography>
-                                            </Box>
-                                        }
-                                    />
-                                </ListItem>
-                                {index < milestones.length - 1 && <Divider component="li" variant="inset" sx={{ ml: 10, mr: 3 }} />}
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, py: 2.5, px: 3 }}>
+                                    <Box sx={{
+                                        width: 44, height: 44, borderRadius: 2.5, flexShrink: 0,
+                                        backgroundColor: `${milestone.color}15`,
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        color: milestone.color,
+                                    }}>
+                                        {milestone.icon}
+                                    </Box>
+                                    <Box sx={{ flexGrow: 1 }}>
+                                        <Typography variant="subtitle1" fontWeight={700} color="#2c3e50">
+                                            {milestone.title}
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.4, mt: 0.25 }}>
+                                            {milestone.desc}
+                                        </Typography>
+                                        <Typography variant="caption" sx={{ color: 'var(--primary-color)', fontWeight: 600, mt: 0.5, display: 'block' }}>
+                                            {milestone.date}
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                                {index < milestones.length - 1 && (
+                                    <Divider sx={{ mx: 3, borderColor: '#f0f0f0' }} />
+                                )}
                             </React.Fragment>
                         ))}
-                    </List>
+                    </Box>
                 </DashboardCard>
             </RowContainer>
 
-            {/* Row 5: Recent Sessions (Full Width) */}
+            {/* Row 5: Recent Sessions */}
             <RowContainer>
                 <DashboardCard>
                     <CardHeader>
-                        <Avatar sx={{ bgcolor: '#8fd3f4', color: '#005bea' }}>
+                        <Box sx={{
+                            width: 42, height: 42, borderRadius: 2.5, flexShrink: 0,
+                            backgroundColor: 'rgba(var(--primary-rgb), 0.08)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            color: 'var(--primary-color)',
+                        }}>
                             <CompletedIcon />
-                        </Avatar>
+                        </Box>
                         <CardTitle>Recent Sessions</CardTitle>
                     </CardHeader>
-                    <List sx={{ p: 0 }}>
+
+                    {/* Box-based rows */}
+                    <Box>
                         {sessions.map((session, index) => (
                             <React.Fragment key={session.id}>
-                                <ListItem sx={{ py: 2.5, px: 3, display: 'flex', justifyContent: 'space-between' }}>
+                                <Box sx={{
+                                    py: 2.5, px: 3,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                }}>
                                     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                                        <Typography variant="subtitle1" fontWeight="700" color="#2c3e50">
+                                        <Typography variant="subtitle1" fontWeight={700} color="#2c3e50">
                                             {session.title}
                                         </Typography>
                                         <Typography variant="body2" color="text.secondary">
@@ -334,35 +382,34 @@ const CoachingPage = () => {
                                             label={session.kpi}
                                             size="small"
                                             sx={{
-                                                backgroundColor: '#eef2f3',
-                                                color: '#34495e',
+                                                backgroundColor: '#e3f2fd',
+                                                color: 'var(--primary-color)',
                                                 fontWeight: 700,
                                                 height: 24,
-                                                border: 'none',
-                                                fontSize: '0.75rem'
+                                                fontSize: '0.75rem',
                                             }}
                                         />
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                            {session.status === 'Completed' ?
-                                                <CompletedIcon sx={{ fontSize: 16, color: '#2ecc71' }} /> :
-                                                <NeutralIcon sx={{ fontSize: 16, color: '#f1c40f' }} />
+                                            {session.status === 'Completed'
+                                                ? <CompletedIcon sx={{ fontSize: 16, color: '#4caf50' }} />
+                                                : <NeutralIcon sx={{ fontSize: 16, color: '#ff9800' }} />
                                             }
                                             <Typography
                                                 variant="caption"
-                                                fontWeight="600"
-                                                sx={{
-                                                    color: session.status === 'Completed' ? '#2ecc71' : '#f1c40f'
-                                                }}
+                                                fontWeight={600}
+                                                sx={{ color: session.status === 'Completed' ? '#4caf50' : '#ff9800' }}
                                             >
                                                 {session.status}
                                             </Typography>
                                         </Box>
                                     </Box>
-                                </ListItem>
-                                {index < sessions.length - 1 && <Divider component="li" sx={{ mx: 3 }} />}
+                                </Box>
+                                {index < sessions.length - 1 && (
+                                    <Divider sx={{ mx: 3, borderColor: '#f0f0f0' }} />
+                                )}
                             </React.Fragment>
                         ))}
-                    </List>
+                    </Box>
                 </DashboardCard>
             </RowContainer>
 

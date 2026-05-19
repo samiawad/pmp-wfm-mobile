@@ -15,12 +15,9 @@ import {
     FormControl,
     Chip,
     SwipeableDrawer,
-    List,
-    ListItem,
-    ListItemText,
-    ListItemButton,
     Radio,
-    IconButton as MuiIconButton,
+    IconButton,
+    Divider,
 } from '@mui/material';
 import {
     GridView as CardViewIcon,
@@ -32,6 +29,7 @@ import {
     Close as CloseIcon,
     CalendarToday as CalendarIcon,
     ExpandMore as DropdownIcon,
+    Check as CheckIcon,
 } from '@mui/icons-material';
 import { AreaChart, Area, ResponsiveContainer, Tooltip } from 'recharts';
 import KPIDetailView from './KPIDetailView';
@@ -313,7 +311,7 @@ const FilterRow = styled(Box)(({ theme }) => ({
 const PageTitle = styled(Typography)({
     fontWeight: 700,
     fontSize: '1rem',
-    color: 'var(--color-on-background)',
+    color: '#1a1a1a',
     whiteSpace: 'nowrap',
     flexShrink: 0,
 });
@@ -334,12 +332,11 @@ const FilterChipSelect = styled(FormControl)({
     },
 });
 
-const FilterChip = styled(Chip)(({ theme, active, selected }) => ({
+const FilterChip = styled(Chip)(({ active, selected }) => ({
     height: 32,
     borderRadius: 20,
-    backgroundColor: (active || selected) ? undefined : '#fff',
-    background: (active || selected) ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : undefined,
-    color: (active || selected) ? '#fff' : 'var(--text-primary)',
+    backgroundColor: (active || selected) ? 'var(--primary-color)' : '#fff',
+    color: (active || selected) ? '#fff' : '#1a1a1a',
     fontWeight: 500,
     fontSize: '0.75rem',
     border: (active || selected) ? 'none' : '1px solid #e0e0e0',
@@ -352,11 +349,12 @@ const FilterChip = styled(Chip)(({ theme, active, selected }) => ({
         marginLeft: '8px',
     },
     '&:hover': {
-        opacity: 0.85,
+        opacity: 0.9,
+        backgroundColor: (active || selected) ? 'var(--primary-color)' : '#f5f5f5',
     },
 }));
 
-const DropdownTrigger = styled(Box)(({ theme }) => ({
+const DropdownTrigger = styled(Box)({
     height: 32,
     display: 'flex',
     alignItems: 'center',
@@ -367,7 +365,7 @@ const DropdownTrigger = styled(Box)(({ theme }) => ({
     backgroundColor: '#fff',
     border: '1px solid #c4c4c4',
     cursor: 'pointer',
-    color: 'var(--text-primary)',
+    color: '#1a1a1a',
     fontWeight: 500,
     fontSize: '0.75rem',
     whiteSpace: 'nowrap',
@@ -379,7 +377,7 @@ const DropdownTrigger = styled(Box)(({ theme }) => ({
     '&:active': {
         backgroundColor: '#f5f5f5',
     },
-}));
+});
 
 const DragHandle = styled(Box)({
     width: 36,
@@ -422,11 +420,11 @@ const KPIHeader = styled(Box)(({ theme }) => ({
     marginBottom: theme.spacing(1),
 }));
 
-const KPIName = styled(Typography)(({ theme }) => ({
+const KPIName = styled(Typography)({
     fontSize: '0.875rem',
     fontWeight: 600,
-    color: 'var(--text-secondary)',
-}));
+    color: '#666',
+});
 
 const KPIValue = styled(Typography)(({ theme, performanceColor }) => ({
     fontSize: '2rem',
@@ -570,7 +568,7 @@ const PerformancePage = ({ selectedKPI, onKPIClick, onBack }) => {
                                         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
                                     }}
                                 >
-                                    <Typography variant="caption" sx={{ fontWeight: 600, color: 'var(--text-primary)' }}>
+                                    <Typography variant="caption" sx={{ fontWeight: 600, color: '#1a1a1a' }}>
                                         {payload[0].payload.date}
                                     </Typography>
                                     <Typography variant="body2" sx={{ fontWeight: 700, color: performanceColor }}>
@@ -605,7 +603,7 @@ const PerformancePage = ({ selectedKPI, onKPIClick, onBack }) => {
                                                 <TrendText trendColor={trendColor}>
                                                     {kpi.changePercent > 0 ? '+' : ''}{kpi.changePercent.toFixed(1)}%
                                                 </TrendText>
-                                                <Typography variant="caption" sx={{ color: 'var(--text-secondary)', fontSize: '0.7rem' }}>
+                                                <Typography variant="caption" sx={{ color: '#666', fontSize: '0.7rem' }}>
                                                     vs previous period
                                                 </Typography>
                                             </>
@@ -639,7 +637,7 @@ const PerformancePage = ({ selectedKPI, onKPIClick, onBack }) => {
                                     sx={{
                                         display: 'block',
                                         textAlign: 'right',
-                                        color: 'var(--text-secondary)',
+                                        color: '#666',
                                         fontSize: '0.65rem',
                                         mt: 1,
                                         opacity: 0.7,
@@ -686,7 +684,7 @@ const PerformancePage = ({ selectedKPI, onKPIClick, onBack }) => {
                                 <Typography variant="h6" sx={{ fontWeight: 700, color: performanceColor }}>
                                     {formatValue(kpi.value, kpi.unit)}
                                 </Typography>
-                                <Typography variant="caption" sx={{ color: 'var(--text-secondary)' }}>
+                                <Typography variant="caption" sx={{ color: '#666' }}>
                                     Target: {formatValue(kpi.target, kpi.unit)}
                                 </Typography>
                             </ListItemRight>
@@ -755,7 +753,7 @@ const PerformancePage = ({ selectedKPI, onKPIClick, onBack }) => {
                                             }}
                                         />
                                     </TableCell>
-                                    <TableCell align="center" sx={{ fontSize: '0.75rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
+                                    <TableCell align="center" sx={{ fontSize: '0.75rem', color: '#666', whiteSpace: 'nowrap' }}>
                                         {kpi.lastUpdated}
                                     </TableCell>
                                 </TableRow>
@@ -823,6 +821,7 @@ const PerformancePage = ({ selectedKPI, onKPIClick, onBack }) => {
             {viewMode === 'table' && renderTableView()}
 
             {/* Bottom Sheet for Date Range Filter */}
+            {/* IONIC MIGRATION: replace with IonActionSheet or IonModal */}
             <SwipeableDrawer
                 anchor="bottom"
                 open={isBottomSheetOpen}
@@ -833,35 +832,55 @@ const PerformancePage = ({ selectedKPI, onKPIClick, onBack }) => {
                         borderTopLeftRadius: '24px',
                         borderTopRightRadius: '24px',
                         paddingBottom: '20px',
-                        maxHeight: '60vh'
+                        maxHeight: '60vh',
                     }
                 }}
             >
                 <DragHandle />
-                <Box sx={{ px: 3, pt: 1, pb: 2 }}>
-                    <Typography variant="h6" fontWeight={700} textAlign="center">Select Period</Typography>
+                {/* Nav header */}
+                <Box sx={{ display: 'flex', alignItems: 'center', px: 2, pb: 1.5 }}>
+                    <Box sx={{ width: 40 }} />
+                    <Box sx={{ flexGrow: 1, textAlign: 'center' }}>
+                        <Typography sx={{ fontWeight: 700, fontSize: '1rem', color: '#1a1a1a' }}>
+                            Select Period
+                        </Typography>
+                    </Box>
+                    <IconButton size="small" onClick={() => setIsBottomSheetOpen(false)}>
+                        <CloseIcon fontSize="small" />
+                    </IconButton>
                 </Box>
-                <List sx={{ pt: 1 }}>
+                <Divider sx={{ borderColor: '#f0f0f0' }} />
+
+                {/* Filter options — Box-based rows */}
+                <Box sx={{ pt: 1 }}>
                     {dateRangePresets.map((preset) => (
-                        <ListItem disablePadding key={preset.id}>
-                            <ListItemButton onClick={() => handleDateRangeSelect(preset.id)} sx={{ px: 3 }}>
-                                <Radio
-                                    checked={dateRangePreset === preset.id}
-                                    onChange={() => handleDateRangeSelect(preset.id)}
-                                    size="small"
-                                    sx={{ mr: 1 }}
-                                />
-                                <ListItemText
-                                    primary={preset.label}
-                                    primaryTypographyProps={{
-                                        fontWeight: dateRangePreset === preset.id ? 700 : 500,
-                                        fontSize: '0.95rem'
-                                    }}
-                                />
-                            </ListItemButton>
-                        </ListItem>
+                        <Box
+                            key={preset.id}
+                            onClick={() => handleDateRangeSelect(preset.id)}
+                            sx={{
+                                display: 'flex', alignItems: 'center',
+                                px: 3, py: 1.5,
+                                cursor: 'pointer',
+                                '&:hover': { backgroundColor: '#f9f9f9' },
+                                '&:active': { backgroundColor: '#f0f4f8' },
+                            }}
+                        >
+                            <Radio
+                                checked={dateRangePreset === preset.id}
+                                size="small"
+                                sx={{ mr: 1, p: 0, color: 'var(--primary-color)', '&.Mui-checked': { color: 'var(--primary-color)' } }}
+                                readOnly
+                            />
+                            <Typography sx={{
+                                fontWeight: dateRangePreset === preset.id ? 700 : 500,
+                                fontSize: '0.95rem',
+                                color: dateRangePreset === preset.id ? 'var(--primary-color)' : '#1a1a1a',
+                            }}>
+                                {preset.label}
+                            </Typography>
+                        </Box>
                     ))}
-                </List>
+                </Box>
             </SwipeableDrawer>
         </PerformanceContainer>
     );

@@ -9,14 +9,12 @@ import {
     Divider,
     Tooltip,
     IconButton,
-    SwipeableDrawer,
 } from '@mui/material';
 import {
     AccessTime as ClockIcon,
     CheckCircle as CheckIcon,
     EventAvailable as EventIcon,
     ViewModule as CardViewIcon,
-    Timeline as TimelineIcon,
     TaskAlt as CompletedIcon,
     CalendarMonth as CalendarIcon,
     ChevronLeft as ChevronLeftIcon,
@@ -228,59 +226,13 @@ const ScheduleContainer = styled(Box)(({ theme }) => ({
     boxSizing: 'border-box',
 }));
 
-const FilterRow = styled(Box)(({ theme }) => ({
-    display: 'flex',
-    alignItems: 'center',
-    gap: 8,
-    overflowX: 'auto',
-    paddingBottom: theme.spacing(1.5),
-    marginBottom: theme.spacing(1),
-    scrollbarWidth: 'none',
-    '&::-webkit-scrollbar': { display: 'none' },
-    flexWrap: 'nowrap',
-}));
-
-const PageTitle = styled(Typography)({
-    fontWeight: 700,
-    fontSize: '1rem',
-    color: 'var(--color-on-background)',
-    whiteSpace: 'nowrap',
-    flexShrink: 0,
-});
-
-
-
-const FilterChip = styled(Chip)(({ selected }) => ({
-    height: 32,
-    borderRadius: 20,
-    border: selected ? 'none' : '1px solid #e0e0e0',
-    padding: '4px 4px',
-    fontSize: '0.75rem',
-    fontWeight: 500,
-    cursor: 'pointer',
-    backgroundColor: selected ? undefined : '#fff',
-    background: selected ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : undefined,
-    color: selected ? '#fff' : undefined,
-    '& .MuiChip-icon': {
-        fontSize: 16,
-        marginLeft: '8px',
-        color: selected ? '#fff' : undefined,
-    },
-    '&:hover': {
-        opacity: 0.85,
-    },
-}));
 
 const DayCard = styled(Card)(({ theme, isOffDay, isToday }) => ({
     marginBottom: theme.spacing(1.5),
-    background: isOffDay
-        ? 'linear-gradient(135deg, rgba(255,235,238,0.9) 0%, rgba(255,205,210,0.7) 100%)'
-        : isToday
-            ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-            : '#ffffff',
+    backgroundColor: isOffDay ? '#ffebee' : isToday ? 'var(--primary-color)' : '#ffffff',
     borderRadius: '12px',
     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
-    border: isToday ? '2px solid #667eea' : '1px solid #e8e8e8',
+    border: isToday ? '2px solid var(--primary-color)' : '1px solid #e8e8e8',
     '&:active': {
         transform: 'scale(0.98)',
         transition: 'transform 0.1s ease',
@@ -297,12 +249,12 @@ const DayHeader = styled(Box)(({ theme, isToday }) => ({
 const DayName = styled(Typography)(({ theme, isToday }) => ({
     fontWeight: 700,
     fontSize: '1.1rem',
-    color: isToday ? 'white' : 'var(--text-primary)',
+    color: isToday ? 'white' : '#1a1a1a',
 }));
 
 const DateText = styled(Typography)(({ theme, isToday }) => ({
     fontSize: '0.875rem',
-    color: isToday ? 'rgba(255,255,255,0.9)' : 'var(--text-secondary)',
+    color: isToday ? 'rgba(255,255,255,0.9)' : '#666',
 }));
 
 const ShiftDetails = styled(Box)(({ theme }) => ({
@@ -321,21 +273,21 @@ const TimeBox = styled(Box)(({ theme, isToday }) => ({
 
 const TimeLabel = styled(Typography)(({ theme, isToday }) => ({
     fontSize: '0.75rem',
-    color: isToday ? 'rgba(255,255,255,0.8)' : 'var(--text-secondary)',
+    color: isToday ? 'rgba(255,255,255,0.8)' : '#666',
     marginBottom: theme.spacing(0.5),
 }));
 
 const TimeValue = styled(Typography)(({ theme, isToday }) => ({
     fontSize: '1rem',
     fontWeight: 600,
-    color: isToday ? 'white' : 'var(--text-primary)',
+    color: isToday ? 'white' : '#1a1a1a',
 }));
 
-const StatusChip = styled(Chip)(({ theme, chipColor }) => ({
-    background: chipColor || 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
+const StatusChip = styled(Chip)(({ chipColor }) => ({
+    backgroundColor: chipColor || '#4caf50',
     color: 'white',
     fontWeight: 600,
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+    boxShadow: 'none',
 }));
 
 const OffDayText = styled(Typography)(({ theme }) => ({
@@ -345,8 +297,6 @@ const OffDayText = styled(Typography)(({ theme }) => ({
     textAlign: 'center',
     padding: theme.spacing(2),
 }));
-
-// ViewSwitcherContainer and StyledToggleButtonGroup removed — merged into FilterRow
 
 // Timeline View Styled Components
 const TimelineContainer = styled(Box)(({ theme }) => ({
@@ -381,13 +331,13 @@ const DayLabel = styled(Box)(({ theme }) => ({
 const DayLabelName = styled(Typography)(({ theme }) => ({
     fontWeight: 700,
     fontSize: '0.7rem',
-    color: 'var(--text-primary)',
+    color: '#1a1a1a',
     lineHeight: 1.2,
 }));
 
 const DayLabelDate = styled(Typography)(({ theme }) => ({
     fontSize: '0.6rem',
-    color: 'var(--text-secondary)',
+    color: '#666',
     lineHeight: 1.2,
 }));
 
@@ -420,7 +370,7 @@ const HourLabel = styled(Typography)(({ theme }) => ({
     left: '50%',
     transform: 'translateX(-50%)',
     fontSize: '0.7rem',
-    color: 'var(--text-secondary)',
+    color: '#666',
     whiteSpace: 'nowrap',
 }));
 
@@ -443,7 +393,7 @@ const HourHeaderCell = styled(Box)(({ theme }) => ({
     borderRight: '1px solid #e0e0e0',
     textAlign: 'center',
     fontSize: '0.6rem',
-    color: 'var(--text-secondary)',
+    color: '#666',
     padding: theme.spacing(0.3, 0),
 }));
 
@@ -461,11 +411,6 @@ const SchedulePage = ({ onDayClick }) => {
 
     const [selectedWeek, setSelectedWeek] = useState('current');
     const [viewMode, setViewMode] = useState(getInitialView);
-    const [periodSheetOpen, setPeriodSheetOpen] = useState(() => {
-        const params = new URLSearchParams(window.location.search);
-        return params.get('period') === 'selector';
-    });
-
     // Sync page=schedule and view= with URL whenever viewMode changes
     useEffect(() => {
         const params = new URLSearchParams();
@@ -473,28 +418,6 @@ const SchedulePage = ({ onDayClick }) => {
         params.set('view', viewMode);
         window.history.replaceState(null, '', '?' + params.toString());
     }, [viewMode]);
-
-    const openPeriodSheet = () => {
-        const params = new URLSearchParams();
-        params.set('page', 'schedule');
-        params.set('view', 'cards');
-        params.set('period', 'selector');
-        window.history.replaceState(null, '', '?' + params.toString());
-        setPeriodSheetOpen(true);
-    };
-
-    const closePeriodSheet = () => {
-        const params = new URLSearchParams();
-        params.set('page', 'schedule');
-        params.set('view', 'cards');
-        window.history.replaceState(null, '', '?' + params.toString());
-        setPeriodSheetOpen(false);
-    };
-
-    const selectPeriod = (weekKey) => {
-        setSelectedWeek(weekKey);
-        closePeriodSheet();
-    };
 
     const MONTH_NAMES = useMemo(() => ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'], []);
 
@@ -524,29 +447,13 @@ const SchedulePage = ({ onDayClick }) => {
     const getStatusInfo = (status) => {
         switch (status) {
             case 'published':
-                return {
-                    label: 'Published',
-                    color: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
-                    icon: <CheckIcon />,
-                };
+                return { label: 'Published', color: '#4caf50', icon: <CheckIcon /> };
             case 'completed':
-                return {
-                    label: 'Completed',
-                    color: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    icon: <CompletedIcon />,
-                };
+                return { label: 'Completed', color: 'var(--primary-color)', icon: <CompletedIcon /> };
             case 'pending':
-                return {
-                    label: 'Pending',
-                    color: 'linear-gradient(135deg, #ff9800 0%, #ff5722 100%)',
-                    icon: <ClockIcon />,
-                };
+                return { label: 'Pending',   color: '#ff9800', icon: <ClockIcon /> };
             default:
-                return {
-                    label: 'Unknown',
-                    color: 'linear-gradient(135deg, #9e9e9e 0%, #757575 100%)',
-                    icon: <ClockIcon />,
-                };
+                return { label: 'Unknown',   color: '#757575', icon: <ClockIcon /> };
         }
     };
 
@@ -827,54 +734,46 @@ const SchedulePage = ({ onDayClick }) => {
                                     cursor: cell.shift ? 'pointer' : 'default',
                                     transition: 'all 0.15s ease',
                                     position: 'relative',
-                                    border: '1.5px solid #e8e8e8',
+                                    // No border on any day — clean look
                                     ...(cell.isToday && {
-                                        background: 'linear-gradient(135deg, #667eea, #764ba2)',
-                                        boxShadow: '0 3px 10px rgba(102,126,234,0.4)',
-                                        border: '1.5px solid transparent',
-                                    }),
-                                    ...(isOff && !cell.isToday && {
-                                        backgroundColor: '#fff5f5',
-                                        border: '1.5px solid #ffcdd2',
-                                    }),
-                                    ...(noData && !cell.isToday && {
-                                        backgroundColor: '#fafafa',
+                                        backgroundColor: 'var(--primary-color)',
+                                        boxShadow: '0 3px 10px rgba(0,86,179,0.35)',
                                     }),
                                     '&:active': cell.shift ? {
                                         transform: 'scale(0.9)',
                                     } : {},
                                 }}
                             >
-                                {/* Adherence dot badge — top right */}
+                                {/* Adherence dot — bottom center */}
                                 {adherenceColor && (
                                     <Box sx={{
                                         position: 'absolute',
-                                        top: 1,
-                                        right: 1,
-                                        width: 8,
-                                        height: 8,
+                                        bottom: 3,
+                                        left: '50%',
+                                        transform: 'translateX(-50%)',
+                                        width: 5,
+                                        height: 5,
                                         borderRadius: '50%',
                                         backgroundColor: adherenceColor,
-                                        border: cell.isToday ? '1.5px solid rgba(255,255,255,0.8)' : '1.5px solid #fff',
                                     }} />
                                 )}
 
                                 {/* Day number */}
                                 <Typography sx={{
-                                    fontWeight: cell.isToday ? 800 : 600,
-                                    fontSize: '0.85rem',
-                                    color: cell.isToday ? '#fff' : isOff ? '#c62828' : noData ? '#ccc' : '#333',
+                                    fontWeight: cell.isToday ? 800 : 500,
+                                    fontSize: '0.88rem',
+                                    color: cell.isToday ? '#fff' : isOff ? '#c62828' : noData ? '#ccc' : '#1a1a1a',
                                     lineHeight: 1.1,
                                 }}>
                                     {cell.day}
                                 </Typography>
 
-                                {/* Shift start time (compact) */}
-                                {hasShift && (
+                                {/* Shift start time (compact) — only show when no adherence dot overlaps */}
+                                {hasShift && !adherenceColor && (
                                     <Typography sx={{
                                         fontSize: '0.45rem',
                                         fontWeight: 600,
-                                        color: cell.isToday ? 'rgba(255,255,255,0.85)' : '#667eea',
+                                        color: cell.isToday ? 'rgba(255,255,255,0.85)' : 'var(--primary-color)',
                                         lineHeight: 1,
                                         mt: 0.15,
                                     }}>
@@ -883,7 +782,7 @@ const SchedulePage = ({ onDayClick }) => {
                                 )}
                                 {isOff && (
                                     <Typography sx={{
-                                        fontSize: '0.4rem',
+                                        fontSize: '0.42rem',
                                         fontWeight: 700,
                                         color: cell.isToday ? 'rgba(255,255,255,0.85)' : '#c62828',
                                         lineHeight: 1,
@@ -943,106 +842,213 @@ const SchedulePage = ({ onDayClick }) => {
 
     // Render Card View
     const renderCardView = () => {
+        const PERIOD_INFO = {
+            prev1:   { name: 'Previous', range: 'Jan 20 – Feb 2' },
+            current: { name: 'Current',  range: 'Feb 3 – Feb 16' },
+            next:    { name: 'Upcoming', range: 'Feb 17 – Mar 2' },
+        };
+
         return (
-            <Box sx={{ position: 'relative', width: '100%' }}>
-                {/* Left Chevron */}
-                {currentWeekIndex > 0 && (
-                    <IconButton
-                        onClick={() => navigateToPeriod(-1)}
-                        sx={{
-                            position: 'fixed',
-                            left: 0,
-                            top: '55%',
-                            zIndex: 10,
-                            backgroundColor: 'rgba(255,255,255,0.8)',
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                            '&:hover': { backgroundColor: '#fff' }
-                        }}
-                    >
-                        <ChevronLeftIcon />
-                    </IconButton>
-                )}
+            <Box>
+                {/* Period Tab Navigation — inspired by app's filter tabs */}
+                <Box sx={{
+                    display: 'flex',
+                    backgroundColor: '#fff',
+                    borderRadius: '14px',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                    overflow: 'hidden',
+                    mb: 2,
+                }}>
+                    {weekKeys.map((key) => {
+                        const active = selectedWeek === key;
+                        const info = PERIOD_INFO[key];
+                        return (
+                            <Box
+                                key={key}
+                                onClick={() => setSelectedWeek(key)}
+                                sx={{
+                                    flex: 1,
+                                    py: 1.25,
+                                    px: 0.5,
+                                    textAlign: 'center',
+                                    cursor: 'pointer',
+                                    borderBottom: active ? '2.5px solid var(--primary-color)' : '2.5px solid transparent',
+                                    backgroundColor: active ? 'rgba(0,86,179,0.04)' : 'transparent',
+                                    transition: 'all 0.2s ease',
+                                    '&:active': { backgroundColor: 'rgba(0,86,179,0.08)' },
+                                }}
+                            >
+                                <Typography sx={{
+                                    fontSize: '0.78rem',
+                                    fontWeight: active ? 700 : 500,
+                                    color: active ? 'var(--primary-color)' : '#999',
+                                    lineHeight: 1.3,
+                                }}>
+                                    {info.name}
+                                </Typography>
+                                <Typography sx={{
+                                    fontSize: '0.6rem',
+                                    color: active ? 'var(--primary-color)' : '#bbb',
+                                    mt: 0.25,
+                                    lineHeight: 1,
+                                }}>
+                                    {info.range}
+                                </Typography>
+                            </Box>
+                        );
+                    })}
+                </Box>
 
-                {/* Right Chevron */}
-                {currentWeekIndex < weekKeys.length - 1 && (
-                    <IconButton
-                        onClick={() => navigateToPeriod(1)}
-                        sx={{
-                            position: 'fixed',
-                            right: 0,
-                            top: '55%',
-                            zIndex: 10,
-                            backgroundColor: 'rgba(255,255,255,0.8)',
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                            '&:hover': { backgroundColor: '#fff' }
-                        }}
-                    >
-                        <ChevronRightIcon />
-                    </IconButton>
-                )}
-
+                {/* Day Cards */}
                 <Box
                     onTouchStart={onTouchStart}
                     onTouchMove={onTouchMove}
                     onTouchEnd={onTouchEnd}
                 >
                     {currentSchedule.schedule.map((shift, index) => (
-                        <DayCard
+                        <Box
                             key={index}
-                            isOffDay={shift.isOffDay}
-                            isToday={shift.isToday}
                             onClick={() => onDayClick && onDayClick(shift, index, currentSchedule.schedule)}
-                            sx={{ cursor: 'pointer' }}
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'stretch',
+                                backgroundColor: '#fff',
+                                borderRadius: '14px',
+                                boxShadow: shift.isToday
+                                    ? '0 4px 16px rgba(0,86,179,0.14)'
+                                    : '0 1px 6px rgba(0,0,0,0.05)',
+                                mb: 1.25,
+                                overflow: 'hidden',
+                                cursor: 'pointer',
+                                border: shift.isToday
+                                    ? '1.5px solid rgba(0,86,179,0.35)'
+                                    : '1px solid #f0f0f0',
+                                transition: 'transform 0.15s ease',
+                                '&:active': { transform: 'scale(0.98)' },
+                            }}
                         >
-                            <CardContent>
-                                <DayHeader isToday={shift.isToday}>
-                                    <Box>
-                                        <DayName isToday={shift.isToday}>
-                                            {shift.day}
-                                            {shift.isToday && ' (Today)'}
-                                        </DayName>
-                                        <DateText isToday={shift.isToday}>
-                                            {shift.date}
-                                        </DateText>
+                            {/* Left accent stripe */}
+                            <Box sx={{
+                                width: 4,
+                                flexShrink: 0,
+                                backgroundColor: shift.isOffDay
+                                    ? '#ffcdd2'
+                                    : shift.isToday
+                                        ? 'var(--primary-color)'
+                                        : '#bbdefb',
+                            }} />
+
+                            {/* Date column */}
+                            <Box sx={{
+                                width: 62,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                py: 1.5,
+                                flexShrink: 0,
+                            }}>
+                                <Typography sx={{
+                                    fontSize: '0.58rem',
+                                    fontWeight: 700,
+                                    color: shift.isToday ? 'var(--primary-color)' : '#bbb',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.06em',
+                                    lineHeight: 1,
+                                }}>
+                                    {shift.day.substring(0, 3)}
+                                </Typography>
+                                <Typography sx={{
+                                    fontSize: '1.55rem',
+                                    fontWeight: 800,
+                                    color: shift.isToday ? 'var(--primary-color)' : shift.isOffDay ? '#c62828' : '#1a1a1a',
+                                    lineHeight: 1.1,
+                                    mt: 0.3,
+                                }}>
+                                    {shift.date.split(' ')[1]}
+                                </Typography>
+                                <Typography sx={{
+                                    fontSize: '0.58rem',
+                                    fontWeight: 500,
+                                    color: '#ccc',
+                                    lineHeight: 1,
+                                }}>
+                                    {shift.date.split(' ')[0].toUpperCase()}
+                                </Typography>
+                                {shift.isToday && (
+                                    <Box sx={{
+                                        mt: 0.75,
+                                        px: 1,
+                                        py: 0.3,
+                                        backgroundColor: 'var(--primary-color)',
+                                        borderRadius: '99px',
+                                    }}>
+                                        <Typography sx={{ fontSize: '0.45rem', color: '#fff', fontWeight: 700, letterSpacing: '0.05em' }}>
+                                            TODAY
+                                        </Typography>
                                     </Box>
-                                    {!shift.isOffDay && (
+                                )}
+                            </Box>
+
+                            {/* Thin vertical divider */}
+                            <Box sx={{ width: '1px', backgroundColor: '#f0f0f0', my: 1.25, flexShrink: 0 }} />
+
+                            {/* Main content */}
+                            <Box sx={{
+                                flex: 1,
+                                px: 2,
+                                py: 1.5,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'center',
+                            }}>
+                                {shift.isOffDay ? (
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <Box sx={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: '#f44336', flexShrink: 0 }} />
+                                        <Typography sx={{ color: '#c62828', fontWeight: 600, fontSize: '0.9rem' }}>
+                                            Off Day
+                                        </Typography>
+                                    </Box>
+                                ) : (
+                                    <>
+                                        {/* Start → duration → End */}
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.85 }}>
+                                            <Box>
+                                                <Typography sx={{ fontSize: '0.55rem', color: '#aaa', fontWeight: 600, letterSpacing: '0.04em', lineHeight: 1 }}>
+                                                    START
+                                                </Typography>
+                                                <Typography sx={{ fontSize: '0.92rem', fontWeight: 700, color: '#1a1a1a', lineHeight: 1.2 }}>
+                                                    {shift.startTime}
+                                                </Typography>
+                                            </Box>
+                                            <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                <Box sx={{ flex: 1, height: '1px', backgroundColor: '#e8e8e8' }} />
+                                                <Typography sx={{ fontSize: '0.58rem', color: '#aaa', px: 0.5, whiteSpace: 'nowrap' }}>
+                                                    {shift.duration}
+                                                </Typography>
+                                                <Box sx={{ flex: 1, height: '1px', backgroundColor: '#e8e8e8' }} />
+                                            </Box>
+                                            <Box sx={{ textAlign: 'right' }}>
+                                                <Typography sx={{ fontSize: '0.55rem', color: '#aaa', fontWeight: 600, letterSpacing: '0.04em', lineHeight: 1 }}>
+                                                    END
+                                                </Typography>
+                                                <Typography sx={{ fontSize: '0.92rem', fontWeight: 700, color: '#1a1a1a', lineHeight: 1.2 }}>
+                                                    {shift.endTime}
+                                                </Typography>
+                                            </Box>
+                                        </Box>
+                                        {/* Status chip inline */}
                                         <StatusChip
                                             label={statusInfo.label}
                                             size="small"
                                             icon={statusInfo.icon}
                                             chipColor={statusInfo.color}
+                                            sx={{ alignSelf: 'flex-start', height: 22, fontSize: '0.65rem' }}
                                         />
-                                    )}
-                                </DayHeader>
-
-                                {shift.isOffDay ? (
-                                    <OffDayText>
-                                        Off Day
-                                    </OffDayText>
-                                ) : (
-                                    <>
-                                        <Divider sx={{
-                                            my: 1.5,
-                                            borderColor: shift.isToday ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.1)'
-                                        }} />
-                                        <ShiftDetails>
-                                            <TimeBox isToday={shift.isToday}>
-                                                <TimeLabel isToday={shift.isToday}>Start Time</TimeLabel>
-                                                <TimeValue isToday={shift.isToday}>{shift.startTime}</TimeValue>
-                                            </TimeBox>
-                                            <TimeBox isToday={shift.isToday}>
-                                                <TimeLabel isToday={shift.isToday}>End Time</TimeLabel>
-                                                <TimeValue isToday={shift.isToday}>{shift.endTime}</TimeValue>
-                                            </TimeBox>
-                                            <TimeBox isToday={shift.isToday}>
-                                                <TimeLabel isToday={shift.isToday}>Duration</TimeLabel>
-                                                <TimeValue isToday={shift.isToday}>{shift.duration}</TimeValue>
-                                            </TimeBox>
-                                        </ShiftDetails>
                                     </>
                                 )}
-                            </CardContent>
-                        </DayCard>
+                            </Box>
+                        </Box>
                     ))}
                 </Box>
             </Box>
@@ -1051,114 +1057,49 @@ const SchedulePage = ({ onDayClick }) => {
 
     return (
         <ScheduleContainer>
-            {/* Title + Filters in one horizontal scrolling row */}
-            <FilterRow>
-                <PageTitle>My Schedule</PageTitle>
-
-                {viewMode === 'calendar' ? (
-                    // Stable Month/Year chip for Calendar View (replaces Select to prevent shifting)
-                    <Box sx={{
-                        height: 32,
-                        borderRadius: 20,
-                        backgroundColor: '#fff',
-                        border: '1px solid #e0e0e0',
-                        fontSize: '0.75rem',
-                        fontWeight: 600,
-                        color: '#667eea',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        px: 2,
-                        flexShrink: 0,
-                        minWidth: '160px', // Match typical width of the selector
-                    }}>
-                        {MONTH_NAMES[calendarMonth]} {calendarYear}
-                    </Box>
-                ) : (
-                    <Chip
-                        label={scheduleData[selectedWeek].label}
-                        onClick={openPeriodSheet}
+            {/* View Toggle — Segmented Control */}
+            <Box sx={{
+                display: 'flex',
+                backgroundColor: '#e8edf2',
+                borderRadius: '14px',
+                padding: '4px',
+                mb: 2,
+            }}>
+                {[
+                    { key: 'calendar', label: 'Calendar', icon: <CalendarIcon sx={{ fontSize: 17 }} /> },
+                    { key: 'cards', label: 'Cards', icon: <CardViewIcon sx={{ fontSize: 17 }} /> },
+                ].map(tab => (
+                    <Box
+                        key={tab.key}
+                        onClick={() => setViewMode(tab.key)}
                         sx={{
-                            height: 32,
-                            borderRadius: 20,
-                            border: '1px solid #e0e0e0',
-                            backgroundColor: '#fff',
-                            fontSize: '0.75rem',
-                            fontWeight: 600,
-                            color: '#667eea',
+                            flex: 1,
+                            py: 0.9,
+                            borderRadius: '11px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: 0.75,
+                            backgroundColor: viewMode === tab.key ? 'var(--primary-color)' : 'transparent',
+                            color: viewMode === tab.key ? '#fff' : '#5a6a7a',
                             cursor: 'pointer',
-                            flexShrink: 0,
-                            '&:hover': { opacity: 0.85 },
+                            transition: 'all 0.2s ease',
+                            boxShadow: viewMode === tab.key ? '0 2px 8px rgba(0,86,179,0.25)' : 'none',
+                            userSelect: 'none',
                         }}
-                    />
-                )}
-
-                <FilterChip
-                    label="Calendar"
-                    icon={<CalendarIcon />}
-                    selected={viewMode === 'calendar'}
-                    onClick={() => setViewMode('calendar')}
-                />
-                <FilterChip
-                    label="Cards"
-                    icon={<CardViewIcon />}
-                    selected={viewMode === 'cards'}
-                    onClick={() => setViewMode('cards')}
-                />
-                {/* Timeline view (hidden, code retained) */}
-                {false && (
-                    <FilterChip
-                        label="Timeline"
-                        icon={<TimelineIcon />}
-                        selected={viewMode === 'timeline'}
-                        onClick={() => setViewMode('timeline')}
-                    />
-                )}
-            </FilterRow>
+                    >
+                        <Box sx={{ display: 'flex', color: 'inherit' }}>{tab.icon}</Box>
+                        <Typography sx={{ fontSize: '0.875rem', fontWeight: viewMode === tab.key ? 600 : 500, color: 'inherit', lineHeight: 1 }}>
+                            {tab.label}
+                        </Typography>
+                    </Box>
+                ))}
+            </Box>
 
             {/* Render View Based on Mode */}
             {viewMode === 'calendar' && renderCalendarView()}
             {viewMode === 'timeline' && renderTimelineView()}
             {viewMode === 'cards' && renderCardView()}
-
-            {/* Period Selector Bottom Sheet */}
-            <SwipeableDrawer
-                anchor="bottom"
-                open={periodSheetOpen}
-                onClose={closePeriodSheet}
-                onOpen={openPeriodSheet}
-                disableSwipeToOpen
-                PaperProps={{ sx: { borderRadius: '20px 20px 0 0', backgroundColor: '#ffffff' } }}
-            >
-                <Box sx={{ pb: 3 }}>
-                    <Box sx={{ width: 36, height: 4, borderRadius: 2, backgroundColor: '#d0d0d0', margin: '12px auto 8px' }} />
-                    <Typography sx={{ fontWeight: 700, fontSize: '1.1rem', px: 2.5, pb: 1.5 }}>Select Period</Typography>
-                    {['prev1', 'current', 'next'].map((key) => (
-                        <Box
-                            key={key}
-                            onClick={() => selectPeriod(key)}
-                            sx={{
-                                px: 2.5, py: 1.5, cursor: 'pointer',
-                                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                                borderBottom: '1px solid #f0f0f0',
-                                '&:last-child': { borderBottom: 'none' },
-                                '&:active': { backgroundColor: '#f5f5f5' },
-                            }}
-                        >
-                            <Typography sx={{
-                                fontSize: '0.95rem',
-                                fontWeight: selectedWeek === key ? 700 : 400,
-                                color: selectedWeek === key ? '#667eea' : '#1a1a1a',
-                            }}>
-                                {scheduleData[key].label}
-                            </Typography>
-                            {selectedWeek === key && (
-                                <Box sx={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#667eea' }} />
-                            )}
-                        </Box>
-                    ))}
-                </Box>
-            </SwipeableDrawer>
         </ScheduleContainer>
     );
 };

@@ -15,12 +15,9 @@ import {
     TableRow,
     TableHead,
     SwipeableDrawer,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemText,
     IconButton,
     Radio,
+    Divider,
 } from '@mui/material';
 import {
     BeachAccess as VacationIcon,
@@ -32,8 +29,7 @@ import {
     Check as CheckIcon,
     Close as CloseIcon,
     ExpandMore as DropdownIcon,
-    RadioButtonUnchecked as RadioUncheckedIcon,
-    RadioButtonChecked as RadioCheckedIcon,
+    ArrowBack as BackIcon,
 } from '@mui/icons-material';
 
 // ============================================
@@ -70,7 +66,7 @@ const PageTitle = styled(Typography)({
     flexShrink: 0,
 });
 
-const DropdownTrigger = styled(Box)(({ theme }) => ({
+const DropdownTrigger = styled(Box)({
     height: 32,
     display: 'flex',
     alignItems: 'center',
@@ -81,7 +77,7 @@ const DropdownTrigger = styled(Box)(({ theme }) => ({
     backgroundColor: '#fff',
     border: '1px solid #c4c4c4',
     cursor: 'pointer',
-    color: 'var(--text-primary)',
+    color: '#1a1a1a',
     fontWeight: 500,
     fontSize: '0.75rem',
     whiteSpace: 'nowrap',
@@ -93,7 +89,7 @@ const DropdownTrigger = styled(Box)(({ theme }) => ({
     '&:active': {
         backgroundColor: '#f5f5f5',
     },
-}));
+});
 
 const RequestCard = styled(Card)(({ theme, $statusColor }) => ({
     borderRadius: '12px',
@@ -114,11 +110,11 @@ const RequestCard = styled(Card)(({ theme, $statusColor }) => ({
         bottom: 16,
         width: 4,
         borderRadius: '0 4px 4px 0',
-        backgroundColor: $statusColor || theme.palette.primary.main,
+        backgroundColor: $statusColor || 'var(--primary-color)',
     }
 }));
 
-const StatusChip = styled(Chip)(({ theme, status }) => {
+const StatusChip = styled(Chip)(({ status }) => {
     let bgcolor, color;
     switch (status) {
         case 'Approved':
@@ -140,6 +136,55 @@ const StatusChip = styled(Chip)(({ theme, status }) => {
         borderRadius: '8px',
     };
 });
+
+// Active = solid #0056b3, no gradient
+// IONIC MIGRATION: replace with IonSegment / IonSegmentButton
+const TogglePill = styled(Box)(({ active }) => ({
+    padding: '6px 12px',
+    borderRadius: '20px',
+    fontSize: '0.75rem',
+    fontWeight: 600,
+    cursor: 'pointer',
+    backgroundColor: active ? 'var(--primary-color)' : '#fff',
+    color: active ? '#fff' : '#666',
+    border: active ? 'none' : '1px solid #e0e0e0',
+    transition: 'all 0.2s ease',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    whiteSpace: 'nowrap',
+    '&:hover': {
+        opacity: 0.9,
+        backgroundColor: active ? 'var(--primary-color)' : '#f5f5f5',
+    },
+}));
+
+const SheetHandle = styled(Box)({
+    width: 36,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#d0d0d0',
+    margin: '12px auto 8px',
+});
+
+// ============================================
+// Helpers
+// ============================================
+
+const getTypeColor = (iconType) => {
+    switch (iconType) {
+        case 'swap':
+        case 'break':
+            return 'var(--primary-color)';
+        case 'vacation':
+        case 'sick':
+            return '#2e7d32';
+        case 'dispute':
+            return '#e53935';
+        default:
+            return 'var(--primary-color)';
+    }
+};
 
 // ============================================
 // Mock Data
@@ -177,8 +222,8 @@ const mockRequests = [
 ];
 
 const mockIncomingRequests = [
-    { id: 101, type: 'Shift Swap', requester: 'Omar Jabri', date: 'Feb 19', details: 'Wants to swap 08:00 AM-04:00 PM for your 09:00 AM-05:00 PM', created: '30 min ago', status: 'Pending', iconType: 'swap' },
-    { id: 102, type: 'Break Swap', requester: 'Sara Hassan', date: 'Feb 20', details: 'Wants to swap 12:00 PM-12:15 PM break for your 11:00 AM-11:15 AM break', created: '2 hours ago', status: 'Pending', iconType: 'break' },
+    { id: 101, type: 'Shift Swap', requester: 'Omar Jabri', date: 'Feb 19', details: 'Wants to swap 08:00 AM–04:00 PM for your 09:00 AM–05:00 PM', created: '30 min ago', status: 'Pending', iconType: 'swap' },
+    { id: 102, type: 'Break Swap', requester: 'Sara Hassan', date: 'Feb 20', details: 'Wants to swap 12:00 PM–12:15 PM break for your 11:00 AM–11:15 AM break', created: '2 hours ago', status: 'Pending', iconType: 'break' },
     { id: 103, type: 'Day Off Swap', requester: 'Khaled Mansour', date: 'Feb 22', details: 'Wants to take your shift so you can have the day off', created: '1 day ago', status: 'Pending', iconType: 'swap' },
 ];
 
@@ -190,39 +235,14 @@ const mockHistoryRequests = [
     { id: 202, type: 'Shift Swap', category: 'Swap', direction: 'Incoming', date: 'Jan 20', swapWith: 'Layla Ahmed', status: 'Rejected', iconType: 'swap', created: '1 month ago' },
 ];
 
-const TogglePill = styled(Box)(({ active }) => ({
-    padding: '6px 12px',
-    borderRadius: '20px',
-    fontSize: '0.75rem',
-    fontWeight: 600,
-    cursor: 'pointer',
-    backgroundColor: active ? undefined : '#fff',
-    background: active ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : undefined,
-    color: active ? '#fff' : '#666',
-    border: active ? 'none' : '1px solid #e0e0e0',
-    transition: 'all 0.2s ease',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    whiteSpace: 'nowrap',
-    '&:hover': {
-        opacity: 0.9,
-        backgroundColor: active ? undefined : '#f5f5f5',
-    },
-}));
-
-const DragHandle = styled(Box)({
-    width: 36,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: '#d0d0d0',
-    margin: '12px auto 8px',
-});
+// ============================================
+// Main Component
+// ============================================
 
 const RequestsPage = ({ defaultTab = 0 }) => {
 
     const [viewMode, setViewMode] = useState(defaultTab === 3 ? 'incoming' : 'pending'); // 'pending' | 'incoming' | 'history'
-    const [tabValue, setTabValue] = useState(defaultTab === 3 ? 0 : defaultTab); // Reset if it was incoming
+    const [tabValue, setTabValue] = useState(defaultTab === 3 ? 0 : defaultTab);
 
     React.useEffect(() => {
         if (defaultTab === 3) {
@@ -230,12 +250,12 @@ const RequestsPage = ({ defaultTab = 0 }) => {
             setTabValue(0);
         } else {
             setTabValue(defaultTab);
-            // Optionally reset viewMode if navigating away from incoming, but 'pending' is safe default behavior for other tabs
             if (viewMode === 'incoming') setViewMode('pending');
         }
     }, [defaultTab]);
+
     const [requests, setRequests] = useState([]);
-    const [historyRequests, setHistoryRequests] = useState(mockHistoryRequests);
+    const [historyRequests] = useState(mockHistoryRequests);
     const [incomingRequests, setIncomingRequests] = useState(mockIncomingRequests);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMsg, setSnackbarMsg] = useState('');
@@ -254,7 +274,6 @@ const RequestsPage = ({ defaultTab = 0 }) => {
     React.useEffect(() => {
         try {
             const storedRequests = JSON.parse(localStorage.getItem('userRequests') || '[]');
-            // Refresh if old cache is missing expiryDate
             const needsRefresh = storedRequests.length === 0 || !storedRequests[0].iconType ||
                 storedRequests.some(r => r.category !== 'Dispute' && r.expiryDate === undefined);
             if (needsRefresh) {
@@ -270,12 +289,16 @@ const RequestsPage = ({ defaultTab = 0 }) => {
 
     const getIconByType = (iconType) => {
         switch (iconType) {
-            case 'vacation': return <VacationIcon />;
-            case 'sick': return <VacationIcon />;
-            case 'swap': return <SwapIcon />;
-            case 'break': return <SwapIcon />;
-            case 'dispute': return <TimeIcon />; // Using TimeIcon for dispute for now
-            default: return <VacationIcon />;
+            case 'vacation':
+            case 'sick':
+                return <VacationIcon />;
+            case 'swap':
+            case 'break':
+                return <SwapIcon />;
+            case 'dispute':
+                return <TimeIcon />;
+            default:
+                return <VacationIcon />;
         }
     };
 
@@ -287,9 +310,6 @@ const RequestsPage = ({ defaultTab = 0 }) => {
         }
     };
 
-
-
-    // Filter logic
     const getSourceRequests = () => {
         if (viewMode === 'pending') return requests.filter(r => r.status === 'Pending');
         if (viewMode === 'history') return historyRequests;
@@ -314,15 +334,16 @@ const RequestsPage = ({ defaultTab = 0 }) => {
     };
 
     const isIncomingTab = viewMode === 'incoming';
+    const pendingIncomingCount = incomingRequests.filter(r => r.status === 'Pending').length;
 
     return (
         <PageContainer>
 
-            {/* Title + Filter Dropdown + View Toggles */}
+            {/* ── Title + Filter Dropdown + View Toggles ── */}
             <FilterRow>
                 <PageTitle>Requests</PageTitle>
 
-                {viewMode === 'history' || viewMode === 'pending' ? (
+                {viewMode !== 'incoming' ? (
                     <DropdownTrigger onClick={() => setIsFilterSheetOpen(true)}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                             {currentFilterLabel}
@@ -331,113 +352,78 @@ const RequestsPage = ({ defaultTab = 0 }) => {
                     </DropdownTrigger>
                 ) : (
                     <DropdownTrigger sx={{ cursor: 'default', backgroundColor: '#f5f5f5', color: '#888', borderColor: '#e0e0e0' }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            Swaps
-                        </Box>
+                        Swaps
                     </DropdownTrigger>
                 )}
 
                 <Box sx={{ display: 'flex', gap: 1 }}>
-                    <TogglePill
-                        active={viewMode === 'pending' ? 1 : 0}
-                        onClick={() => setViewMode('pending')}
-                    >
+                    <TogglePill active={viewMode === 'pending' ? 1 : 0} onClick={() => setViewMode('pending')}>
                         Pending
                     </TogglePill>
-                    <TogglePill
-                        active={viewMode === 'incoming' ? 1 : 0}
-                        onClick={() => setViewMode('incoming')}
-                    >
+                    <TogglePill active={viewMode === 'incoming' ? 1 : 0} onClick={() => setViewMode('incoming')}>
                         Incoming
-                        {incomingRequests.filter(r => r.status === 'Pending').length > 0 && (
+                        {pendingIncomingCount > 0 && (
                             <Box sx={{
-                                minWidth: 16,
-                                height: 16,
-                                borderRadius: '8px',
-                                backgroundColor: '#f44336',
-                                color: '#fff',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                fontSize: '0.6rem',
-                                fontWeight: 700,
-                                px: 0.5,
-                                lineHeight: 0,
+                                minWidth: 16, height: 16, borderRadius: '8px',
+                                backgroundColor: '#f44336', color: '#fff',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                fontSize: '0.6rem', fontWeight: 700, px: 0.5, lineHeight: 0,
                             }}>
-                                {incomingRequests.filter(r => r.status === 'Pending').length}
+                                {pendingIncomingCount}
                             </Box>
                         )}
                     </TogglePill>
-                    <TogglePill
-                        active={viewMode === 'history' ? 1 : 0}
-                        onClick={() => setViewMode('history')}
-                    >
+                    <TogglePill active={viewMode === 'history' ? 1 : 0} onClick={() => setViewMode('history')}>
                         History
                     </TogglePill>
                 </Box>
             </FilterRow>
 
-
-
-            {/* Pending Requests (Card View) */}
-            {
-                viewMode === 'pending' && (
-                    <Box>
-                        {filteredRequests.length === 0 ? (
-                            <Box sx={{ textAlign: 'center', py: 6, color: '#aaa' }}>
-                                <PendingIcon sx={{ fontSize: 48, opacity: 0.3, mb: 1 }} />
-                                <Typography sx={{ fontWeight: 600 }}>No pending requests</Typography>
-                            </Box>
-                        ) : (
-                            filteredRequests.map((req) => (
+            {/* ── Pending Requests (Card View) ── */}
+            {viewMode === 'pending' && (
+                <Box>
+                    {filteredRequests.length === 0 ? (
+                        <Box sx={{ textAlign: 'center', py: 6, color: '#aaa' }}>
+                            <PendingIcon sx={{ fontSize: 48, opacity: 0.3, mb: 1 }} />
+                            <Typography sx={{ fontWeight: 600 }}>No pending requests</Typography>
+                        </Box>
+                    ) : (
+                        filteredRequests.map((req) => {
+                            const typeColor = getTypeColor(req.iconType);
+                            return (
                                 <RequestCard
                                     key={req.id}
-                                    $statusColor={'#ff9800'} // Orange for Pending
+                                    $statusColor='#ff9800'
                                     onClick={() => setSelectedRequest(req)}
                                     sx={{ cursor: 'pointer' }}
                                 >
                                     <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                                            <Box
-                                                sx={{
-                                                    mr: 2,
-                                                    p: 1.5,
-                                                    borderRadius: '12px',
-                                                    bgcolor: req.category === 'Swap' ? '#e3f2fd' : '#f3e5f5',
-                                                    color: req.category === 'Swap' ? '#2196f3' : '#9c27b0',
-                                                }}
-                                            >
+                                            {/* Icon box — tinted bg pattern */}
+                                            <Box sx={{
+                                                mr: 2, width: 42, height: 42, borderRadius: 2.5, flexShrink: 0,
+                                                backgroundColor: `${typeColor}15`,
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                color: typeColor,
+                                            }}>
                                                 {getIconByType(req.iconType)}
                                             </Box>
-
                                             <Box sx={{ flexGrow: 1 }}>
-                                                <Typography variant="subtitle1" fontWeight={700}>
-                                                    {req.type}
-                                                </Typography>
+                                                <Typography variant="subtitle1" fontWeight={700}>{req.type}</Typography>
                                                 <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
-                                                    {req.fromDate ? `${req.fromDate} - ${req.toDate}` : req.date}
+                                                    {req.fromDate ? `${req.fromDate} – ${req.toDate}` : req.date}
                                                 </Typography>
                                             </Box>
-
                                             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 0.5 }}>
-                                                <StatusChip
-                                                    label={req.status}
-                                                    size="small"
-                                                    status={req.status}
-                                                    icon={getStatusIcon(req.status)}
-                                                />
-                                                <Typography variant="caption" color="text.disabled">
-                                                    {req.created}
-                                                </Typography>
+                                                <StatusChip label={req.status} size="small" status={req.status} icon={getStatusIcon(req.status)} />
+                                                <Typography variant="caption" color="text.disabled">{req.created}</Typography>
                                             </Box>
                                         </Box>
 
                                         {(req.comment || req.details) && (
                                             <Box sx={{
-                                                p: 1.5,
-                                                borderRadius: '10px',
-                                                backgroundColor: '#f8f9fa',
-                                                border: '1px solid #e9ecef',
+                                                p: 1.5, borderRadius: '10px',
+                                                backgroundColor: '#f8f9fa', border: '1px solid #e9ecef',
                                             }}>
                                                 <Typography sx={{ fontSize: '0.8rem', color: '#555' }}>
                                                     {req.comment || req.details}
@@ -446,31 +432,30 @@ const RequestsPage = ({ defaultTab = 0 }) => {
                                         )}
                                     </CardContent>
                                 </RequestCard>
-                            ))
-                        )}
-                    </Box>
-                )
-            }
+                            );
+                        })
+                    )}
+                </Box>
+            )}
 
-            {/* History (Table View) */}
-            {
-                viewMode === 'history' && (
-                    <Box sx={{ overflowX: 'auto', backgroundColor: '#fff', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
-                        {filteredRequests.length > 0 ? (
-                            <Table sx={{ minWidth: 500 }}>
-                                <TableHead>
-                                    <TableRow sx={{ backgroundColor: '#f9f9f9' }}>
-                                        <TableCell sx={{ fontWeight: 700, fontSize: '0.85rem' }}>Type</TableCell>
-                                        {viewMode === 'history' && (
-                                            <TableCell sx={{ fontWeight: 700, fontSize: '0.85rem' }}>Direction</TableCell>
-                                        )}
-                                        <TableCell sx={{ fontWeight: 700, fontSize: '0.85rem' }}>Details</TableCell>
-                                        <TableCell sx={{ fontWeight: 700, fontSize: '0.85rem' }}>Status</TableCell>
-                                        <TableCell sx={{ fontWeight: 700, fontSize: '0.85rem' }} align="right">Created</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {filteredRequests.map((req) => (
+            {/* ── History (Table View) ── */}
+            {viewMode === 'history' && (
+                <Box sx={{ overflowX: 'auto', backgroundColor: '#fff', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+                    {filteredRequests.length > 0 ? (
+                        <Table sx={{ minWidth: 500 }}>
+                            <TableHead>
+                                <TableRow sx={{ backgroundColor: '#f9f9f9' }}>
+                                    <TableCell sx={{ fontWeight: 700, fontSize: '0.85rem' }}>Type</TableCell>
+                                    <TableCell sx={{ fontWeight: 700, fontSize: '0.85rem' }}>Direction</TableCell>
+                                    <TableCell sx={{ fontWeight: 700, fontSize: '0.85rem' }}>Details</TableCell>
+                                    <TableCell sx={{ fontWeight: 700, fontSize: '0.85rem' }}>Status</TableCell>
+                                    <TableCell sx={{ fontWeight: 700, fontSize: '0.85rem' }} align="right">Created</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {filteredRequests.map((req) => {
+                                    const typeColor = getTypeColor(req.iconType);
+                                    return (
                                         <TableRow
                                             key={req.id}
                                             hover
@@ -479,39 +464,33 @@ const RequestsPage = ({ defaultTab = 0 }) => {
                                         >
                                             <TableCell>
                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                    <Box
-                                                        sx={{
-                                                            p: 0.8,
-                                                            borderRadius: '8px',
-                                                            bgcolor: req.category === 'Swap' ? '#e3f2fd' : '#f3e5f5',
-                                                            color: req.category === 'Swap' ? '#2196f3' : '#9c27b0',
-                                                            display: 'flex'
-                                                        }}
-                                                    >
+                                                    <Box sx={{
+                                                        width: 32, height: 32, borderRadius: 1.5,
+                                                        backgroundColor: `${typeColor}15`,
+                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                        color: typeColor,
+                                                    }}>
                                                         {React.cloneElement(getIconByType(req.iconType), { sx: { fontSize: 18 } })}
                                                     </Box>
                                                     <Typography variant="body2" sx={{ fontWeight: 600 }}>{req.type}</Typography>
                                                 </Box>
                                             </TableCell>
-                                            {viewMode === 'history' && (
-                                                <TableCell>
-                                                    <Chip
-                                                        label={req.direction}
-                                                        size="small"
-                                                        sx={{
-                                                            height: 20,
-                                                            fontSize: '0.65rem',
-                                                            backgroundColor: req.direction === 'Incoming' ? '#e3f2fd' : '#f5f5f5',
-                                                            color: req.direction === 'Incoming' ? '#1565c0' : '#616161',
-                                                            fontWeight: 600
-                                                        }}
-                                                    />
-                                                </TableCell>
-                                            )}
+                                            <TableCell>
+                                                <Chip
+                                                    label={req.direction}
+                                                    size="small"
+                                                    sx={{
+                                                        height: 20, fontSize: '0.65rem',
+                                                        backgroundColor: req.direction === 'Incoming' ? '#e3f2fd' : '#f5f5f5',
+                                                        color: req.direction === 'Incoming' ? 'var(--primary-color)' : '#616161',
+                                                        fontWeight: 600,
+                                                    }}
+                                                />
+                                            </TableCell>
                                             <TableCell>
                                                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                        {req.fromDate ? `${req.fromDate} - ${req.toDate}` : req.date || (req.startDate && `${req.startDate} - ${req.endDate}`)}
+                                                    <Typography variant="caption" color="text.secondary">
+                                                        {req.fromDate ? `${req.fromDate} – ${req.toDate}` : req.date || (req.startDate && `${req.startDate} – ${req.endDate}`)}
                                                     </Typography>
                                                     {req.category === 'Swap' && req.swapWith && (
                                                         <Typography variant="caption" sx={{ color: '#666' }}>W/ {req.swapWith}</Typography>
@@ -523,9 +502,7 @@ const RequestsPage = ({ defaultTab = 0 }) => {
                                             </TableCell>
                                             <TableCell>
                                                 <StatusChip
-                                                    label={req.status}
-                                                    size="small"
-                                                    status={req.status}
+                                                    label={req.status} size="small" status={req.status}
                                                     icon={getStatusIcon(req.status)}
                                                     sx={{ height: 24, fontSize: '0.65rem' }}
                                                 />
@@ -534,83 +511,62 @@ const RequestsPage = ({ defaultTab = 0 }) => {
                                                 <Typography variant="caption" color="text.disabled">{req.created}</Typography>
                                             </TableCell>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        ) : (
-                            <Box sx={{ textAlign: 'center', py: 6, color: '#aaa' }}>
-                                <Typography sx={{ fontWeight: 600 }}>No requests found</Typography>
-                            </Box>
-                        )}
-                    </Box>
-                )
-            }
+                                    );
+                                })}
+                            </TableBody>
+                        </Table>
+                    ) : (
+                        <Box sx={{ textAlign: 'center', py: 6, color: '#aaa' }}>
+                            <Typography sx={{ fontWeight: 600 }}>No requests found</Typography>
+                        </Box>
+                    )}
+                </Box>
+            )}
 
-            {/* Incoming Requests */}
-            {
-                viewMode === 'incoming' && (
-                    <Box>
-                        {incomingRequests.length === 0 ? (
-                            <Box sx={{ textAlign: 'center', py: 6, color: '#aaa' }}>
-                                <SwapIcon sx={{ fontSize: 48, opacity: 0.3, mb: 1 }} />
-                                <Typography sx={{ fontWeight: 600 }}>No incoming requests</Typography>
-                            </Box>
-                        ) : (
-                            incomingRequests.map((req) => (
-                                <RequestCard
-                                    key={req.id}
-                                    $statusColor={req.status === 'Approved' ? '#4caf50' : req.status === 'Rejected' ? '#f44336' : '#2196f3'}
-                                >
+            {/* ── Incoming Requests ── */}
+            {viewMode === 'incoming' && (
+                <Box>
+                    {incomingRequests.length === 0 ? (
+                        <Box sx={{ textAlign: 'center', py: 6, color: '#aaa' }}>
+                            <SwapIcon sx={{ fontSize: 48, opacity: 0.3, mb: 1 }} />
+                            <Typography sx={{ fontWeight: 600 }}>No incoming requests</Typography>
+                        </Box>
+                    ) : (
+                        incomingRequests.map((req) => {
+                            const typeColor = getTypeColor(req.iconType);
+                            const sideColor = req.status === 'Approved' ? '#4caf50' : req.status === 'Rejected' ? '#f44336' : 'var(--primary-color)';
+                            return (
+                                <RequestCard key={req.id} $statusColor={sideColor}>
                                     <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                                            <Box
-                                                sx={{
-                                                    mr: 2,
-                                                    p: 1.5,
-                                                    borderRadius: '12px',
-                                                    bgcolor: '#e3f2fd',
-                                                    color: '#2196f3',
-                                                }}
-                                            >
+                                            <Box sx={{
+                                                mr: 2, width: 42, height: 42, borderRadius: 2.5, flexShrink: 0,
+                                                backgroundColor: `${typeColor}15`,
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                color: typeColor,
+                                            }}>
                                                 {getIconByType(req.iconType)}
                                             </Box>
-
                                             <Box sx={{ flexGrow: 1 }}>
-                                                <Typography variant="subtitle1" fontWeight={700}>
-                                                    {req.type}
-                                                </Typography>
+                                                <Typography variant="subtitle1" fontWeight={700}>{req.type}</Typography>
                                                 <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
-                                                    From <strong>{req.requester}</strong> - {req.date}
+                                                    From <strong>{req.requester}</strong> · {req.date}
                                                 </Typography>
                                             </Box>
-
                                             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 0.5 }}>
-                                                <StatusChip
-                                                    label={req.status}
-                                                    size="small"
-                                                    status={req.status}
-                                                    icon={getStatusIcon(req.status)}
-                                                />
-                                                <Typography variant="caption" color="text.disabled">
-                                                    {req.created}
-                                                </Typography>
+                                                <StatusChip label={req.status} size="small" status={req.status} icon={getStatusIcon(req.status)} />
+                                                <Typography variant="caption" color="text.disabled">{req.created}</Typography>
                                             </Box>
                                         </Box>
 
-                                        {/* Swap details */}
                                         <Box sx={{
-                                            p: 1.5,
-                                            borderRadius: '10px',
-                                            backgroundColor: '#f8f9fa',
-                                            border: '1px solid #e9ecef',
+                                            p: 1.5, borderRadius: '10px',
+                                            backgroundColor: '#f8f9fa', border: '1px solid #e9ecef',
                                             mb: req.status === 'Pending' ? 1.5 : 0,
                                         }}>
-                                            <Typography sx={{ fontSize: '0.8rem', color: '#555' }}>
-                                                {req.details}
-                                            </Typography>
+                                            <Typography sx={{ fontSize: '0.8rem', color: '#555' }}>{req.details}</Typography>
                                         </Box>
 
-                                        {/* Accept / Reject buttons */}
                                         {req.status === 'Pending' && (
                                             <Box sx={{ display: 'flex', gap: 1 }}>
                                                 <Button
@@ -624,8 +580,9 @@ const RequestsPage = ({ defaultTab = 0 }) => {
                                                         fontWeight: 600,
                                                         fontSize: '0.8rem',
                                                         py: 0.8,
-                                                        background: 'linear-gradient(135deg, #4caf50, #43a047)',
-                                                        boxShadow: '0 2px 8px rgba(76,175,80,0.3)',
+                                                        backgroundColor: '#4caf50',
+                                                        boxShadow: 'none',
+                                                        '&:hover': { backgroundColor: '#388e3c', boxShadow: 'none' },
                                                     }}
                                                 >
                                                     Accept
@@ -643,10 +600,7 @@ const RequestsPage = ({ defaultTab = 0 }) => {
                                                         py: 0.8,
                                                         borderColor: '#f44336',
                                                         color: '#f44336',
-                                                        '&:hover': {
-                                                            borderColor: '#d32f2f',
-                                                            backgroundColor: '#ffebee',
-                                                        },
+                                                        '&:hover': { borderColor: '#d32f2f', backgroundColor: '#ffebee' },
                                                     }}
                                                 >
                                                     Reject
@@ -655,13 +609,13 @@ const RequestsPage = ({ defaultTab = 0 }) => {
                                         )}
                                     </CardContent>
                                 </RequestCard>
-                            ))
-                        )}
-                    </Box>
-                )
-            }
+                            );
+                        })
+                    )}
+                </Box>
+            )}
 
-            {/* Success Snackbar */}
+            {/* ── Success Snackbar ── */}
             <Snackbar
                 open={snackbarOpen}
                 autoHideDuration={3000}
@@ -669,17 +623,14 @@ const RequestsPage = ({ defaultTab = 0 }) => {
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
                 sx={{ bottom: 80 }}
             >
-                <Alert
-                    onClose={() => setSnackbarOpen(false)}
-                    severity="success"
-                    variant="filled"
-                    sx={{ borderRadius: '12px', fontWeight: 600 }}
-                >
+                <Alert onClose={() => setSnackbarOpen(false)} severity="success" variant="filled"
+                    sx={{ borderRadius: '12px', fontWeight: 600 }}>
                     {snackbarMsg}
                 </Alert>
             </Snackbar>
 
-            {/* Filter Bottom Sheet */}
+            {/* ── Filter Bottom Sheet ── */}
+            {/* IONIC MIGRATION: replace with IonActionSheet or IonModal */}
             <SwipeableDrawer
                 anchor="bottom"
                 open={isFilterSheetOpen}
@@ -690,65 +641,62 @@ const RequestsPage = ({ defaultTab = 0 }) => {
                         borderTopLeftRadius: '24px',
                         borderTopRightRadius: '24px',
                         paddingBottom: '20px',
-                        maxHeight: '60vh'
+                        maxHeight: '60vh',
                     }
                 }}
             >
-                <DragHandle />
-                <Box sx={{ px: 3, pt: 1, pb: 2 }}>
-                    <Typography variant="h6" fontWeight={700} textAlign="center">Filter Requests</Typography>
+                <SheetHandle />
+                {/* Nav header */}
+                <Box sx={{
+                    display: 'flex', alignItems: 'center',
+                    px: 2, pb: 1.5,
+                }}>
+                    <Box sx={{ width: 40 }} /> {/* spacer */}
+                    <Box sx={{ flexGrow: 1, textAlign: 'center' }}>
+                        <Typography sx={{ fontWeight: 700, fontSize: '1rem', color: '#1a1a1a' }}>
+                            Filter Requests
+                        </Typography>
+                    </Box>
+                    <IconButton size="small" onClick={() => setIsFilterSheetOpen(false)}>
+                        <CloseIcon fontSize="small" />
+                    </IconButton>
                 </Box>
-                <List sx={{ pt: 1 }}>
-                    {filterOptions.map((option) => {
-                        const isIncoming = option.label === 'Incoming';
-                        const pendingCount = incomingRequests.filter(r => r.status === 'Pending').length;
+                <Divider sx={{ borderColor: '#f0f0f0' }} />
 
-                        return (
-                            <ListItem disablePadding key={option.value}>
-                                <ListItemButton
-                                    onClick={() => { setTabValue(option.value); setIsFilterSheetOpen(false); }}
-                                    sx={{ px: 3 }}
-                                >
-                                    <Radio
-                                        checked={tabValue === option.value}
-                                        onChange={() => { setTabValue(option.value); setIsFilterSheetOpen(false); }}
-                                        size="small"
-                                        sx={{ mr: 1 }}
-                                    />
-                                    <ListItemText
-                                        primary={
-                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                                                <Typography fontWeight={tabValue === option.value ? 700 : 500}>
-                                                    {option.label}
-                                                </Typography>
-                                                {isIncoming && pendingCount > 0 && (
-                                                    <Box sx={{
-                                                        minWidth: 20,
-                                                        height: 20,
-                                                        borderRadius: '10px',
-                                                        backgroundColor: '#f44336',
-                                                        color: '#fff',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        fontSize: '0.7rem',
-                                                        fontWeight: 700,
-                                                        px: 0.5
-                                                    }}>
-                                                        {pendingCount}
-                                                    </Box>
-                                                )}
-                                            </Box>
-                                        }
-                                    />
-                                </ListItemButton>
-                            </ListItem>
-                        );
-                    })}
-                </List>
+                {/* Filter options — Box-based rows */}
+                <Box sx={{ pt: 1 }}>
+                    {filterOptions.map((option) => (
+                        <Box
+                            key={option.value}
+                            onClick={() => { setTabValue(option.value); setIsFilterSheetOpen(false); }}
+                            sx={{
+                                display: 'flex', alignItems: 'center',
+                                px: 3, py: 1.5,
+                                cursor: 'pointer',
+                                '&:hover': { backgroundColor: '#f9f9f9' },
+                                '&:active': { backgroundColor: '#f0f4f8' },
+                            }}
+                        >
+                            <Radio
+                                checked={tabValue === option.value}
+                                size="small"
+                                sx={{ mr: 1, p: 0, color: 'var(--primary-color)', '&.Mui-checked': { color: 'var(--primary-color)' } }}
+                                readOnly
+                            />
+                            <Typography sx={{
+                                fontWeight: tabValue === option.value ? 700 : 500,
+                                fontSize: '0.95rem',
+                                color: tabValue === option.value ? 'var(--primary-color)' : '#1a1a1a',
+                            }}>
+                                {option.label}
+                            </Typography>
+                        </Box>
+                    ))}
+                </Box>
             </SwipeableDrawer>
 
-            {/* Request Detail Drawer */}
+            {/* ── Request Detail Bottom Sheet ── */}
+            {/* IONIC MIGRATION: replace with IonModal */}
             <SwipeableDrawer
                 anchor="bottom"
                 open={Boolean(selectedRequest)}
@@ -758,95 +706,128 @@ const RequestsPage = ({ defaultTab = 0 }) => {
                     sx: {
                         borderTopLeftRadius: '24px',
                         borderTopRightRadius: '24px',
-                        padding: '0',
-                        maxHeight: '85vh'
+                        maxHeight: '85vh',
+                        display: 'flex',
+                        flexDirection: 'column',
                     }
                 }}
             >
-                {selectedRequest && (
-                    <Box sx={{ pb: 4 }}>
-                        <DragHandle />
-                        <Box sx={{ px: 3, pt: 1, pb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <Typography variant="h6" fontWeight={700}>Request Details</Typography>
-                        </Box>
-
-                        <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 3 }}>
-                            {/* Header Status */}
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                <Box sx={{
-                                    p: 2,
-                                    borderRadius: '16px',
-                                    bgcolor: selectedRequest.category === 'Swap' ? '#e3f2fd' : '#f3e5f5',
-                                    color: selectedRequest.category === 'Swap' ? '#2196f3' : '#9c27b0',
-                                }}>
-                                    {React.cloneElement(getIconByType(selectedRequest.iconType), { sx: { fontSize: 32 } })}
-                                </Box>
-                                <Box>
-                                    <Typography variant="h6" fontWeight={700}>{selectedRequest.type}</Typography>
-                                    <Typography variant="body2" color="text.secondary">{selectedRequest.category}</Typography>
-                                </Box>
-                                <Box sx={{ flexGrow: 1 }} />
-                                <StatusChip
-                                    label={selectedRequest.status}
-                                    status={selectedRequest.status}
-                                    icon={getStatusIcon(selectedRequest.status)}
-                                />
-                            </Box>
-
-                            {/* Details Grid */}
-                            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-                                <Box sx={{ p: 2, bgcolor: '#f9f9f9', borderRadius: '12px' }}>
-                                    <Typography variant="caption" color="text.secondary" fontWeight={600}>DATE / PERIOD</Typography>
-                                    <Typography variant="body1" fontWeight={600} mt={0.5}>
-                                        {selectedRequest.fromDate ? `${selectedRequest.fromDate} - ${selectedRequest.toDate}` : (selectedRequest.date || 'N/A')}
+                {selectedRequest && (() => {
+                    const typeColor = getTypeColor(selectedRequest.iconType);
+                    return (
+                        <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                            <SheetHandle />
+                            {/* Nav header */}
+                            <Box sx={{ display: 'flex', alignItems: 'center', px: 2, pb: 1.5 }}>
+                                <Box sx={{ width: 40 }} /> {/* spacer */}
+                                <Box sx={{ flexGrow: 1, textAlign: 'center' }}>
+                                    <Typography sx={{ fontWeight: 700, fontSize: '1rem', color: '#1a1a1a' }}>
+                                        Request Details
+                                    </Typography>
+                                    <Typography sx={{ fontSize: '0.75rem', color: '#888' }}>
+                                        {selectedRequest.type}
                                     </Typography>
                                 </Box>
-                                <Box sx={{ p: 2, bgcolor: '#f9f9f9', borderRadius: '12px' }}>
-                                    <Typography variant="caption" color="text.secondary" fontWeight={600}>CREATED</Typography>
-                                    <Typography variant="body1" fontWeight={600} mt={0.5}>{selectedRequest.created}</Typography>
-                                </Box>
-                                {selectedRequest.expiryDate && (
+                                <IconButton size="small" onClick={() => setSelectedRequest(null)}>
+                                    <CloseIcon fontSize="small" />
+                                </IconButton>
+                            </Box>
+                            <Divider sx={{ borderColor: '#f0f0f0' }} />
+
+                            {/* Scrollable content */}
+                            <Box sx={{ overflowY: 'auto', flex: 1, p: 3, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+
+                                {/* Header — icon + type + status */}
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                     <Box sx={{
-                                        p: 2,
-                                        bgcolor: '#fff8e1',
-                                        borderRadius: '12px',
-                                        border: '1px solid #ffe082',
-                                        gridColumn: '1 / -1',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'space-between',
+                                        width: 52, height: 52, borderRadius: 3, flexShrink: 0,
+                                        backgroundColor: `${typeColor}15`,
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        color: typeColor,
                                     }}>
-                                        <Typography variant="caption" color="#e65100" fontWeight={700} sx={{ letterSpacing: '0.06em' }}>EXPIRY DATE</Typography>
-                                        <Typography variant="body1" fontWeight={700} color="#e65100">{selectedRequest.expiryDate}</Typography>
+                                        {React.cloneElement(getIconByType(selectedRequest.iconType), { sx: { fontSize: 28 } })}
                                     </Box>
-                                )}
-                            </Box>
+                                    <Box sx={{ flexGrow: 1 }}>
+                                        <Typography variant="h6" fontWeight={700}>{selectedRequest.type}</Typography>
+                                        <Typography variant="body2" color="text.secondary">{selectedRequest.category}</Typography>
+                                    </Box>
+                                    <StatusChip
+                                        label={selectedRequest.status}
+                                        status={selectedRequest.status}
+                                        icon={getStatusIcon(selectedRequest.status)}
+                                    />
+                                </Box>
 
-                            {/* Additional Info */}
-                            <Box sx={{ p: 2, bgcolor: '#f9f9f9', borderRadius: '12px' }}>
-                                <Typography variant="caption" color="text.secondary" fontWeight={600}>DETAILS</Typography>
-                                <Typography variant="body1" mt={0.5}>
-                                    {selectedRequest.comment || selectedRequest.reason || selectedRequest.details || 'No additional details provided.'}
-                                </Typography>
-                                {selectedRequest.swapWith && (
-                                    <Typography variant="body2" mt={1} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <SwapIcon fontSize="small" color="action" />
-                                        Swap with: <strong>{selectedRequest.swapWith}</strong>
+                                {/* Details grid */}
+                                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5 }}>
+                                    <Box sx={{ p: 2, bgcolor: '#f9f9f9', borderRadius: '12px' }}>
+                                        <Typography variant="caption" color="text.secondary" fontWeight={600} sx={{ letterSpacing: '0.06em' }}>
+                                            DATE / PERIOD
+                                        </Typography>
+                                        <Typography variant="body1" fontWeight={600} mt={0.5}>
+                                            {selectedRequest.fromDate
+                                                ? `${selectedRequest.fromDate} – ${selectedRequest.toDate}`
+                                                : (selectedRequest.date || 'N/A')}
+                                        </Typography>
+                                    </Box>
+                                    <Box sx={{ p: 2, bgcolor: '#f9f9f9', borderRadius: '12px' }}>
+                                        <Typography variant="caption" color="text.secondary" fontWeight={600} sx={{ letterSpacing: '0.06em' }}>
+                                            SUBMITTED
+                                        </Typography>
+                                        <Typography variant="body1" fontWeight={600} mt={0.5}>{selectedRequest.created}</Typography>
+                                    </Box>
+                                    {selectedRequest.expiryDate && (
+                                        <Box sx={{
+                                            p: 2, bgcolor: '#fff8e1', borderRadius: '12px',
+                                            border: '1px solid #ffe082', gridColumn: '1 / -1',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                        }}>
+                                            <Typography variant="caption" color="#e65100" fontWeight={700} sx={{ letterSpacing: '0.06em' }}>
+                                                EXPIRY DATE
+                                            </Typography>
+                                            <Typography variant="body1" fontWeight={700} color="#e65100">
+                                                {selectedRequest.expiryDate}
+                                            </Typography>
+                                        </Box>
+                                    )}
+                                </Box>
+
+                                {/* Additional info */}
+                                <Box sx={{ p: 2, bgcolor: '#f9f9f9', borderRadius: '12px' }}>
+                                    <Typography variant="caption" color="text.secondary" fontWeight={600} sx={{ letterSpacing: '0.06em' }}>
+                                        DETAILS
                                     </Typography>
+                                    <Typography variant="body1" mt={0.5}>
+                                        {selectedRequest.comment || selectedRequest.reason || selectedRequest.details || 'No additional details provided.'}
+                                    </Typography>
+                                    {selectedRequest.swapWith && (
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
+                                            <SwapIcon fontSize="small" sx={{ color: '#888' }} />
+                                            <Typography variant="body2">
+                                                Swap with: <strong>{selectedRequest.swapWith}</strong>
+                                            </Typography>
+                                        </Box>
+                                    )}
+                                </Box>
+
+                                {/* Cancel action for own pending requests */}
+                                {selectedRequest.status === 'Pending' && !isIncomingTab && (
+                                    <Button
+                                        variant="outlined"
+                                        color="error"
+                                        fullWidth
+                                        sx={{ borderRadius: '12px', py: 1.5, fontWeight: 700 }}
+                                    >
+                                        Cancel Request
+                                    </Button>
                                 )}
                             </Box>
-
-                            {/* Action Button (Placeholder for future actions like Cancel Request) */}
-                            {selectedRequest.status === 'Pending' && !isIncomingTab && (
-                                <Button variant="outlined" color="error" fullWidth sx={{ borderRadius: '12px', py: 1.5, fontWeight: 700 }}>
-                                    Cancel Request
-                                </Button>
-                            )}
                         </Box>
-                    </Box>
-                )}
+                    );
+                })()}
             </SwipeableDrawer>
-        </PageContainer >
+
+        </PageContainer>
     );
 };
 

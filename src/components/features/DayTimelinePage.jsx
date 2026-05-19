@@ -12,10 +12,6 @@ import {
     Button,
     Snackbar,
     Alert,
-    List,
-    ListItemButton,
-    ListItemIcon,
-    ListItemText,
 } from '@mui/material';
 import {
     ArrowBack as BackIcon,
@@ -111,9 +107,10 @@ const Header = styled(Box)({
     display: 'flex',
     alignItems: 'center',
     gap: 8,
-    padding: '12px 12px 12px 4px',
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    color: '#fff',
+    padding: '10px 12px 10px 4px',
+    backgroundColor: '#ffffff',
+    borderBottom: '1px solid #e8ecf1',
+    color: '#1a1a1a',
     position: 'sticky',
     top: 0,
     zIndex: 10,
@@ -126,13 +123,14 @@ const HeaderTextBlock = styled(Box)({
 
 const HeaderDay = styled(Typography)({
     fontWeight: 700,
-    fontSize: '1.1rem',
+    fontSize: '1rem',
     lineHeight: 1.3,
+    color: '#1a1a1a',
 });
 
 const HeaderDate = styled(Typography)({
-    fontSize: '0.8rem',
-    opacity: 0.85,
+    fontSize: '0.78rem',
+    color: '#666',
     lineHeight: 1.2,
 });
 
@@ -211,41 +209,40 @@ const NowLine = styled(Box)({
     },
 });
 
-const ActivityBlock = styled(Box)(({ bgcolor, gradient }) => ({
+const ActivityBlock = styled(Box)(({ accentcolor }) => ({
     position: 'absolute',
-    left: 4,
-    right: 4,
+    left: 6,
+    right: 6,
     borderRadius: 10,
-    background: gradient || bgcolor || '#ccc',
-    color: '#fff',
+    backgroundColor: accentcolor ? `${accentcolor}12` : '#f0f4f8',
+    borderLeft: `3.5px solid ${accentcolor || '#ccc'}`,
+    color: '#1a1a1a',
     padding: '8px 10px',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'flex-start',
     overflow: 'hidden',
-    boxShadow: '0 3px 12px rgba(0,0,0,0.15)',
-    backdropFilter: 'blur(8px)',
-    border: '1px solid rgba(255,255,255,0.2)',
+    boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
     zIndex: 3,
     cursor: 'default',
-    transition: 'box-shadow 0.2s ease',
+    transition: 'box-shadow 0.15s ease',
     '&:hover': {
-        boxShadow: '0 6px 20px rgba(0,0,0,0.2)',
+        boxShadow: '0 3px 10px rgba(0,0,0,0.1)',
     },
 }));
 
 const ActivityTitle = styled(Typography)({
     fontWeight: 700,
-    fontSize: '0.8rem',
+    fontSize: '0.82rem',
     lineHeight: 1.3,
+    color: '#1a1a1a',
     display: 'flex',
     alignItems: 'center',
     gap: 4,
 });
 
 const ActivityTime = styled(Typography)({
-    fontSize: '0.7rem',
-    opacity: 0.9,
+    fontSize: '0.72rem',
     marginTop: 2,
     fontWeight: 500,
 });
@@ -346,13 +343,16 @@ const DetailValue = styled(Typography)({
 
 const REQUEST_TYPES = [
     { id: 'day_off', label: 'Day Off', icon: <DayOffIcon />, color: '#e91e63', needsTime: false, isSwap: false, multiDay: true },
-    { id: 'personal_leave', label: 'Personal Leave', icon: <PersonalLeaveIcon />, color: '#667eea', needsTime: true, isSwap: false, multiDay: false },
+    { id: 'personal_leave', label: 'Personal Leave', icon: <PersonalLeaveIcon />, color: 'var(--primary-color)', needsTime: true, isSwap: false, multiDay: false },
     { id: 'sick_leave', label: 'Sick Leave', icon: <SickLeaveIcon />, color: '#ff9800', needsTime: true, isSwap: false, multiDay: false },
     { id: 'sick_day_off', label: 'Sick Day Off', icon: <SickDayOffIcon />, color: '#f44336', needsTime: false, isSwap: false, multiDay: true },
     { id: 'shift_swap', label: 'Shift Swap', icon: <SwapIcon />, color: '#2196f3', needsTime: false, isSwap: true, multiDay: false },
     { id: 'break_swap', label: 'Break Swap', icon: <SwapIcon />, color: '#009688', needsTime: true, isSwap: true, multiDay: false },
     { id: 'day_off_swap', label: 'Day Off Swap', icon: <SwapIcon />, color: '#795548', needsTime: false, isSwap: true, multiDay: false },
 ];
+
+// Step order for the unified request sheet
+const STEP_ORDER = ['type', 'form', 'agents', 'confirm'];
 
 // ============================================
 // Mock Agent Data (skill group peers)
@@ -394,11 +394,11 @@ const MOCK_AGENTS = [
 // Selection highlight styled component
 const SelectionHighlight = styled(Box)({
     position: 'absolute',
-    left: 4,
-    right: 4,
+    left: 6,
+    right: 6,
     borderRadius: 10,
-    backgroundColor: 'rgba(102, 126, 234, 0.18)',
-    border: '2px dashed rgba(102, 126, 234, 0.5)',
+    backgroundColor: 'rgba(0, 86, 179, 0.1)',
+    border: '2px dashed rgba(0, 86, 179, 0.4)',
     zIndex: 6,
     pointerEvents: 'none',
 });
@@ -407,7 +407,7 @@ const SelectionHighlight = styled(Box)({
 // Date Picker Field Component (click to open)
 // ============================================
 
-const CALENDAR_BLUE = '#1976d2';
+const CALENDAR_BLUE = 'var(--primary-color)';
 
 
 // ---- iOS drum constants ----
@@ -674,11 +674,14 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
     const urlRestoredRef = useRef(false); // prevent re-running on every activities change
 
     // ---- Request creation state ----
-    const [showTypePicker, setShowTypePicker] = useState(() => {
+    // Single step state drives the unified bottom sheet
+    const [requestStep, setRequestStep] = useState(() => {
         const p = new URLSearchParams(window.location.search);
-        return p.get('view') === 'request' && !p.get('requestType');
+        if (p.get('view') === 'request' && !p.get('requestType')) return 'type';
+        return null;
     });
-    const [showRequestForm, setShowRequestForm] = useState(false);
+    const stepIdx = requestStep ? STEP_ORDER.indexOf(requestStep) : 0;
+
     const [selectedRequestType, setSelectedRequestType] = useState(() => {
         const p = new URLSearchParams(window.location.search);
         const rt = p.get('requestType');
@@ -704,9 +707,7 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
     const [snackbarOpen, setSnackbarOpen] = useState(false);
 
     // ---- Swap agent selection state ----
-    const [showAgentPicker, setShowAgentPicker] = useState(false);
     const [selectedAgent, setSelectedAgent] = useState(null);
-    const [showSwapConfirm, setShowSwapConfirm] = useState(false);
 
     // ---- Timeline selection state ----
     const [selectionStart, setSelectionStart] = useState(null); // minutes
@@ -824,29 +825,25 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
         params.set('page', 'schedule');
         params.set('view', 'request');
         window.history.replaceState(null, '', '?' + params.toString());
-        setShowTypePicker(true);
+        setRequestStep('type');
     }, []);
 
     const selectRequestType = useCallback((type) => {
         setSelectedRequestType(type);
-        setShowTypePicker(false);
         const params = new URLSearchParams();
         params.set('page', 'schedule');
         params.set('view', 'request');
         params.set('requestType', type.id.replace(/_/g, '-'));
         window.history.replaceState(null, '', '?' + params.toString());
-        // All types (swap or not) start with the request form
         if (!type.needsTime) {
             setRequestFromTime('');
             setRequestToTime('');
         }
-        setShowRequestForm(true);
+        setRequestStep('form');
     }, []);
 
     const closeRequestForm = useCallback(() => {
-        setShowRequestForm(false);
-        setShowAgentPicker(false);
-        setShowSwapConfirm(false);
+        setRequestStep(null);
         setSelectedRequestType(null);
         setSelectedAgent(null);
         setRequestFromTime('');
@@ -855,6 +852,12 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
         setSelectionStart(null);
         setSelectionEnd(null);
     }, []);
+
+    const goBackStep = useCallback(() => {
+        const idx = STEP_ORDER.indexOf(requestStep);
+        if (idx <= 0) closeRequestForm();
+        else setRequestStep(STEP_ORDER[idx - 1]);
+    }, [requestStep, closeRequestForm]);
 
     const submitRequest = useCallback(() => {
         // In production this would call an API
@@ -865,8 +868,7 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
     // ---- Swap agent helpers ----
     const selectAgent = useCallback((agent) => {
         setSelectedAgent(agent);
-        setShowAgentPicker(false);
-        setShowSwapConfirm(true);
+        setRequestStep('confirm');
     }, []);
 
 
@@ -906,7 +908,7 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
             setRequestToTime(formatMinutesToTime(toMin));
             // Only show leave types for timeline selection
             setSelectedRequestType(null);
-            setShowTypePicker(true);
+            setRequestStep('type');
         } else {
             setSelectionStart(null);
             setSelectionEnd(null);
@@ -939,11 +941,11 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
         if (!act) return [];
         const isBreak = act.id.startsWith('break');
         return [
-            { icon: <TypeIcon />, label: 'Activity Type', value: act.label, color: '#667eea' },
+            { icon: <TypeIcon />, label: 'Activity Type', value: act.label, color: 'var(--primary-color)' },
             { icon: <TimeIcon />, label: 'Time', value: act.timeText, color: '#ff9800' },
             { icon: <DurationIcon />, label: 'Duration', value: act.sub, color: '#4caf50' },
             { icon: <StatusIcon />, label: 'Status', value: 'Approved', color: '#11998e' },
-            { icon: <ApprovedByIcon />, label: 'Approved By', value: isBreak ? 'Auto-Scheduled' : 'Ahmad Khalil', color: '#764ba2' },
+            { icon: <ApprovedByIcon />, label: 'Approved By', value: isBreak ? 'Auto-Scheduled' : 'Ahmad Khalil', color: '#9c27b0' },
             { icon: <RequestDateIcon />, label: 'Scheduled On', value: 'Jan 28, 2025', color: '#e91e63' },
         ];
     };
@@ -964,7 +966,7 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
             icon: <ShiftIcon sx={{ fontSize: 16 }} />,
             startMin: shiftStart,
             endMin: shiftEnd,
-            gradient: 'linear-gradient(180deg, rgba(102,126,234,0.85) 0%, rgba(118,75,162,0.85) 100%)',
+            accentcolor: 'var(--primary-color)',
             timeText: `${dayData.startTime} - ${dayData.endTime}`,
             sub: dayData.duration,
         });
@@ -977,7 +979,7 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
                 icon: <BreakIcon sx={{ fontSize: 16 }} />,
                 startMin: brk.start,
                 endMin: brk.end,
-                gradient: 'linear-gradient(180deg, rgba(255,152,0,0.92) 0%, rgba(245,124,0,0.92) 100%)',
+                accentcolor: '#e65100',
                 timeText: `${formatMinutesToTime(brk.start)} - ${formatMinutesToTime(brk.end)}`,
                 sub: `${brk.end - brk.start} min`,
             });
@@ -1011,17 +1013,14 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
                 base.set('shift', shiftParam);
             }
         } else if (view === 'request' && rtParam) {
-            // Open the specific request form
             const type = REQUEST_TYPES.find(t => t.id.replace(/_/g, '-') === rtParam);
             if (type) {
                 setSelectedRequestType(type);
-                if (type.isSwap) setShowAgentPicker(true);
-                else setShowRequestForm(true);
+                setRequestStep('form');
                 base.set('view', 'request');
                 base.set('requestType', rtParam);
             }
         } else if (view === 'request') {
-            // Just open the type picker (already initialized via useState)
             base.set('view', 'request');
         }
 
@@ -1111,17 +1110,17 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
         <PageContainer>
             {/* ===== Header ===== */}
             <Header>
-                <IconButton onClick={onBack} sx={{ color: '#fff' }}>
+                <IconButton onClick={onBack} sx={{ color: '#1a1a1a' }}>
                     <BackIcon />
                 </IconButton>
                 {canGoPrev && (
-                    <IconButton onClick={goToPrev} sx={{ color: '#fff', p: 0.5 }} disabled={isAnimating}>
+                    <IconButton onClick={goToPrev} sx={{ color: '#555', p: 0.5 }} disabled={isAnimating}>
                         <ChevronLeftIcon />
                     </IconButton>
                 )}
                 <HeaderTextBlock sx={{ flex: 1 }}>
                     <HeaderDay>
-                        {dayData.day}{dayData.isToday ? ' (Today)' : ''}
+                        {dayData.day}{dayData.isToday ? ' · Today' : ''}
                     </HeaderDay>
                     <HeaderDate>{dayData.date}</HeaderDate>
                 </HeaderTextBlock>
@@ -1131,17 +1130,18 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
                         size="small"
                         sx={{
                             ml: 'auto',
-                            mr: 1,
-                            backgroundColor: 'rgba(255,255,255,0.2)',
-                            color: '#fff',
-                            fontWeight: 600,
-                            fontSize: '0.75rem',
-                            backdropFilter: 'blur(4px)',
+                            mr: canGoNext ? 0.5 : 1,
+                            backgroundColor: '#e3f2fd',
+                            color: 'var(--primary-color)',
+                            fontWeight: 700,
+                            fontSize: '0.72rem',
+                            height: 26,
+                            border: '1px solid #bbdefb',
                         }}
                     />
                 )}
                 {canGoNext && (
-                    <IconButton onClick={goToNext} sx={{ color: '#fff', p: 0.5 }} disabled={isAnimating}>
+                    <IconButton onClick={goToNext} sx={{ color: '#555', p: 0.5 }} disabled={isAnimating}>
                         <ChevronRightIcon />
                     </IconButton>
                 )}
@@ -1153,22 +1153,24 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
                     size="small"
                     label="Shift"
                     sx={{
-                        background: 'linear-gradient(135deg, #667eea, #764ba2)',
-                        color: '#fff',
+                        backgroundColor: '#e3f2fd',
+                        color: 'var(--primary-color)',
                         fontWeight: 600,
                         fontSize: '0.65rem',
-                        height: 24,
+                        height: 22,
+                        border: '1px solid #bbdefb',
                     }}
                 />
                 <Chip
                     size="small"
                     label="Break"
                     sx={{
-                        background: 'linear-gradient(135deg, #ff9800, #f57c00)',
-                        color: '#fff',
+                        backgroundColor: '#fff3e0',
+                        color: '#e65100',
                         fontWeight: 600,
                         fontSize: '0.65rem',
-                        height: 24,
+                        height: 22,
+                        border: '1px solid #ffe0b2',
                     }}
                 />
                 {isOffDay && (
@@ -1176,11 +1178,12 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
                         size="small"
                         label="Off Day"
                         sx={{
-                            background: '#ffcdd2',
+                            backgroundColor: '#ffebee',
                             color: '#c62828',
                             fontWeight: 600,
                             fontSize: '0.65rem',
-                            height: 24,
+                            height: 22,
+                            border: '1px solid #ffcdd2',
                         }}
                     />
                 )}
@@ -1262,7 +1265,7 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
                                 return (
                                     <ActivityBlock
                                         key={act.id}
-                                        gradient={act.gradient}
+                                        accentcolor={act.accentcolor}
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             setSelectedActivity(act);
@@ -1277,8 +1280,6 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
                                             height,
                                             cursor: 'pointer',
                                             ...(isBreak && {
-                                                left: 12,
-                                                right: 12,
                                                 zIndex: 4,
                                                 padding: '0 10px',
                                                 flexDirection: 'row',
@@ -1291,8 +1292,9 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
                                         {isBreak ? (
                                             <Typography sx={{
                                                 fontWeight: 600,
-                                                fontSize: '0.7rem',
+                                                fontSize: '0.72rem',
                                                 lineHeight: 1,
+                                                color: act.accentcolor,
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 gap: '4px',
@@ -1301,19 +1303,19 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
                                                 textOverflow: 'ellipsis',
                                             }}>
                                                 {act.icon}
-                                                {act.label}: {act.timeText} ({act.sub})
+                                                {act.label}: {act.timeText}
                                             </Typography>
                                         ) : (
                                             <>
-                                                <ActivityTitle>
-                                                    {act.icon}
+                                                <ActivityTitle sx={{ color: '#1a2138' }}>
+                                                    <Box component="span" sx={{ color: act.accentcolor, display: 'flex' }}>{act.icon}</Box>
                                                     {act.label}
                                                 </ActivityTitle>
-                                                <ActivityTime>{act.timeText}</ActivityTime>
+                                                <ActivityTime sx={{ color: act.accentcolor }}>{act.timeText}</ActivityTime>
                                                 {act.sub && (
                                                     <Typography sx={{
-                                                        fontSize: '0.65rem',
-                                                        opacity: 0.8,
+                                                        fontSize: '0.68rem',
+                                                        color: '#666',
                                                         mt: 0.25,
                                                     }}>
                                                         {act.sub}
@@ -1380,7 +1382,7 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
                     {/* Color banner with activity name */}
                     {selectedActivity && (
                         <>
-                            <SheetBanner gradient={selectedActivity.gradient}>
+                            <SheetBanner gradient={`linear-gradient(135deg, ${selectedActivity.accentcolor || 'var(--primary-color)'}, ${selectedActivity.accentcolor || 'var(--primary-color)'}bb)`}>
                                 <Box sx={{ fontSize: 28, display: 'flex' }}>
                                     {selectedActivity.icon}
                                 </Box>
@@ -1422,10 +1424,10 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
                     position: 'fixed',
                     bottom: 80,
                     right: 20,
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    boxShadow: '0 6px 20px rgba(102,126,234,0.4)',
+                    backgroundColor: 'var(--primary-color)',
+                    boxShadow: '0 6px 20px rgba(0,86,179,0.35)',
                     '&:hover': {
-                        background: 'linear-gradient(135deg, #5a6fd6 0%, #6a4092 100%)',
+                        backgroundColor: 'var(--primary-color)',
                     },
                     zIndex: 20,
                 }}
@@ -1433,198 +1435,248 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
                 <AddIcon />
             </Fab>
 
-            {/* ===== Type Picker Bottom Sheet ===== */}
+            {/* ===== Unified Request Sheet (single persistent drawer, internal step navigation) ===== */}
+            {/* IONIC MIGRATION: replace with <IonModal> using presentingElement for card-style stack */}
             <SwipeableDrawer
                 anchor="bottom"
-                open={showTypePicker}
-                onClose={() => { setShowTypePicker(false); setSelectionStart(null); setSelectionEnd(null); }}
-                onOpen={() => { }}
-                disableSwipeToOpen
-                PaperProps={{
-                    sx: {
-                        borderRadius: '20px 20px 0 0',
-                        backgroundColor: '#ffffff',
-                    },
-                }}
-            >
-                <Box>
-                    <SheetHandle />
-                    <Typography sx={{ fontWeight: 700, fontSize: '1rem', px: 2.5, pt: 1.5, pb: 0.5 }}>
-                        Select Request Type
-                    </Typography>
-                    <List sx={{ pb: 2 }}>
-                        {availableRequestTypes.map((type) => (
-                            <ListItemButton
-                                key={type.id}
-                                onClick={() => selectRequestType(type)}
-                                sx={{ py: 1.5, px: 2.5 }}
-                            >
-                                <ListItemIcon sx={{ minWidth: 44 }}>
-                                    <Box sx={{
-                                        width: 36,
-                                        height: 36,
-                                        borderRadius: '10px',
-                                        backgroundColor: `${type.color}14`,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        color: type.color,
-                                    }}>
-                                        {type.icon}
-                                    </Box>
-                                </ListItemIcon>
-                                <ListItemText
-                                    primary={type.label}
-                                    secondary={type.isSwap ? 'Select agent to swap with' : type.needsTime ? 'Select time range' : 'Full day'}
-                                    primaryTypographyProps={{ fontWeight: 600, fontSize: '0.9rem' }}
-                                    secondaryTypographyProps={{ fontSize: '0.75rem', color: '#888' }}
-                                />
-                            </ListItemButton>
-                        ))}
-                    </List>
-                </Box>
-            </SwipeableDrawer>
-
-            {/* ===== Agent Selection Bottom Sheet ===== */}
-            <SwipeableDrawer
-                anchor="bottom"
-                open={showAgentPicker}
-                onClose={() => { setShowAgentPicker(false); closeRequestForm(); }}
-                onOpen={() => { }}
-                disableSwipeToOpen
-                PaperProps={{
-                    sx: {
-                        borderRadius: '20px 20px 0 0',
-                        maxHeight: '85vh',
-                        backgroundColor: '#ffffff',
-                    },
-                }}
-            >
-                <Box sx={{ pb: 2 }}>
-                    <SheetHandle />
-
-                    {/* Header */}
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 2.5, pt: 1.5, pb: 1 }}>
-                        <Box>
-                            <Typography sx={{ fontWeight: 700, fontSize: '1rem' }}>
-                                Select Agent
-                            </Typography>
-                            <Typography sx={{ fontSize: '0.75rem', color: '#888' }}>
-                                {selectedRequestType?.label} - {dayData?.day}, {dayData?.date}
-                            </Typography>
-                        </Box>
-                        <IconButton size="small" onClick={() => { setShowAgentPicker(false); closeRequestForm(); }} sx={{ color: '#aaa' }}>
-                            <CloseIcon fontSize="small" />
-                        </IconButton>
-                    </Box>
-
-                    <Divider sx={{ mb: 1 }} />
-
-                    {/* Agent list */}
-                    <List sx={{ px: 0.5 }}>
-                        {eligibleAgents.map((agent) => (
-                            <ListItemButton
-                                key={agent.id}
-                                onClick={() => agent.eligible && selectAgent(agent)}
-                                disabled={!agent.eligible}
-                                sx={{
-                                    py: 1.5,
-                                    px: 2,
-                                    borderRadius: '12px',
-                                    mx: 1,
-                                    mb: 0.5,
-                                    opacity: agent.eligible ? 1 : 0.45,
-                                    '&.Mui-disabled': {
-                                        opacity: 0.45,
-                                    },
-                                }}
-                            >
-                                <ListItemIcon sx={{ minWidth: 48 }}>
-                                    <Box sx={{
-                                        width: 40,
-                                        height: 40,
-                                        borderRadius: '50%',
-                                        background: agent.eligible
-                                            ? `linear-gradient(135deg, ${selectedRequestType?.color || '#667eea'}, ${selectedRequestType?.color || '#667eea'}88)`
-                                            : '#e0e0e0',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        color: '#fff',
-                                    }}>
-                                        <PersonIcon sx={{ fontSize: 22 }} />
-                                    </Box>
-                                </ListItemIcon>
-                                <ListItemText
-                                    primary={agent.name}
-                                    secondary={agent.reason}
-                                    primaryTypographyProps={{ fontWeight: 600, fontSize: '0.9rem' }}
-                                    secondaryTypographyProps={{
-                                        fontSize: '0.75rem',
-                                        color: agent.eligible ? '#555' : '#c62828',
-                                    }}
-                                />
-                                {agent.eligible && (
-                                    <Chip
-                                        label="Available"
-                                        size="small"
-                                        sx={{
-                                            backgroundColor: '#e8f5e9',
-                                            color: '#2e7d32',
-                                            fontWeight: 600,
-                                            fontSize: '0.7rem',
-                                        }}
-                                    />
-                                )}
-                            </ListItemButton>
-                        ))}
-                    </List>
-                </Box>
-            </SwipeableDrawer>
-
-            {/* ===== Swap Confirmation Bottom Sheet ===== */}
-            <SwipeableDrawer
-                anchor="bottom"
-                open={showSwapConfirm}
+                open={requestStep !== null}
                 onClose={closeRequestForm}
                 onOpen={() => { }}
                 disableSwipeToOpen
                 PaperProps={{
                     sx: {
                         borderRadius: '20px 20px 0 0',
-                        maxHeight: '80vh',
+                        height: '85vh',
                         backgroundColor: '#ffffff',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        overflow: 'hidden',
                     },
                 }}
             >
-                <Box sx={{ pb: 3 }}>
-                    <SheetHandle />
+                {/* --- FIXED: Drag handle --- */}
+                <SheetHandle />
 
-                    {/* Close button */}
-                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', px: 1, pt: 0.5 }}>
-                        <IconButton size="small" onClick={closeRequestForm} sx={{ color: '#aaa' }}>
-                            <CloseIcon fontSize="small" />
+                {/* --- FIXED: Navigation header --- */}
+                <Box sx={{ display: 'flex', alignItems: 'center', px: 1, pt: 0.5, pb: 0.75, gap: 0.5, flexShrink: 0 }}>
+                    {/* Back button (hidden on type step) */}
+                    {requestStep !== 'type' ? (
+                        <IconButton size="small" onClick={goBackStep} sx={{ color: '#444' }}>
+                            <BackIcon fontSize="small" />
                         </IconButton>
+                    ) : (
+                        <Box sx={{ width: 34, height: 34 }} />
+                    )}
+
+                    {/* Title + subtitle */}
+                    <Box sx={{ flex: 1, px: 0.25 }}>
+                        <Typography sx={{ fontWeight: 700, fontSize: '1rem', color: '#1a1a1a', lineHeight: 1.2 }}>
+                            {requestStep === 'type' && 'New Request'}
+                            {requestStep === 'form' && (selectedRequestType?.label || 'Request Details')}
+                            {requestStep === 'agents' && 'Select Agent'}
+                            {requestStep === 'confirm' && 'Confirm Swap'}
+                        </Typography>
+                        <Typography sx={{ fontSize: '0.7rem', color: '#999', mt: 0.15, lineHeight: 1.2 }}>
+                            {requestStep === 'type' && 'Choose a request type'}
+                            {requestStep === 'form' && !selectedRequestType?.isSwap && `${dayData?.day}, ${dayData?.date}`}
+                            {requestStep === 'form' && selectedRequestType?.isSwap && 'Step 1 of 3 · Set details'}
+                            {requestStep === 'agents' && 'Step 2 of 3 · Choose who to swap with'}
+                            {requestStep === 'confirm' && 'Step 3 of 3 · Review and send'}
+                        </Typography>
                     </Box>
 
-                    {selectedRequestType && selectedAgent && (
-                        <>
-                            {/* Swap banner */}
-                            <SheetBanner gradient={`linear-gradient(135deg, ${selectedRequestType.color}, ${selectedRequestType.color}cc)`}>
-                                <Box sx={{ fontSize: 28, display: 'flex' }}>
-                                    <SwapIcon />
-                                </Box>
-                                <Box>
-                                    <SheetBannerTitle>{selectedRequestType.label}</SheetBannerTitle>
-                                    <SheetBannerSub>with {selectedAgent.name}</SheetBannerSub>
-                                </Box>
-                            </SheetBanner>
+                    {/* Animated step dots — only for swap flows on steps 2-4 */}
+                    {selectedRequestType?.isSwap && ['form', 'agents', 'confirm'].includes(requestStep) && (
+                        <Box sx={{ display: 'flex', gap: '5px', alignItems: 'center', mr: 0.5 }}>
+                            {['form', 'agents', 'confirm'].map((s, i) => {
+                                const swapIdx = ['form', 'agents', 'confirm'].indexOf(requestStep);
+                                return (
+                                    <Box key={s} sx={{
+                                        height: 6,
+                                        width: i === swapIdx ? 20 : 6,
+                                        borderRadius: 3,
+                                        backgroundColor: i <= swapIdx ? 'var(--primary-color)' : '#d8d8d8',
+                                        transition: 'width 0.3s ease, background-color 0.3s ease',
+                                    }} />
+                                );
+                            })}
+                        </Box>
+                    )}
 
+                    {/* Close button */}
+                    <IconButton size="small" onClick={closeRequestForm} sx={{ color: '#bbb' }}>
+                        <CloseIcon fontSize="small" />
+                    </IconButton>
+                </Box>
 
-                            <Box sx={{ px: 2.5, pt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                {/* Swap confirmation summary */}
-                                <Box sx={{ p: 2, borderRadius: '12px', backgroundColor: '#f8f9fa', border: '1px solid #e9ecef' }}>
-                                    <Typography sx={{ fontWeight: 600, fontSize: '0.85rem', mb: 1, color: '#333' }}>
+                {/* --- FIXED: Divider --- */}
+                <Box sx={{ borderTop: '1px solid #f0f0f0', flexShrink: 0 }} />
+
+                {/* --- SCROLLABLE: Sliding 4-panel content row --- */}
+                <Box sx={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
+                    <Box sx={{
+                        display: 'flex',
+                        width: '400%',
+                        height: '100%',
+                        transform: `translateX(-${stepIdx * 25}%)`,
+                        transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    }}>
+
+                        {/* ── Panel 0: Type picker ── */}
+                        <Box sx={{ width: '25%', flexShrink: 0, overflowY: 'auto', height: '100%' }}>
+                            {availableRequestTypes.map((type, index) => (
+                                <Box
+                                    key={type.id}
+                                    onClick={() => selectRequestType(type)}
+                                    sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        px: 2.5,
+                                        py: 1.5,
+                                        gap: 1.5,
+                                        cursor: 'pointer',
+                                        borderBottom: index < availableRequestTypes.length - 1 ? '1px solid #f5f5f5' : 'none',
+                                        '&:active': { backgroundColor: '#f8f9fa' },
+                                    }}
+                                >
+                                    <Box sx={{
+                                        width: 42, height: 42, borderRadius: 2.5, flexShrink: 0,
+                                        backgroundColor: `${type.color}15`,
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        color: type.color,
+                                    }}>
+                                        {type.icon}
+                                    </Box>
+                                    <Box sx={{ flex: 1 }}>
+                                        <Typography sx={{ fontWeight: 600, fontSize: '0.9rem', color: '#1a1a1a' }}>
+                                            {type.label}
+                                        </Typography>
+                                        <Typography sx={{ fontSize: '0.75rem', color: '#888', mt: 0.25 }}>
+                                            {type.isSwap ? '3 steps · Select agent to swap with' : type.needsTime ? 'Specify time range' : 'Full day'}
+                                        </Typography>
+                                    </Box>
+                                    <ChevronRightIcon sx={{ color: '#ccc', fontSize: 20 }} />
+                                </Box>
+                            ))}
+                            <Box sx={{ height: 16 }} />
+                        </Box>
+
+                        {/* ── Panel 1: Request form ── */}
+                        <Box sx={{ width: '25%', flexShrink: 0, overflowY: 'auto', height: '100%', px: 2.5, pt: 2, pb: 2 }}>
+                            {selectedRequestType && (
+                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                    {selectedRequestType.multiDay ? (
+                                        <Box sx={{ display: 'flex', gap: 1.5 }}>
+                                            <Box sx={{ flex: 1 }}>
+                                                <InlineDatePicker value={requestDate} onChange={setRequestDate} label="From" />
+                                            </Box>
+                                            <Box sx={{ flex: 1 }}>
+                                                <InlineDatePicker value={requestToDate} onChange={setRequestToDate} label="To" />
+                                            </Box>
+                                        </Box>
+                                    ) : (
+                                        <InlineDatePicker value={requestDate} onChange={setRequestDate} />
+                                    )}
+                                    {selectedRequestType.needsTime && (
+                                        <Box sx={{ display: 'flex', gap: 1.5 }}>
+                                            <TextField
+                                                label="From" type="time" value={requestFromTime}
+                                                onChange={(e) => setRequestFromTime(e.target.value)}
+                                                size="small" fullWidth InputLabelProps={{ shrink: true }}
+                                                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                                            />
+                                            <TextField
+                                                label="To" type="time" value={requestToTime}
+                                                onChange={(e) => setRequestToTime(e.target.value)}
+                                                size="small" fullWidth InputLabelProps={{ shrink: true }}
+                                                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                                            />
+                                        </Box>
+                                    )}
+                                    <TextField
+                                        label="Reason (optional)" multiline rows={3}
+                                        value={requestReason} onChange={(e) => setRequestReason(e.target.value)}
+                                        size="small" fullWidth
+                                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                                    />
+                                    <InlineDatePicker value={expiryDate} onChange={setExpiryDate} label="Expiry Date" />
+                                    {!selectedRequestType.isSwap && (
+                                        <Box sx={{
+                                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                            px: 2, py: 1.5, borderRadius: '12px',
+                                            backgroundColor: '#e3f2fd', border: '1.5px solid #bbdefb',
+                                        }}>
+                                            <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--primary-color)' }}>
+                                                Remaining Balance
+                                            </Typography>
+                                            <Typography sx={{ fontSize: '1rem', fontWeight: 800, color: 'var(--primary-color)' }}>
+                                                8 Days
+                                            </Typography>
+                                        </Box>
+                                    )}
+                                </Box>
+                            )}
+                        </Box>
+
+                        {/* ── Panel 2: Agent picker ── */}
+                        <Box sx={{ width: '25%', flexShrink: 0, overflowY: 'auto', height: '100%' }}>
+                            {eligibleAgents.map((agent, index) => (
+                                <Box
+                                    key={agent.id}
+                                    onClick={() => agent.eligible && selectAgent(agent)}
+                                    sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        px: 2.5,
+                                        py: 1.5,
+                                        gap: 1.5,
+                                        cursor: agent.eligible ? 'pointer' : 'default',
+                                        opacity: agent.eligible ? 1 : 0.45,
+                                        borderBottom: index < eligibleAgents.length - 1 ? '1px solid #f5f5f5' : 'none',
+                                        '&:active': agent.eligible ? { backgroundColor: '#f8f9fa' } : {},
+                                    }}
+                                >
+                                    <Box sx={{
+                                        width: 42, height: 42, borderRadius: 2.5, flexShrink: 0,
+                                        backgroundColor: agent.eligible
+                                            ? `${selectedRequestType?.color || 'var(--primary-color)'}15`
+                                            : '#f0f0f0',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        color: agent.eligible ? (selectedRequestType?.color || 'var(--primary-color)') : '#aaa',
+                                    }}>
+                                        <PersonIcon sx={{ fontSize: 22 }} />
+                                    </Box>
+                                    <Box sx={{ flex: 1 }}>
+                                        <Typography sx={{ fontWeight: 600, fontSize: '0.9rem', color: '#1a1a1a' }}>
+                                            {agent.name}
+                                        </Typography>
+                                        <Typography sx={{ fontSize: '0.75rem', color: agent.eligible ? '#555' : '#c62828', mt: 0.25 }}>
+                                            {agent.reason}
+                                        </Typography>
+                                    </Box>
+                                    {agent.eligible && (
+                                        <Chip
+                                            label="Available"
+                                            size="small"
+                                            sx={{
+                                                backgroundColor: '#e8f5e9',
+                                                color: '#2e7d32',
+                                                fontWeight: 600,
+                                                fontSize: '0.7rem',
+                                                border: '1px solid #c8e6c9',
+                                            }}
+                                        />
+                                    )}
+                                </Box>
+                            ))}
+                            <Box sx={{ height: 8 }} />
+                        </Box>
+
+                        {/* ── Panel 3: Swap confirmation ── */}
+                        <Box sx={{ width: '25%', flexShrink: 0, overflowY: 'auto', height: '100%', px: 2.5, pt: 2, pb: 2 }}>
+                            {selectedRequestType && selectedAgent && (
+                                <Box sx={{ p: 2, borderRadius: '12px', backgroundColor: '#f8f9fa', border: '1px solid #eee' }}>
+                                    <Typography sx={{ fontWeight: 600, fontSize: '0.85rem', mb: 1.5, color: '#333' }}>
                                         Swap Summary
                                     </Typography>
                                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}>
@@ -1672,226 +1724,39 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
                                         ) : null}
                                     </Box>
                                 </Box>
+                            )}
+                        </Box>
 
-                                {/* Submit */}
-                                <Button
-                                    variant="contained"
-                                    fullWidth
-                                    onClick={submitRequest}
-                                    sx={{
-                                        mt: 1,
-                                        py: 1.3,
-                                        borderRadius: '14px',
-                                        fontWeight: 700,
-                                        fontSize: '0.95rem',
-                                        textTransform: 'none',
-                                        background: `linear-gradient(135deg, ${selectedRequestType.color}, ${selectedRequestType.color}cc)`,
-                                        boxShadow: `0 4px 14px ${selectedRequestType.color}40`,
-                                        '&:hover': {
-                                            background: `linear-gradient(135deg, ${selectedRequestType.color}dd, ${selectedRequestType.color}aa)`,
-                                        },
-                                    }}
-                                >
-                                    Send Swap Request
-                                </Button>
-                            </Box>
-                        </>
-                    )}
-                </Box>
-            </SwipeableDrawer>
-
-            {/* ===== Request Form Bottom Sheet ===== */}
-            <SwipeableDrawer
-                anchor="bottom"
-                open={showRequestForm}
-                onClose={closeRequestForm}
-                onOpen={() => { }}
-                disableSwipeToOpen
-                PaperProps={{
-                    sx: {
-                        borderRadius: '20px 20px 0 0',
-                        maxHeight: '80vh',
-                        backgroundColor: '#ffffff',
-                    },
-                }}
-            >
-                <Box sx={{ pb: 3 }}>
-                    <SheetHandle />
-
-                    {/* Close button */}
-                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', px: 1, pt: 0.5 }}>
-                        <IconButton size="small" onClick={closeRequestForm} sx={{ color: '#aaa' }}>
-                            <CloseIcon fontSize="small" />
-                        </IconButton>
                     </Box>
-
-                    {selectedRequestType && (
-                        <>
-                            {/* Request type banner */}
-                            <SheetBanner gradient={`linear-gradient(135deg, ${selectedRequestType.color}, ${selectedRequestType.color}cc)`}>
-                                <Box sx={{ fontSize: 28, display: 'flex' }}>
-                                    {selectedRequestType.icon}
-                                </Box>
-                                <Box>
-                                    <SheetBannerTitle>{selectedRequestType.label}</SheetBannerTitle>
-                                </Box>
-                            </SheetBanner>
-
-                            <Box sx={{ px: 2.5, pt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                {/* Date picker(s) */}
-                                {selectedRequestType.multiDay ? (
-                                    <Box sx={{ display: 'flex', gap: 1.5 }}>
-                                        <Box sx={{ flex: 1 }}>
-                                            <InlineDatePicker
-                                                value={requestDate}
-                                                onChange={setRequestDate}
-                                                label="From"
-                                            />
-                                        </Box>
-                                        <Box sx={{ flex: 1 }}>
-                                            <InlineDatePicker
-                                                value={requestToDate}
-                                                onChange={setRequestToDate}
-                                                label="To"
-                                            />
-                                        </Box>
-                                    </Box>
-                                ) : (
-                                    <InlineDatePicker
-                                        value={requestDate}
-                                        onChange={setRequestDate}
-                                    />
-                                )}
-
-                                {/* Time pickers (only for leave types) */}
-                                {selectedRequestType.needsTime && (
-                                    <Box sx={{ display: 'flex', gap: 1.5 }}>
-                                        <TextField
-                                            label="From"
-                                            type="time"
-                                            value={requestFromTime}
-                                            onChange={(e) => setRequestFromTime(e.target.value)}
-                                            size="small"
-                                            fullWidth
-                                            InputLabelProps={{ shrink: true }}
-                                            sx={{
-                                                '& .MuiOutlinedInput-root': {
-                                                    borderRadius: '12px',
-                                                },
-                                            }}
-                                        />
-                                        <TextField
-                                            label="To"
-                                            type="time"
-                                            value={requestToTime}
-                                            onChange={(e) => setRequestToTime(e.target.value)}
-                                            size="small"
-                                            fullWidth
-                                            InputLabelProps={{ shrink: true }}
-                                            sx={{
-                                                '& .MuiOutlinedInput-root': {
-                                                    borderRadius: '12px',
-                                                },
-                                            }}
-                                        />
-                                    </Box>
-                                )}
-
-                                {/* Reason */}
-                                <TextField
-                                    label="Reason (optional)"
-                                    multiline
-                                    rows={3}
-                                    value={requestReason}
-                                    onChange={(e) => setRequestReason(e.target.value)}
-                                    size="small"
-                                    fullWidth
-                                    sx={{
-                                        '& .MuiOutlinedInput-root': {
-                                            borderRadius: '12px',
-                                        },
-                                    }}
-                                />
-
-                                {/* Expiry Date picker */}
-                                <InlineDatePicker
-                                    value={expiryDate}
-                                    onChange={setExpiryDate}
-                                    label="Expiry Date"
-                                />
-
-                                {/* Remaining Balance — only for non-swap */}
-                                {!selectedRequestType.isSwap && (
-                                    <Box sx={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'space-between',
-                                        px: 2,
-                                        py: 1.5,
-                                        borderRadius: '12px',
-                                        backgroundColor: '#f0f7ff',
-                                        border: '1.5px solid #c8e0ff',
-                                    }}>
-                                        <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: '#1565c0' }}>
-                                            Remaining Balance
-                                        </Typography>
-                                        <Typography sx={{ fontSize: '1rem', fontWeight: 800, color: '#1976d2' }}>
-                                            8 Days
-                                        </Typography>
-                                    </Box>
-                                )}
-
-                                {/* Submit / Next button */}
-                                {selectedRequestType.isSwap ? (
-                                    <Button
-                                        variant="contained"
-                                        fullWidth
-                                        onClick={() => {
-                                            setShowRequestForm(false);
-                                            setShowAgentPicker(true);
-                                        }}
-                                        sx={{
-                                            mt: 1,
-                                            py: 1.3,
-                                            borderRadius: '14px',
-                                            fontWeight: 700,
-                                            fontSize: '0.95rem',
-                                            textTransform: 'none',
-                                            background: `linear-gradient(135deg, ${selectedRequestType.color}, ${selectedRequestType.color}cc)`,
-                                            boxShadow: `0 4px 14px ${selectedRequestType.color}40`,
-                                            '&:hover': {
-                                                background: `linear-gradient(135deg, ${selectedRequestType.color}dd, ${selectedRequestType.color}aa)`,
-                                            },
-                                        }}
-                                    >
-                                        Next: Select Agent →
-                                    </Button>
-                                ) : (
-                                    <Button
-                                        variant="contained"
-                                        fullWidth
-                                        onClick={submitRequest}
-                                        sx={{
-                                            mt: 1,
-                                            py: 1.3,
-                                            borderRadius: '14px',
-                                            fontWeight: 700,
-                                            fontSize: '0.95rem',
-                                            textTransform: 'none',
-                                            background: `linear-gradient(135deg, ${selectedRequestType.color}, ${selectedRequestType.color}cc)`,
-                                            boxShadow: `0 4px 14px ${selectedRequestType.color}40`,
-                                            '&:hover': {
-                                                background: `linear-gradient(135deg, ${selectedRequestType.color}dd, ${selectedRequestType.color}aa)`,
-                                            },
-                                        }}
-                                    >
-                                        Submit Request
-                                    </Button>
-                                )}
-                            </Box>
-                        </>
-                    )}
                 </Box>
+
+                {/* --- FIXED: Footer action button (shown only on form and confirm steps) --- */}
+                {(requestStep === 'form' || requestStep === 'confirm') && (
+                    <Box sx={{ px: 2.5, pt: 1.5, pb: 2.5, borderTop: '1px solid #f0f0f0', flexShrink: 0 }}>
+                        <Button
+                            variant="contained"
+                            fullWidth
+                            onClick={
+                                requestStep === 'confirm'
+                                    ? submitRequest
+                                    : selectedRequestType?.isSwap
+                                        ? () => setRequestStep('agents')
+                                        : submitRequest
+                            }
+                            sx={{
+                                py: 1.3, borderRadius: '14px',
+                                fontWeight: 700, fontSize: '0.95rem', textTransform: 'none',
+                                backgroundColor: 'var(--primary-color)',
+                                boxShadow: '0 4px 14px rgba(0,86,179,0.25)',
+                                '&:hover': { backgroundColor: 'var(--primary-color)' },
+                            }}
+                        >
+                            {requestStep === 'confirm' && 'Send Swap Request'}
+                            {requestStep === 'form' && selectedRequestType?.isSwap && 'Next: Select Agent →'}
+                            {requestStep === 'form' && !selectedRequestType?.isSwap && 'Submit Request'}
+                        </Button>
+                    </Box>
+                )}
             </SwipeableDrawer>
 
             {/* ===== Success Snackbar ===== */}

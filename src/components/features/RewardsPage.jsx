@@ -7,7 +7,6 @@ import {
     CardContent,
     Grid,
     LinearProgress,
-    Avatar,
     Chip,
     Button,
 } from '@mui/material';
@@ -130,8 +129,16 @@ const RewardsPage = () => {
                         <ChallengeCard key={challenge.id}>
                             <CardContent>
                                 <Box display="flex" justifyContent="space-between" mb={2}>
-                                    <Avatar sx={{ bgcolor: '#fff3e0' }}>{challenge.icon}</Avatar>
-                                    <Chip label={challenge.goal} size="small" color="primary" sx={{ fontWeight: 700 }} />
+                                    {/* Icon box — tinted bg pattern */}
+                                    <Box sx={{
+                                        width: 42, height: 42, borderRadius: 2.5,
+                                        backgroundColor: '#f57c0015',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        color: '#f57c00',
+                                    }}>
+                                        {challenge.icon}
+                                    </Box>
+                                    <Chip label={challenge.goal} size="small" sx={{ fontWeight: 700, backgroundColor: '#e3f2fd', color: 'var(--primary-color)' }} />
                                 </Box>
                                 <Typography variant="subtitle1" fontWeight={700} gutterBottom>{challenge.title}</Typography>
                                 <Typography variant="body2" color="text.secondary" mb={2} sx={{ minHeight: 40 }}>{challenge.desc}</Typography>
@@ -151,11 +158,19 @@ const RewardsPage = () => {
                             <Typography variant="h6" fontWeight={700} width={40} color={index === 0 ? '#ffb300' : index === 1 ? '#9e9e9e' : '#795548'}>
                                 #{user.rank}
                             </Typography>
-                            <Avatar sx={{ bgcolor: index === 2 ? 'primary.main' : '#e0e0e0', width: 32, height: 32, fontSize: 14, mr: 2 }}>{user.avatar}</Avatar>
+                            <Box sx={{
+                                width: 32, height: 32, borderRadius: '50%', mr: 2, flexShrink: 0,
+                                backgroundColor: index === 2 ? 'var(--primary-color)' : '#e0e0e0',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                color: index === 2 ? '#fff' : '#555',
+                                fontSize: 12, fontWeight: 700,
+                            }}>
+                                {user.avatar}
+                            </Box>
                             <Box flex={1}>
                                 <Typography variant="subtitle2" fontWeight={700}>{user.name}</Typography>
                             </Box>
-                            <Typography variant="body2" fontWeight={600} color="primary">{user.points.toLocaleString()} pts</Typography>
+                            <Typography variant="body2" fontWeight={600} sx={{ color: 'var(--primary-color)' }}>{user.points.toLocaleString()} pts</Typography>
                         </Box>
                     ))}
                 </CardContent>
@@ -169,9 +184,14 @@ const RewardsPage = () => {
                         <Grid item size={6} key={reward.id}>
                             <DashboardCard sx={{ height: '100%', justifyContent: 'space-between' }}>
                                 <CardContent sx={{ textAlign: 'center', pt: 3 }}>
-                                    <Avatar sx={{ width: 48, height: 48, bgcolor: reward.locked ? '#f5f5f5' : '#e3f2fd', color: reward.locked ? '#bdbdbd' : '#2196f3', mx: 'auto', mb: 2 }}>
+                                    <Box sx={{
+                                        width: 48, height: 48, borderRadius: 3, mx: 'auto', mb: 2,
+                                        backgroundColor: reward.locked ? '#f5f5f5' : 'rgba(var(--primary-rgb), 0.08)',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        color: reward.locked ? '#bdbdbd' : 'var(--primary-color)',
+                                    }}>
                                         {reward.locked ? <LockIcon /> : <GiftIcon />}
-                                    </Avatar>
+                                    </Box>
                                     <Typography variant="subtitle2" fontWeight={700}>{reward.title}</Typography>
                                     <Typography variant="caption" color="text.secondary" display="block" mb={2}>
                                         {reward.cost.toLocaleString()} pts

@@ -51,15 +51,23 @@
 }
 
 /* =========================================
-   Theme 1: Default (Corporate Blue)
+   Theme 1: Default (Globitel Brand)
    Clean, professional, trusted.
    ========================================= */
 :root,
 [data-theme="default"] {
-  --primary-color: #0056b3;
-  --primary-hover: #004494;
-  --secondary-color: #6c757d;
-  --accent-color: #00a8cc;
+
+  /* ── BRAND COLORS — update only these lines to rebrand ──────────────
+     When changing --primary-color, also update --primary-rgb to match.
+     When changing --secondary-color, also update --secondary-rgb.       */
+  --primary-color: #061836;         /* Globitel navy                     */
+  --primary-rgb:   6, 24, 54;       /* RGB of --primary-color            */
+  --secondary-color: #ec4424;       /* Globitel orange-red               */
+  --secondary-rgb:   236, 68, 36;   /* RGB of --secondary-color          */
+  /* ──────────────────────────────────────────────────────────────────── */
+
+  --primary-hover: #0d2d6b;
+  --accent-color: #ec4424;          /* alias to secondary */
 
   --bg-color: #ffffff;
   --surface-color: #f8f9fa;

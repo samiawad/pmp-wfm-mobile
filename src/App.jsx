@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import HomeDashboard from './components/features/HomeDashboard';
+import HomeDashboardV2 from './components/features/HomeDashboardV2';
 import SchedulePage from './components/features/SchedulePage';
 import PerformancePage from './components/features/PerformancePage';
 import ActivitiesPage from './components/features/ActivitiesPage';
@@ -89,7 +90,8 @@ function App() {
   return (
     <AppLayout currentPage={currentPage} onPageChange={setCurrentPage}>
       <div className="app-container">
-        {currentPage === 'home' && <HomeDashboard onAction={handleNotificationClick} onPageChange={setCurrentPage} onDayClick={handleDayClick} />}
+        {currentPage === 'home' && <HomeDashboardV2 onAction={handleNotificationClick} onPageChange={setCurrentPage} onDayClick={handleDayClick} />}
+        {/* {currentPage === 'home' && <HomeDashboard onAction={handleNotificationClick} onPageChange={setCurrentPage} onDayClick={handleDayClick} />} */}
         {currentPage === 'schedule' && <SchedulePage onDayClick={handleDayClick} />}
         {currentPage === 'dayTimeline' && (
           <DayTimelinePage
@@ -102,7 +104,7 @@ function App() {
         {currentPage === 'performance' && <PerformancePage onKPIClick={handleKPIClick} />}
         {currentPage === 'performanceDetails' && <PerformancePage selectedKPI={selectedKPI} onBack={handleBackFromKPI} />}
         {currentPage === 'activities' && <ActivitiesPage initialFilter={activitiesFilter} />}
-        {currentPage === 'coaching' && <CoachingPage />}
+        {currentPage === 'coaching' && <ActivitiesPage initialFilter="Coaching" />}
 
         {currentPage === 'requests' && <RequestsPage defaultTab={requestsTab} />}
         {currentPage === 'rewards' && <GamificationDashboard />}

@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/Sami.Awad/OneDrive - Globitel/Documents/GitHub/pmp-wfm-mobile/src/components/features/**)",
+      "Read(//c/Users/Sami.Awad/OneDrive - Globitel/Documents/GitHub/pmp-wfm-mobile/src/components/common/**)",
+      "Read(//c/Users/Sami.Awad/OneDrive - Globitel/Documents/GitHub/pmp-wfm-mobile/src/components/layout/**)"
+    ]
+  }
+}

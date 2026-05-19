@@ -349,9 +349,11 @@ const DisputeModal = ({
                     variant="contained"
                     sx={{
                         borderRadius: '8px',
-                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        backgroundColor: 'var(--primary-color)',
+                        boxShadow: 'none',
                         '&:hover': {
-                            background: 'linear-gradient(135deg, #5568d3 0%, #6a4190 100%)',
+                            backgroundColor: 'var(--primary-color)',
+                            boxShadow: 'none',
                         },
                     }}
                 >
