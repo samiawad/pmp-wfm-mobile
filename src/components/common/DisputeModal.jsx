@@ -25,33 +25,70 @@ import {
 // Styled Components
 // ============================================
 
-const StyledDialog = styled(Dialog)(({ theme }) => ({
+const StyledDialog = styled(Dialog)({
     '& .MuiDialog-paper': {
-        borderRadius: '16px',
+        borderRadius: '20px',
+        margin: '16px',
+        width: 'calc(100% - 32px)',
         maxWidth: '500px',
-        width: '100%',
+        overflow: 'hidden',
     },
-}));
+});
 
-const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
+const ModalHeader = styled(Box)({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingBottom: theme.spacing(1),
-    borderBottom: '1px solid #e0e0e0',
-}));
+    padding: '18px 20px 16px',
+    backgroundColor: 'var(--primary-color)',
+});
 
-const UploadButton = styled(Button)(({ theme }) => ({
-    marginTop: theme.spacing(1),
-    textTransform: 'none',
-    borderRadius: '8px',
-}));
+// Shared field style — matches the rest of the app modals
+const fieldSx = {
+    '& .MuiOutlinedInput-root': {
+        borderRadius: '12px',
+        backgroundColor: '#ffffff',
+        fontSize: '0.9rem',
+        '& fieldset': { border: '1px solid #00000014' },
+        '&:hover fieldset': { border: '1px solid #00000014' },
+        '&.Mui-focused fieldset': { border: '1px solid #00000014' },
+        '&.Mui-disabled': { backgroundColor: 'rgba(0,0,0,0.04)' },
+    },
+    '& .MuiInputLabel-root': {
+        color: '#94a3b8',
+        fontSize: '0.88rem',
+        '&.Mui-focused': { color: 'var(--primary-color)' },
+    },
+    '& .MuiSelect-icon': { color: '#94a3b8' },
+    '& .MuiFormHelperText-root': { marginLeft: 0 },
+};
 
-const FileName = styled(Typography)(({ theme }) => ({
-    marginTop: theme.spacing(1),
-    fontSize: '0.875rem',
-    color: theme.palette.text.secondary,
-}));
+const formControlSx = {
+    ...fieldSx,
+    '& .MuiOutlinedInput-root': {
+        ...fieldSx['& .MuiOutlinedInput-root'],
+    },
+};
+
+const UploadBox = styled(Box)({
+    border: '1.5px dashed #c5cdd8',
+    borderRadius: '12px',
+    padding: '16px',
+    textAlign: 'center',
+    cursor: 'pointer',
+    backgroundColor: '#f5f7fa',
+    transition: 'all 0.2s',
+    '&:hover': {
+        borderColor: 'var(--primary-color)',
+        backgroundColor: 'rgba(var(--primary-rgb), 0.04)',
+    },
+});
+
+const FileName = styled(Typography)({
+    marginTop: '6px',
+    fontSize: '0.8rem',
+    color: '#94a3b8',
+});
 
 // ============================================
 // Dispute Reasons
@@ -178,30 +215,37 @@ const DisputeModal = ({
 
     return (
         <StyledDialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-            <StyledDialogTitle>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                    Create Dispute
-                </Typography>
-                <IconButton onClick={handleClose} size="small">
-                    <CloseIcon />
-                </IconButton>
-            </StyledDialogTitle>
 
-            <DialogContent sx={{ pt: 3 }}>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+            {/* Branded header */}
+            <ModalHeader>
+                <Box>
+                    <Typography sx={{ fontWeight: 800, fontSize: '1.05rem', color: '#fff' }}>
+                        Create Dispute
+                    </Typography>
+                    <Typography sx={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.65)', mt: 0.25 }}>
+                        Fill in the details below
+                    </Typography>
+                </Box>
+                <IconButton onClick={handleClose} size="small" sx={{ color: 'rgba(255,255,255,0.8)', '&:hover': { backgroundColor: 'rgba(255,255,255,0.12)' } }}>
+                    <CloseIcon fontSize="small" />
+                </IconButton>
+            </ModalHeader>
+
+            <DialogContent sx={{ px: 2.5, pt: 2.5, pb: 1 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+
                     {/* KPI Selection */}
                     {isKPIReadOnly ? (
                         <TextField
                             label="KPI Name"
                             value={formData.kpiName}
                             fullWidth
-                            InputProps={{
-                                readOnly: true,
-                            }}
+                            InputProps={{ readOnly: true }}
                             variant="outlined"
+                            sx={fieldSx}
                         />
                     ) : (
-                        <FormControl fullWidth error={!!errors.kpiId}>
+                        <FormControl fullWidth error={!!errors.kpiId} sx={formControlSx}>
                             <InputLabel>KPI Name *</InputLabel>
                             <Select
                                 value={formData.kpiId}
@@ -223,9 +267,8 @@ const DisputeModal = ({
                     )}
 
                     {/* Period Selection */}
-                    {/* Period Selection */}
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                        <Box sx={{ display: 'flex', gap: 2 }}>
+                        <Box sx={{ display: 'flex', gap: 1.5 }}>
                             <TextField
                                 label="Start Date *"
                                 type="date"
@@ -234,12 +277,9 @@ const DisputeModal = ({
                                 fullWidth
                                 error={!!errors.startDate}
                                 helperText={errors.startDate}
-                                InputLabelProps={{
-                                    shrink: true,
-                                }}
-                                InputProps={{
-                                    readOnly: isPeriodReadOnly,
-                                }}
+                                InputLabelProps={{ shrink: true }}
+                                InputProps={{ readOnly: isPeriodReadOnly }}
+                                sx={fieldSx}
                             />
                             <TextField
                                 label="End Date *"
@@ -249,12 +289,9 @@ const DisputeModal = ({
                                 fullWidth
                                 error={!!errors.endDate}
                                 helperText={errors.endDate}
-                                InputLabelProps={{
-                                    shrink: true,
-                                }}
-                                InputProps={{
-                                    readOnly: isPeriodReadOnly,
-                                }}
+                                InputLabelProps={{ shrink: true }}
+                                InputProps={{ readOnly: isPeriodReadOnly }}
+                                sx={fieldSx}
                             />
                         </Box>
 
@@ -263,16 +300,15 @@ const DisputeModal = ({
                                 label="Time / Interval"
                                 value={formData.period}
                                 fullWidth
-                                InputProps={{
-                                    readOnly: true,
-                                }}
+                                InputProps={{ readOnly: true }}
                                 variant="outlined"
+                                sx={fieldSx}
                             />
                         )}
                     </Box>
 
                     {/* Dispute Reason */}
-                    <FormControl fullWidth error={!!errors.reason}>
+                    <FormControl fullWidth error={!!errors.reason} sx={formControlSx}>
                         <InputLabel>Dispute Reason *</InputLabel>
                         <Select
                             value={formData.reason}
@@ -296,6 +332,7 @@ const DisputeModal = ({
                         fullWidth
                         variant="outlined"
                         placeholder="e.g., Ticket #12345"
+                        sx={fieldSx}
                     />
 
                     {/* Comment Field */}
@@ -310,10 +347,14 @@ const DisputeModal = ({
                         error={!!errors.comment}
                         helperText={errors.comment || 'Please provide detailed information about your dispute'}
                         placeholder="Explain the reason for your dispute..."
+                        sx={fieldSx}
                     />
 
                     {/* File Upload */}
                     <Box>
+                        <Typography sx={{ fontSize: '0.78rem', fontWeight: 600, color: '#64748b', mb: 0.75 }}>
+                            Attachment (Optional)
+                        </Typography>
                         <input
                             accept="image/*,.pdf,.doc,.docx"
                             style={{ display: 'none' }}
@@ -322,37 +363,40 @@ const DisputeModal = ({
                             onChange={handleFileUpload}
                         />
                         <label htmlFor="dispute-file-upload">
-                            <UploadButton
-                                variant="outlined"
-                                component="span"
-                                startIcon={<UploadIcon />}
-                                fullWidth
-                            >
-                                Upload Supporting Document (Optional)
-                            </UploadButton>
+                            <UploadBox>
+                                <UploadIcon sx={{ fontSize: 28, color: '#94a3b8', mb: 0.5 }} />
+                                <Typography sx={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: 500 }}>
+                                    {formData.file ? formData.file.name : 'Tap to attach a file or document'}
+                                </Typography>
+                            </UploadBox>
                         </label>
                         {formData.file && (
-                            <FileName>
-                                Selected: {formData.file.name}
-                            </FileName>
+                            <FileName>Selected: {formData.file.name}</FileName>
                         )}
                     </Box>
                 </Box>
             </DialogContent>
 
-            <DialogActions sx={{ p: 2.5, pt: 2 }}>
-                <Button onClick={handleClose} variant="outlined" sx={{ borderRadius: '8px' }}>
+            <DialogActions sx={{ px: 2.5, pb: 2.5, pt: 1.5, gap: 1 }}>
+                <Button
+                    onClick={handleClose}
+                    variant="outlined"
+                    sx={{
+                        borderRadius: '12px', px: 3, fontWeight: 600,
+                        borderColor: '#e2e8f0', color: '#64748b',
+                        '&:hover': { backgroundColor: '#f5f7fa', borderColor: '#c5cdd8' },
+                    }}
+                >
                     Cancel
                 </Button>
                 <Button
                     onClick={handleSubmit}
                     variant="contained"
                     sx={{
-                        borderRadius: '8px',
-                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                        '&:hover': {
-                            background: 'linear-gradient(135deg, #5568d3 0%, #6a4190 100%)',
-                        },
+                        flex: 1, borderRadius: '12px', py: 1.25, fontWeight: 700,
+                        backgroundColor: 'var(--primary-color)',
+                        boxShadow: 'none',
+                        '&:hover': { backgroundColor: 'var(--primary-color)', boxShadow: 'none' },
                     }}
                 >
                     Submit Dispute

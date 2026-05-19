@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import HomeDashboard from './components/features/HomeDashboard';
+import HomeDashboardV2 from './components/features/HomeDashboardV2';
 import SchedulePage from './components/features/SchedulePage';
 import PerformancePage from './components/features/PerformancePage';
 import ActivitiesPage from './components/features/ActivitiesPage';
@@ -7,7 +8,7 @@ import CoachingPage from './components/features/CoachingPage';
 import RequestsPage from './components/features/RequestsPage';
 import EvaluationsPage from './components/features/EvaluationsPage';
 import GamificationDashboard from './components/gamification/GamificationDashboard';
-import DisputesPage from './components/features/DisputesPage';
+import DisputesPage from './components/features/DisputesPage'; // dedicated disputes page
 import LogsPage from './components/features/LogsPage';
 import EventsPage from './components/features/EventsPage';
 import DayTimelinePage from './components/features/DayTimelinePage';
@@ -89,7 +90,8 @@ function App() {
   return (
     <AppLayout currentPage={currentPage} onPageChange={setCurrentPage}>
       <div className="app-container">
-        {currentPage === 'home' && <HomeDashboard onAction={handleNotificationClick} onPageChange={setCurrentPage} onDayClick={handleDayClick} />}
+        {currentPage === 'home' && <HomeDashboardV2 onAction={handleNotificationClick} onPageChange={setCurrentPage} onDayClick={handleDayClick} />}
+        {/* {currentPage === 'home' && <HomeDashboard onAction={handleNotificationClick} onPageChange={setCurrentPage} onDayClick={handleDayClick} />} */}
         {currentPage === 'schedule' && <SchedulePage onDayClick={handleDayClick} />}
         {currentPage === 'dayTimeline' && (
           <DayTimelinePage
@@ -102,12 +104,12 @@ function App() {
         {currentPage === 'performance' && <PerformancePage onKPIClick={handleKPIClick} />}
         {currentPage === 'performanceDetails' && <PerformancePage selectedKPI={selectedKPI} onBack={handleBackFromKPI} />}
         {currentPage === 'activities' && <ActivitiesPage initialFilter={activitiesFilter} />}
-        {currentPage === 'coaching' && <CoachingPage />}
+        {currentPage === 'coaching' && <ActivitiesPage initialFilter="Coaching" />}
 
         {currentPage === 'requests' && <RequestsPage defaultTab={requestsTab} />}
         {currentPage === 'rewards' && <GamificationDashboard />}
         {currentPage === 'evaluations' && <ActivitiesPage initialFilter="Evaluations" />}
-        {currentPage === 'disputes' && <RequestsPage defaultTab={4} />}
+        {currentPage === 'disputes' && <DisputesPage />}
         {currentPage === 'events' && <ActivitiesPage initialFilter="Events" />}
         {currentPage === 'logs' && <ActivitiesPage initialFilter="Logs" />}
       </div>

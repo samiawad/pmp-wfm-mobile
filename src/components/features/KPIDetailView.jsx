@@ -5,9 +5,6 @@ import {
     Typography,
     IconButton,
     SwipeableDrawer,
-    List,
-    ListItemButton,
-    ListItemText,
     Divider,
     Card,
     CardContent,
@@ -26,6 +23,7 @@ import {
     BarChart as BreakdownIcon,
     Check as CheckIcon,
     ExpandMore as ExpandMoreIcon,
+    Close as CloseIcon,
 } from '@mui/icons-material';
 import { AreaChart, Area, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, LineChart, Line, Cell } from 'recharts';
 import DisputeModal from '../common/DisputeModal';
@@ -58,11 +56,11 @@ const BackButton = styled(IconButton)(({ theme }) => ({
     },
 }));
 
-const KPITitle = styled(Typography)(({ theme }) => ({
+const KPITitle = styled(Typography)({
     fontWeight: 700,
-    color: 'var(--color-on-background)',
+    color: '#1a1a1a',
     flex: 1,
-}));
+});
 
 const StatsCard = styled(Card)(({ theme }) => ({
     backgroundColor: 'white',
@@ -86,14 +84,14 @@ const StatItem = styled(Box)(({ theme }) => ({
 
 const StatLabel = styled(Typography)(({ theme }) => ({
     fontSize: '0.75rem',
-    color: 'var(--text-secondary)',
+    color: '#666',
     marginBottom: theme.spacing(0.5),
 }));
 
-const StatValue = styled(Typography)(({ theme, color }) => ({
+const StatValue = styled(Typography)(({ color }) => ({
     fontSize: '1.5rem',
     fontWeight: 700,
-    color: color || 'var(--text-primary)',
+    color: color || '#1a1a1a',
 }));
 
 const ViewSwitcher = styled(ToggleButtonGroup)(({ theme }) => ({
@@ -107,10 +105,10 @@ const ViewSwitcher = styled(ToggleButtonGroup)(({ theme }) => ({
         padding: theme.spacing(1),
         flex: 1,
         '&.Mui-selected': {
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            backgroundColor: 'var(--primary-color)',
             color: 'white',
             '&:hover': {
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                backgroundColor: 'var(--primary-color)',
             },
         },
     },
@@ -127,7 +125,7 @@ const ChartTitle = styled(Typography)(({ theme }) => ({
     fontSize: '1rem',
     fontWeight: 600,
     marginBottom: theme.spacing(2),
-    color: 'var(--text-primary)',
+    color: '#1a1a1a',
 }));
 
 const GoalCard = styled(Box)(({ theme }) => ({
@@ -350,7 +348,7 @@ const KPIDetailView = ({ kpi, onBack, dateRange }) => {
                         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
                     }}
                 >
-                    <Typography variant="caption" sx={{ fontWeight: 600, color: 'var(--text-primary)' }}>
+                    <Typography variant="caption" sx={{ fontWeight: 600, color: '#1a1a1a' }}>
                         {payload[0].payload.label}
                     </Typography>
                     <Typography variant="body2" sx={{ fontWeight: 700, color: performanceColor }}>
@@ -393,6 +391,7 @@ const KPIDetailView = ({ kpi, onBack, dateRange }) => {
                 </Box>
 
                 {/* Interval bottom sheet */}
+                {/* IONIC MIGRATION: replace with IonActionSheet */}
                 <SwipeableDrawer
                     anchor="bottom"
                     open={intervalSheetOpen}
@@ -401,51 +400,61 @@ const KPIDetailView = ({ kpi, onBack, dateRange }) => {
                     disableSwipeToOpen
                     PaperProps={{
                         sx: {
-                            borderRadius: '20px 20px 0 0',
+                            borderTopLeftRadius: '24px',
+                            borderTopRightRadius: '24px',
                             backgroundColor: '#fff',
                             pb: 2,
                         },
                     }}
                 >
-                    {/* Handle */}
-                    <Box sx={{ width: 36, height: 4, borderRadius: 2, backgroundColor: '#d0d0d0', margin: '12px auto 4px' }} />
+                    {/* SheetHandle */}
+                    <Box sx={{ width: 36, height: 4, borderRadius: 2, backgroundColor: '#d0d0d0', margin: '12px auto 8px' }} />
+                    {/* Nav header */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', px: 2, pb: 1.5 }}>
+                        <Box sx={{ width: 40 }} />
+                        <Box sx={{ flexGrow: 1, textAlign: 'center' }}>
+                            <Typography sx={{ fontWeight: 700, fontSize: '1rem', color: '#1a1a1a' }}>
+                                Select Interval
+                            </Typography>
+                        </Box>
+                        <IconButton size="small" onClick={() => setIntervalSheetOpen(false)}>
+                            <CloseIcon fontSize="small" />
+                        </IconButton>
+                    </Box>
+                    <Divider sx={{ borderColor: '#f0f0f0' }} />
 
-                    <Typography sx={{ fontWeight: 700, fontSize: '1rem', px: 2.5, pt: 1, pb: 1.5 }}>
-                        Select Interval
-                    </Typography>
-                    <Divider />
-
-                    <List sx={{ pt: 0.5 }}>
+                    {/* Box-based rows */}
+                    <Box sx={{ pt: 0.5 }}>
                         {availableIntervals.map((opt, idx) => (
-                            <Box key={opt.value}>
-                                <ListItemButton
+                            <React.Fragment key={opt.value}>
+                                <Box
                                     onClick={() => handleIntervalChange(opt.value)}
                                     sx={{
-                                        px: 2.5,
-                                        py: 1.5,
-                                        borderRadius: '12px',
-                                        mx: 1,
-                                        backgroundColor: interval === opt.value ? 'rgba(102,126,234,0.08)' : 'transparent',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                        px: 3, py: 1.5,
+                                        cursor: 'pointer',
+                                        backgroundColor: interval === opt.value ? 'rgba(0,86,179,0.05)' : 'transparent',
+                                        '&:hover': { backgroundColor: '#f9f9f9' },
+                                        '&:active': { backgroundColor: '#f0f4f8' },
                                     }}
                                 >
-                                    <ListItemText
-                                        primary={opt.label}
-                                        primaryTypographyProps={{
-                                            fontWeight: interval === opt.value ? 700 : 500,
-                                            fontSize: '0.95rem',
-                                            color: interval === opt.value ? '#667eea' : '#222',
-                                        }}
-                                    />
+                                    <Typography sx={{
+                                        fontWeight: interval === opt.value ? 700 : 500,
+                                        fontSize: '0.95rem',
+                                        color: interval === opt.value ? 'var(--primary-color)' : '#1a1a1a',
+                                    }}>
+                                        {opt.label}
+                                    </Typography>
                                     {interval === opt.value && (
-                                        <CheckIcon sx={{ fontSize: 20, color: '#667eea' }} />
+                                        <CheckIcon sx={{ fontSize: 20, color: 'var(--primary-color)' }} />
                                     )}
-                                </ListItemButton>
+                                </Box>
                                 {idx < availableIntervals.length - 1 && (
-                                    <Divider sx={{ mx: 3 }} />
+                                    <Divider sx={{ mx: 3, borderColor: '#f5f5f5' }} />
                                 )}
-                            </Box>
+                            </React.Fragment>
                         ))}
-                    </List>
+                    </Box>
                 </SwipeableDrawer>
 
                 <ContentCard>
@@ -494,10 +503,9 @@ const KPIDetailView = ({ kpi, onBack, dateRange }) => {
                                     onClick={handleOpenDispute}
                                     sx={{
                                         borderRadius: '8px',
-                                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                        '&:hover': {
-                                            background: 'linear-gradient(135deg, #5568d3 0%, #6a4190 100%)',
-                                        },
+                                        backgroundColor: 'var(--primary-color)',
+                                        boxShadow: 'none',
+                                        '&:hover': { backgroundColor: 'var(--primary-color)', boxShadow: 'none' },
                                     }}
                                 >
                                     + Dispute

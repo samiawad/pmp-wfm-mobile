@@ -28,16 +28,6 @@ import {
     BeachAccess as VacationIcon,
 } from '@mui/icons-material';
 
-// ... (styled components)
-
-const wfmMenuItems = [
-    { text: 'My Schedule', icon: <CalendarIcon />, path: 'schedule' },
-];
-
-const generalMenuItems = [
-    { text: 'Requests', icon: <RequestsIcon />, path: 'requests' },
-];
-
 // ============================================
 // Styled Components
 // ============================================
@@ -46,7 +36,7 @@ const StyledDrawer = styled(Drawer)(({ theme }) => ({
     '& .MuiDrawer-paper': {
         width: 280,
         backgroundColor: '#ffffff',
-        color: 'var(--color-on-surface)',
+        color: '#1a1a1a',
         boxShadow: '2px 0 8px rgba(0, 0, 0, 0.15)',
     },
     '& .MuiBackdrop-root': {
@@ -62,7 +52,7 @@ const DrawerHeader = styled(Box)(({ theme }) => ({
 }));
 
 const CloseIconButton = styled(IconButton)(({ theme }) => ({
-    color: 'var(--color-primary)',
+    color: 'var(--primary-color)',
 }));
 
 const MenuTitle = styled(Typography)(({ theme }) => ({
@@ -71,7 +61,7 @@ const MenuTitle = styled(Typography)(({ theme }) => ({
 
 const SectionTitle = styled(Typography)(({ theme }) => ({
     paddingLeft: theme.spacing(2),
-    color: 'var(--color-on-surface-variant)',
+    color: '#666',
     fontWeight: 600,
 }));
 
@@ -81,12 +71,12 @@ const SectionContainer = styled(Box)(({ theme }) => ({
 
 const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
     '&:hover': {
-        backgroundColor: 'var(--color-primary-container)',
+        backgroundColor: 'rgba(var(--primary-rgb), 0.08)',
     },
 }));
 
 const StyledListItemIcon = styled(ListItemIcon)(({ theme }) => ({
-    color: 'var(--color-primary)',
+    color: 'var(--primary-color)',
 }));
 
 const StyledDivider = styled(Divider)(({ theme }) => ({

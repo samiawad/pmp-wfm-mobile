@@ -2,8 +2,6 @@ import { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import {
     Box,
-    Card,
-    CardContent,
     Typography,
     Table,
     TableBody,
@@ -12,15 +10,12 @@ import {
     TableHead,
     TableRow,
     Paper,
-    FormControl,
-    Chip,
     SwipeableDrawer,
-    List,
-    ListItem,
-    ListItemText,
-    ListItemButton,
     Radio,
-    IconButton as MuiIconButton,
+    IconButton,
+    Divider,
+    Switch,
+    Tooltip as MuiTooltip,
 } from '@mui/material';
 import {
     GridView as CardViewIcon,
@@ -31,7 +26,10 @@ import {
     CompareArrows as CompareIcon,
     Close as CloseIcon,
     CalendarToday as CalendarIcon,
-    ExpandMore as DropdownIcon,
+    Check as CheckIcon,
+    AccessTime as LastUpdatedIcon,
+    Tune as TuneIcon,
+    FilterAlt as FilterIcon,
 } from '@mui/icons-material';
 import { AreaChart, Area, ResponsiveContainer, Tooltip } from 'recharts';
 import KPIDetailView from './KPIDetailView';
@@ -286,99 +284,22 @@ const formatValue = (value, unit) => {
     return Math.round(value);
 };
 
+const getStatusLabel = (value, kpi) => {
+    const color = getPerformanceColor(value, kpi);
+    if (color === '#4caf50') return 'Good';
+    if (color === '#ff9800') return 'Avg';
+    return 'Low';
+};
+
 // ============================================
 // Styled Components
 // ============================================
 
 const PerformanceContainer = styled(Box)(({ theme }) => ({
-    paddingBottom: theme.spacing(2),
     backgroundColor: '#f5f5f5',
     width: '100%',
-    padding: '16px',
+    padding: '0 16px 16px',
     boxSizing: 'border-box',
-}));
-
-const FilterRow = styled(Box)(({ theme }) => ({
-    display: 'flex',
-    alignItems: 'center',
-    gap: 8,
-    overflowX: 'auto',
-    paddingBottom: theme.spacing(1.5),
-    marginBottom: theme.spacing(1),
-    scrollbarWidth: 'none',
-    '&::-webkit-scrollbar': { display: 'none' },
-    flexWrap: 'nowrap',
-}));
-
-const PageTitle = styled(Typography)({
-    fontWeight: 700,
-    fontSize: '1rem',
-    color: 'var(--color-on-background)',
-    whiteSpace: 'nowrap',
-    flexShrink: 0,
-});
-
-const FilterChipSelect = styled(FormControl)({
-    width: 'fit-content',
-    flexShrink: 0,
-    '& .MuiOutlinedInput-root': {
-        height: 32,
-        borderRadius: 20,
-        backgroundColor: '#fff',
-        fontSize: '0.75rem',
-        '& fieldset': { borderColor: '#e0e0e0' },
-    },
-    '& .MuiSelect-select': {
-        padding: '4px 28px 4px 12px !important',
-        fontSize: '0.75rem',
-    },
-});
-
-const FilterChip = styled(Chip)(({ theme, active, selected }) => ({
-    height: 32,
-    borderRadius: 20,
-    backgroundColor: (active || selected) ? undefined : '#fff',
-    background: (active || selected) ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : undefined,
-    color: (active || selected) ? '#fff' : 'var(--text-primary)',
-    fontWeight: 500,
-    fontSize: '0.75rem',
-    border: (active || selected) ? 'none' : '1px solid #e0e0e0',
-    cursor: 'pointer',
-    whiteSpace: 'nowrap',
-    flexShrink: 0,
-    '& .MuiChip-icon': {
-        color: (active || selected) ? '#fff' : 'inherit',
-        fontSize: 16,
-        marginLeft: '8px',
-    },
-    '&:hover': {
-        opacity: 0.85,
-    },
-}));
-
-const DropdownTrigger = styled(Box)(({ theme }) => ({
-    height: 32,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 8,
-    padding: '0 12px 0 8px',
-    borderRadius: 20,
-    backgroundColor: '#fff',
-    border: '1px solid #c4c4c4',
-    cursor: 'pointer',
-    color: 'var(--text-primary)',
-    fontWeight: 500,
-    fontSize: '0.75rem',
-    whiteSpace: 'nowrap',
-    flexShrink: 0,
-    '&:hover': {
-        borderColor: '#212121',
-        backgroundColor: '#fafafa',
-    },
-    '&:active': {
-        backgroundColor: '#f5f5f5',
-    },
 }));
 
 const DragHandle = styled(Box)({
@@ -389,79 +310,21 @@ const DragHandle = styled(Box)({
     margin: '12px auto 8px',
 });
 
-
-// Card View Components
+// KPI Card Grid — 2 columns on mobile, 3 on wider screens
 const KPIGrid = styled(Box)(({ theme }) => ({
     display: 'grid',
     gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: theme.spacing(2),
+    gap: 'var(--card-spacing)',
     [theme.breakpoints.up('md')]: {
         gridTemplateColumns: 'repeat(3, 1fr)',
     },
 }));
 
-const KPICard = styled(Card)(({ theme, performanceColor }) => ({
-    background: '#ffffff',
-    borderRadius: '12px',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
-    border: `2px solid ${performanceColor}20`,
-    cursor: 'default',
-}));
-
-const KPICardContent = styled(CardContent)(({ theme }) => ({
-    padding: theme.spacing(2),
-    '&:last-child': {
-        paddingBottom: theme.spacing(2),
-    },
-}));
-
-const KPIHeader = styled(Box)(({ theme }) => ({
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: theme.spacing(1),
-}));
-
-const KPIName = styled(Typography)(({ theme }) => ({
-    fontSize: '0.875rem',
-    fontWeight: 600,
-    color: 'var(--text-secondary)',
-}));
-
-const KPIValue = styled(Typography)(({ theme, performanceColor }) => ({
-    fontSize: '2rem',
-    fontWeight: 700,
-    color: performanceColor,
-    lineHeight: 1,
-    marginBottom: theme.spacing(1),
-}));
-
-const TrendContainer = styled(Box)(({ theme }) => ({
-    display: 'flex',
-    alignItems: 'center',
-    gap: theme.spacing(0.5),
-    marginBottom: theme.spacing(1.5),
-}));
-
-const TrendText = styled(Typography)(({ theme, trendColor }) => ({
-    fontSize: '0.75rem',
-    fontWeight: 600,
-    color: trendColor,
-}));
-
-const ChartContainer = styled(Box)(({ theme }) => ({
-    height: '50px',
-    marginTop: theme.spacing(1),
-    marginLeft: theme.spacing(-2), // Remove left spacing
-    marginRight: theme.spacing(-2), // Remove right spacing
-}));
-
 // List View Components
 const ListContainer = styled(Box)(({ theme }) => ({
     backgroundColor: 'white',
-    borderRadius: '12px',
+    borderRadius: 'var(--card-radius)',
     padding: theme.spacing(2),
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
 }));
 
 const KPIListItem = styled(Box)(({ theme }) => ({
@@ -496,17 +359,41 @@ const PerformancePage = ({ selectedKPI, onKPIClick, onBack }) => {
     const [viewMode, setViewMode] = useState('cards');
     const [dateRangePreset, setDateRangePreset] = useState('last7');
     const [showComparison, setShowComparison] = useState(false);
-    const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+    const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
 
-    const handleDateRangeSelect = (presetId) => {
-        setDateRangePreset(presetId);
-        setIsBottomSheetOpen(false);
+    // Draft state — only committed on Apply
+    const [draftDateRangePreset, setDraftDateRangePreset] = useState('last7');
+    const [draftShowComparison, setDraftShowComparison] = useState(false);
+
+    // Badge count — how many non-default filters are active
+    const activeFilterCount = [
+        dateRangePreset !== 'last7',
+        showComparison,
+    ].filter(Boolean).length;
+
+    const openFilterSheet = () => {
+        setDraftDateRangePreset(dateRangePreset); // seed drafts from committed state
+        setDraftShowComparison(showComparison);
+        setIsFilterSheetOpen(true);
     };
 
+    const applyFilters = () => {
+        setDateRangePreset(draftDateRangePreset);
+        setShowComparison(draftShowComparison);
+        setIsFilterSheetOpen(false);
+    };
 
+    const resetFilters = () => {
+        setDraftDateRangePreset('last7');
+        setDraftShowComparison(false);
+    };
+
+    const closeSheet = () => {
+        setIsFilterSheetOpen(false); // discard draft — do NOT apply
+    };
 
     const toggleComparison = () => {
-        setShowComparison(!showComparison);
+        setDraftShowComparison(prev => !prev);
     };
 
     const handleKPIClick = (kpi) => {
@@ -555,25 +442,21 @@ const PerformancePage = ({ selectedKPI, onKPIClick, onBack }) => {
                 {kpiData.map((kpi) => {
                     const performanceColor = getPerformanceColor(kpi.value, kpi);
                     const trendColor = getTrendColor(kpi.change, kpi.lowerIsBetter);
-                    const chartData = kpi.trend;
+                    const statusLabel = getStatusLabel(kpi.value, kpi);
+                    const isGood = performanceColor === '#4caf50';
+                    const isPositiveTrend = (kpi.lowerIsBetter && kpi.change < 0) || (!kpi.lowerIsBetter && kpi.change > 0);
 
-                    // Custom tooltip component
                     const CustomTooltip = ({ active, payload }) => {
                         if (active && payload && payload.length) {
                             return (
-                                <Box
-                                    sx={{
-                                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                                        padding: '8px 12px',
-                                        borderRadius: '8px',
-                                        border: `2px solid ${performanceColor}`,
-                                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-                                    }}
-                                >
-                                    <Typography variant="caption" sx={{ fontWeight: 600, color: 'var(--text-primary)' }}>
-                                        {payload[0].payload.date}
-                                    </Typography>
-                                    <Typography variant="body2" sx={{ fontWeight: 700, color: performanceColor }}>
+                                <Box sx={{
+                                    backgroundColor: '#fff',
+                                    padding: '6px 10px',
+                                    borderRadius: 'var(--card-radius)',
+                                    border: `1.5px solid ${performanceColor}`,
+                                }}>
+                                    <Typography sx={{ fontSize: '0.65rem', color: '#999' }}>{payload[0].payload.date}</Typography>
+                                    <Typography sx={{ fontSize: '0.82rem', fontWeight: 700, color: performanceColor }}>
                                         {formatValue(payload[0].value, kpi.unit)}
                                     </Typography>
                                 </Box>
@@ -583,75 +466,120 @@ const PerformancePage = ({ selectedKPI, onKPIClick, onBack }) => {
                     };
 
                     return (
-                        <KPICard key={kpi.id} performanceColor={performanceColor}>
-                            <KPICardContent>
-                                <KPIHeader>
-                                    <KPIName>{kpi.name}</KPIName>
-                                </KPIHeader>
+                        // IONIC MIGRATION: replace with IonCard + IonRippleEffect
+                        <Box
+                            key={kpi.id}
+                            // onClick={() => handleKPIClick(kpi)}
+                            sx={{
+                                backgroundColor: '#ffffff',
+                                borderRadius: 'var(--card-radius)',
+                                overflow: 'hidden',
+                                // cursor: 'pointer',
+                                // transition: 'transform 0.12s ease',
+                                // '&:active': { transform: 'scale(0.97)' },
+                            }}
+                        >
+                            {/* Colored top accent bar */}
+                            {/* <Box sx={{ height: 4, backgroundColor: performanceColor }} /> */}
 
-                                <KPIValue performanceColor={performanceColor}>
-                                    {formatValue(kpi.value, kpi.unit)}
-                                </KPIValue>
+                            <Box sx={{ pt: 1.75, px: 1.75, pb: 0 }}>
+                                {/* Row 1: KPI name + last-updated icon */}
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.25 }}>
+                                    <Typography sx={{
+                                        fontSize: '0.78rem',
+                                        fontWeight: 700,
+                                        color: '#64748b',
+                                        letterSpacing: '0.2px',
+                                        textTransform: 'uppercase',
+                                    }}>
+                                        {kpi.name}
+                                    </Typography>
 
-                                {showComparison && (
-                                    <TrendContainer>
-                                        {kpi.change !== 0 && (
-                                            <>
-                                                {((kpi.lowerIsBetter && kpi.change < 0) || (!kpi.lowerIsBetter && kpi.change > 0)) ? (
-                                                    <TrendingUpIcon sx={{ fontSize: '1rem', color: trendColor }} />
-                                                ) : (
-                                                    <TrendingDownIcon sx={{ fontSize: '1rem', color: trendColor }} />
-                                                )}
-                                                <TrendText trendColor={trendColor}>
-                                                    {kpi.changePercent > 0 ? '+' : ''}{kpi.changePercent.toFixed(1)}%
-                                                </TrendText>
-                                                <Typography variant="caption" sx={{ color: 'var(--text-secondary)', fontSize: '0.7rem' }}>
-                                                    vs previous period
-                                                </Typography>
-                                            </>
-                                        )}
-                                    </TrendContainer>
-                                )}
+                                    {/* IONIC MIGRATION: replace MuiTooltip with IonPopover triggered on icon click */}
+                                    {/* <MuiTooltip
+                                        title={`Updated: ${kpi.lastUpdated}`}
+                                        enterTouchDelay={0}
+                                        leaveTouchDelay={3000}
+                                        arrow
+                                        placement="top"
+                                    >
+                                        <IconButton
+                                            size="small"
+                                            onClick={(e) => e.stopPropagation()}
+                                            sx={{
+                                                p: 0.4,
+                                                color: '#b0bec5',
+                                                '&:hover': { color: '#78909c', backgroundColor: 'transparent' },
+                                            }}
+                                        >
+                                            <LastUpdatedIcon sx={{ fontSize: '0.88rem' }} />
+                                        </IconButton>
+                                    </MuiTooltip> */}
+                                </Box>
 
-                                <ChartContainer>
+                                {/* Row 2: Big value + inline comparison */}
+                                <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.75, mb: 0.5 }}>
+                                    <Typography sx={{
+                                        fontSize: '1.85rem',
+                                        fontWeight: 800,
+                                        color: 'var(--primary-color)',
+                                        lineHeight: 1,
+                                    }}>
+                                        {formatValue(kpi.value, kpi.unit)}
+                                    </Typography>
+                                    {showComparison && kpi.change !== 0 && (
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25 }}>
+                                            {isPositiveTrend
+                                                ? <TrendingUpIcon sx={{ fontSize: '0.78rem', color: trendColor }} />
+                                                : <TrendingDownIcon sx={{ fontSize: '0.78rem', color: trendColor }} />
+                                            }
+                                            <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: trendColor, lineHeight: 1 }}>
+                                                {kpi.changePercent > 0 ? '+' : ''}{kpi.changePercent.toFixed(1)}%
+                                            </Typography>
+                                        </Box>
+                                    )}
+                                </Box>
+
+                                {/* Row 3: Target */}
+                                <Typography sx={{ fontSize: '0.7rem', color: '#94a3b8' }}>
+                                    Target: {formatValue(kpi.target, kpi.unit)}
+                                </Typography>
+
+                                <Typography sx={{
+                                    fontSize: '8px',
+                                    color: '#64748b',
+                                }}>
+                                    Updated: {kpi.lastUpdated}
+                                </Typography>
+                                {/* Sparkline */}
+                                <Box sx={{ position: 'relative', height: 70, mx: -1.75 }}>
                                     <ResponsiveContainer width="100%" height="100%">
-                                        <AreaChart data={chartData}>
+                                        <AreaChart data={kpi.trend}>
                                             <defs>
-                                                <linearGradient id={`gradient-${kpi.id}`} x1="0" y1="0" x2="0" y2="1">
-                                                    <stop offset="0%" stopColor={performanceColor} stopOpacity={0.4} />
-                                                    <stop offset="95%" stopColor={performanceColor} stopOpacity={0.05} />
+                                                <linearGradient id={`grad-${kpi.id}`} x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="0%" stopColor={performanceColor} stopOpacity={0.3} />
+                                                    <stop offset="95%" stopColor={performanceColor} stopOpacity={0.02} />
                                                 </linearGradient>
                                             </defs>
-                                            <Tooltip content={<CustomTooltip />} />
+                                            {/* <Tooltip content={<CustomTooltip />} /> */}
                                             <Area
                                                 type="monotone"
                                                 dataKey="value"
                                                 stroke={performanceColor}
-                                                strokeWidth={2}
-                                                fill={`url(#gradient-${kpi.id})`}
+                                                strokeWidth={1.5}
+                                                fill={`url(#grad-${kpi.id})`}
                                                 dot={false}
                                             />
                                         </AreaChart>
                                     </ResponsiveContainer>
-                                </ChartContainer>
-                                <Typography
-                                    variant="caption"
-                                    sx={{
-                                        display: 'block',
-                                        textAlign: 'right',
-                                        color: 'var(--text-secondary)',
-                                        fontSize: '0.65rem',
-                                        mt: 1,
-                                        opacity: 0.7,
-                                    }}
-                                >
-                                    Last updated: {kpi.lastUpdated}
-                                </Typography>
-                            </KPICardContent>
-                        </KPICard>
+                                </Box>
+
+                            </Box>
+                        </Box>
                     );
-                })}
-            </KPIGrid>
+                })
+                }
+            </KPIGrid >
         );
     };
 
@@ -686,7 +614,7 @@ const PerformancePage = ({ selectedKPI, onKPIClick, onBack }) => {
                                 <Typography variant="h6" sx={{ fontWeight: 700, color: performanceColor }}>
                                     {formatValue(kpi.value, kpi.unit)}
                                 </Typography>
-                                <Typography variant="caption" sx={{ color: 'var(--text-secondary)' }}>
+                                <Typography variant="caption" sx={{ color: '#666' }}>
                                     Target: {formatValue(kpi.target, kpi.unit)}
                                 </Typography>
                             </ListItemRight>
@@ -700,7 +628,7 @@ const PerformancePage = ({ selectedKPI, onKPIClick, onBack }) => {
     // Render Table View
     const renderTableView = () => {
         return (
-            <TableContainer component={Paper} sx={{ borderRadius: '16px', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)' }}>
+            <TableContainer component={Paper} sx={{ borderRadius: 'var(--card-radius)', boxShadow: 'none' }}>
                 <Table>
                     <TableHead>
                         <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
@@ -755,7 +683,7 @@ const PerformancePage = ({ selectedKPI, onKPIClick, onBack }) => {
                                             }}
                                         />
                                     </TableCell>
-                                    <TableCell align="center" sx={{ fontSize: '0.75rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
+                                    <TableCell align="center" sx={{ fontSize: '0.75rem', color: '#666', whiteSpace: 'nowrap' }}>
                                         {kpi.lastUpdated}
                                     </TableCell>
                                 </TableRow>
@@ -780,88 +708,290 @@ const PerformancePage = ({ selectedKPI, onKPIClick, onBack }) => {
 
     return (
         <PerformanceContainer>
-            {/* Title + Filters in one horizontal scrolling row */}
-            <FilterRow>
-                <PageTitle>My Performance</PageTitle>
-                <DropdownTrigger onClick={() => setIsBottomSheetOpen(true)}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <CalendarIcon sx={{ fontSize: '1rem', color: '#757575' }} />
-                        {dateRangePresets.find(p => p.id === dateRangePreset)?.label || 'Select Period'}
+            {/* View toggle — Segmented control, matches SchedulePage exactly */}
+            {/* IONIC MIGRATION: replace with IonSegment + IonSegmentButton */}
+            {/* TODO: Restore this block when you want to add tabs */}
+            {/* <Box sx={{
+                display: 'flex',
+                backgroundColor: '#e8edf2',
+                borderRadius: 'var(--card-radius)',
+                padding: '4px',
+                mb: 1.5,
+            }}>
+                {[
+                    { key: 'cards', label: 'Cards', icon: <CardViewIcon sx={{ fontSize: 17 }} /> },
+                    { key: 'list', label: 'List', icon: <ListViewIcon sx={{ fontSize: 17 }} /> },
+                    { key: 'table', label: 'Table', icon: <TableViewIcon sx={{ fontSize: 17 }} /> },
+                ].map(tab => (
+                    <Box
+                        key={tab.key}
+                        onClick={() => setViewMode(tab.key)}
+                        sx={{
+                            flex: 1,
+                            py: 0.9,
+                            borderRadius: 'calc(var(--card-radius) - 2px)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: 0.75,
+                            backgroundColor: viewMode === tab.key ? 'var(--primary-color)' : 'transparent',
+                            color: viewMode === tab.key ? '#fff' : '#5a6a7a',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease',
+                            userSelect: 'none',
+                        }}
+                    >
+                        <Box sx={{ display: 'flex', color: 'inherit' }}>{tab.icon}</Box>
+                        <Typography sx={{ fontSize: '0.875rem', fontWeight: viewMode === tab.key ? 600 : 500, color: 'inherit', lineHeight: 1 }}>
+                            {tab.label}
+                        </Typography>
                     </Box>
-                    <DropdownIcon sx={{ fontSize: '1.2rem', color: '#757575' }} />
-                </DropdownTrigger>
-                <FilterChip
-                    icon={<CompareIcon />}
-                    label="Compare"
-                    onClick={toggleComparison}
-                    active={showComparison}
-                    size="small"
-                />
-                <FilterChip
-                    label="Cards"
-                    icon={<CardViewIcon />}
-                    selected={viewMode === 'cards'}
-                    onClick={() => setViewMode('cards')}
-                />
-                <FilterChip
-                    label="List"
-                    icon={<ListViewIcon />}
-                    selected={viewMode === 'list'}
-                    onClick={() => setViewMode('list')}
-                />
-                <FilterChip
-                    label="Table"
-                    icon={<TableViewIcon />}
-                    selected={viewMode === 'table'}
-                    onClick={() => setViewMode('table')}
-                />
-            </FilterRow>
+                ))}
+            </Box> */}
 
             {/* Render View Based on Mode */}
             {viewMode === 'cards' && renderCardView()}
             {viewMode === 'list' && renderListView()}
             {viewMode === 'table' && renderTableView()}
 
-            {/* Bottom Sheet for Date Range Filter */}
+            {/* ── Floating Filter Button ─────────────────────────── */}
+            {/* IONIC MIGRATION: replace with <IonFab vertical="bottom" horizontal="end"> */}
+            <Box
+                onClick={openFilterSheet}
+                sx={{
+                    position: 'fixed',
+                    bottom: 82,
+                    right: 18,
+                    width: 52,
+                    height: 52,
+                    borderRadius: '50%',
+                    backgroundColor: 'var(--primary-color)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    zIndex: 200,
+                    userSelect: 'none',
+                    transition: 'transform 0.15s ease',
+                    '&:active': { transform: 'scale(0.91)' },
+                }}
+            >
+                <FilterIcon sx={{ color: '#fff', fontSize: '1.25rem' }} />
+
+                {/* Active filter badge */}
+                {activeFilterCount > 0 && (
+                    <Box sx={{
+                        position: 'absolute',
+                        top: -5,
+                        right: -5,
+                        minWidth: 18,
+                        height: 18,
+                        borderRadius: '9px',
+                        backgroundColor: 'var(--secondary-color)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        px: 0.5,
+                        border: '2px solid #f5f5f5',
+                    }}>
+                        <Typography sx={{ fontSize: '0.6rem', fontWeight: 800, color: '#fff', lineHeight: 1 }}>
+                            {activeFilterCount}
+                        </Typography>
+                    </Box>
+                )}
+            </Box>
+
+            {/* ── Filter Bottom Sheet ────────────────────────────── */}
+            {/* IONIC MIGRATION: replace with IonModal + sheet: true */}
             <SwipeableDrawer
                 anchor="bottom"
-                open={isBottomSheetOpen}
-                onClose={() => setIsBottomSheetOpen(false)}
-                onOpen={() => setIsBottomSheetOpen(true)}
+                open={isFilterSheetOpen}
+                onClose={closeSheet}
+                onOpen={openFilterSheet}
                 PaperProps={{
                     sx: {
                         borderTopLeftRadius: '24px',
                         borderTopRightRadius: '24px',
-                        paddingBottom: '20px',
-                        maxHeight: '60vh'
+                        maxHeight: '82vh',
+                        overflow: 'hidden',
+                        display: 'flex',
+                        flexDirection: 'column',
                     }
                 }}
             >
                 <DragHandle />
-                <Box sx={{ px: 3, pt: 1, pb: 2 }}>
-                    <Typography variant="h6" fontWeight={700} textAlign="center">Select Period</Typography>
+
+                {/* Sheet header */}
+                <Box sx={{ display: 'flex', alignItems: 'center', px: 2.5, pb: 1.5 }}>
+                    <Typography sx={{ flexGrow: 1, fontWeight: 800, fontSize: '1.1rem', color: '#0f172a' }}>
+                        Filters
+                    </Typography>
+                    <IconButton size="small" onClick={closeSheet} sx={{ color: '#64748b' }}>
+                        <CloseIcon fontSize="small" />
+                    </IconButton>
                 </Box>
-                <List sx={{ pt: 1 }}>
-                    {dateRangePresets.map((preset) => (
-                        <ListItem disablePadding key={preset.id}>
-                            <ListItemButton onClick={() => handleDateRangeSelect(preset.id)} sx={{ px: 3 }}>
-                                <Radio
-                                    checked={dateRangePreset === preset.id}
-                                    onChange={() => handleDateRangeSelect(preset.id)}
-                                    size="small"
-                                    sx={{ mr: 1 }}
-                                />
-                                <ListItemText
-                                    primary={preset.label}
-                                    primaryTypographyProps={{
-                                        fontWeight: dateRangePreset === preset.id ? 700 : 500,
-                                        fontSize: '0.95rem'
+
+                <Divider sx={{ borderColor: '#f1f5f9' }} />
+
+                {/* Scrollable body */}
+                <Box sx={{ overflowY: 'auto', px: 2.5, pt: 2.5, pb: 2, flex: 1 }}>
+
+                    {/* ── Section: Period ── */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+                        <CalendarIcon sx={{ fontSize: '0.95rem', color: '#94a3b8' }} />
+                        <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: '#94a3b8', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
+                            Period
+                        </Typography>
+                    </Box>
+
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, mb: 3 }}>
+                        {dateRangePresets.map((preset) => {
+                            const isSelected = draftDateRangePreset === preset.id;
+                            return (
+                                <Box
+                                    key={preset.id}
+                                    onClick={() => setDraftDateRangePreset(preset.id)}
+                                    sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        px: 1.5,
+                                        py: 1.25,
+                                        borderRadius: 'var(--card-radius)',
+                                        cursor: 'pointer',
+                                        backgroundColor: isSelected ? 'rgba(6,24,54,0.06)' : 'transparent',
+                                        transition: 'background-color 0.12s ease',
+                                        '&:active': { backgroundColor: '#e8edf2' },
                                     }}
-                                />
-                            </ListItemButton>
-                        </ListItem>
-                    ))}
-                </List>
+                                >
+                                    <Radio
+                                        checked={isSelected}
+                                        size="small"
+                                        readOnly
+                                        sx={{
+                                            mr: 1.25, p: 0,
+                                            color: '#cbd5e1',
+                                            '&.Mui-checked': { color: 'var(--primary-color)' },
+                                        }}
+                                    />
+                                    <Typography sx={{
+                                        fontSize: '0.95rem',
+                                        fontWeight: isSelected ? 700 : 500,
+                                        color: isSelected ? 'var(--primary-color)' : '#334155',
+                                        flexGrow: 1,
+                                    }}>
+                                        {preset.label}
+                                    </Typography>
+                                    {isSelected && (
+                                        <CheckIcon sx={{ fontSize: '1rem', color: 'var(--primary-color)' }} />
+                                    )}
+                                </Box>
+                            );
+                        })}
+                    </Box>
+
+                    <Divider sx={{ borderColor: '#f1f5f9', mb: 3 }} />
+
+                    {/* ── Section: Options ── */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+                        <CompareIcon sx={{ fontSize: '0.95rem', color: '#94a3b8' }} />
+                        <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: '#94a3b8', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
+                            Options
+                        </Typography>
+                    </Box>
+
+                    <Box
+                        onClick={toggleComparison}
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            px: 1.5,
+                            py: 1.25,
+                            borderRadius: '12px',
+                            backgroundColor: draftShowComparison ? 'rgba(6,24,54,0.06)' : 'transparent',
+                            cursor: 'pointer',
+                            transition: 'background-color 0.12s ease',
+                            '&:active': { backgroundColor: '#e8edf2' },
+                        }}
+                    >
+                        <Box>
+                            <Typography sx={{ fontSize: '0.95rem', fontWeight: 600, color: '#334155' }}>
+                                Compare with previous period
+                            </Typography>
+                            <Typography sx={{ fontSize: '0.78rem', color: '#94a3b8', mt: 0.25 }}>
+                                Show % change next to each score
+                            </Typography>
+                        </Box>
+                        <Switch
+                            checked={draftShowComparison}
+                            size="small"
+                            onClick={(e) => e.stopPropagation()}
+                            onChange={toggleComparison}
+                            sx={{
+                                ml: 1,
+                                '& .MuiSwitch-switchBase.Mui-checked': { color: 'var(--primary-color)' },
+                                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { backgroundColor: 'var(--primary-color)' },
+                            }}
+                        />
+                    </Box>
+                </Box>
+
+                {/* ── Sticky footer — Reset + Apply ── */}
+                <Box sx={{
+                    borderTop: '1px solid #f1f5f9',
+                    px: 2.5,
+                    pt: 1.5,
+                    pb: 'max(1.5rem, env(safe-area-inset-bottom))',
+                    display: 'flex',
+                    gap: 1.5,
+                    backgroundColor: '#fff',
+                }}>
+                    {/* Reset — outline style */}
+                    <Box
+                        onClick={resetFilters}
+                        sx={{
+                            flex: 1,
+                            height: 48,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderRadius: 'var(--card-radius)',
+                            border: '1.5px solid #e2e8f0',
+                            backgroundColor: '#ffffff',
+                            cursor: 'pointer',
+                            userSelect: 'none',
+                            transition: 'all 0.15s ease',
+                            '&:active': { backgroundColor: '#f8fafc', borderColor: '#cbd5e1' },
+                        }}
+                    >
+                        <Typography sx={{ fontWeight: 700, fontSize: '0.92rem', color: '#64748b' }}>
+                            Reset
+                        </Typography>
+                    </Box>
+
+                    {/* Apply — primary fill */}
+                    <Box
+                        onClick={applyFilters}
+                        sx={{
+                            flex: 1,
+                            height: 48,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderRadius: 'var(--card-radius)',
+                            border: '1.5px solid transparent',
+                            backgroundColor: 'var(--primary-color)',
+                            cursor: 'pointer',
+                            userSelect: 'none',
+                            transition: 'opacity 0.15s ease',
+                            '&:active': { opacity: 0.82 },
+                        }}
+                    >
+                        <Typography sx={{ fontWeight: 700, fontSize: '0.92rem', color: '#ffffff' }}>
+                            Apply
+                        </Typography>
+                    </Box>
+                </Box>
             </SwipeableDrawer>
         </PerformanceContainer>
     );

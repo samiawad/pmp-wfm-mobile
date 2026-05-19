@@ -5,11 +5,7 @@ import {
     Typography,
     Card,
     CardContent,
-    List,
-    ListItem,
-    ListItemText,
     Chip,
-    Avatar,
     Divider,
     IconButton,
 } from '@mui/material';
@@ -25,13 +21,11 @@ import {
 import {
     RateReview as EvaluationIcon,
     TrendingUp as TrendIcon,
-    Assignment as FormIcon,
     ChevronRight as ChevronRightIcon,
-    Star as StarIcon,
 } from '@mui/icons-material';
 
 // ============================================
-// Styled Components (Consistent with Coaching/Rewards)
+// Styled Components
 // ============================================
 
 const PageContainer = styled(Box)(({ theme }) => ({
@@ -64,7 +58,7 @@ const RowContainer = styled(Box)(({ theme }) => ({
     gap: theme.spacing(2),
 }));
 
-const DashboardCard = styled(Card)(({ theme }) => ({
+const DashboardCard = styled(Card)({
     borderRadius: '12px',
     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
     display: 'flex',
@@ -74,7 +68,7 @@ const DashboardCard = styled(Card)(({ theme }) => ({
     flex: 1,
     width: '100%',
     backgroundColor: '#fff',
-}));
+});
 
 const CardHeader = styled(Box)(({ theme }) => ({
     padding: theme.spacing(2.5),
@@ -85,11 +79,11 @@ const CardHeader = styled(Box)(({ theme }) => ({
     backgroundColor: '#fff',
 }));
 
-const CardTitle = styled(Typography)(({ theme }) => ({
+const CardTitle = styled(Typography)({
     fontWeight: 700,
     fontSize: '1.05rem',
     color: '#2c3e50',
-}));
+});
 
 const StatCardContent = styled(CardContent)(({ theme }) => ({
     display: 'flex',
@@ -100,22 +94,22 @@ const StatCardContent = styled(CardContent)(({ theme }) => ({
     padding: `${theme.spacing(4)} !important`,
 }));
 
-const StatValue = styled(Typography)(({ theme }) => ({
+const StatValue = styled(Typography)({
     fontWeight: 800,
     fontSize: '2.75rem',
-    color: theme.palette.primary.main,
+    color: 'var(--primary-color)',
     lineHeight: 1,
-    marginBottom: theme.spacing(1),
+    marginBottom: 8,
     letterSpacing: '-1px',
-}));
+});
 
-const StatLabel = styled(Typography)(({ theme }) => ({
+const StatLabel = styled(Typography)({
     fontSize: '0.9rem',
     fontWeight: 600,
     color: '#7f8c8d',
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
-}));
+});
 
 // ============================================
 // Mock Data
@@ -131,16 +125,16 @@ const scoreTrendData = [
 ];
 
 const recentEvaluations = [
-    { id: 1, form: 'Call Quality Form V2', date: 'June 10, 2026', evaluator: 'Sarah Supervisor', score: 98, status: 'Excellent' },
-    { id: 2, form: 'Email Etiquette', date: 'June 05, 2026', evaluator: 'Mike Manager', score: 85, status: 'Good' },
-    { id: 3, form: 'Chat Protocol', date: 'May 28, 2026', evaluator: 'Sarah Supervisor', score: 92, status: 'Excellent' },
-    { id: 4, form: 'Call Quality Form V2', date: 'May 15, 2026', evaluator: 'Mike Manager', score: 78, status: 'Average' },
+    { id: 1, form: 'Call Quality Form V2', date: 'June 10, 2026', evaluator: 'Sarah Supervisor', score: 98,  status: 'Excellent' },
+    { id: 2, form: 'Email Etiquette',      date: 'June 05, 2026', evaluator: 'Mike Manager',     score: 85,  status: 'Good' },
+    { id: 3, form: 'Chat Protocol',        date: 'May 28, 2026',  evaluator: 'Sarah Supervisor', score: 92,  status: 'Excellent' },
+    { id: 4, form: 'Call Quality Form V2', date: 'May 15, 2026',  evaluator: 'Mike Manager',     score: 78,  status: 'Average' },
 ];
 
 const getScoreColor = (score) => {
-    if (score >= 90) return '#4caf50'; // Green
-    if (score >= 80) return '#ff9800'; // Orange
-    return '#f44336'; // Red
+    if (score >= 90) return '#4caf50';
+    if (score >= 80) return '#ff9800';
+    return '#f44336';
 };
 
 // ============================================
@@ -148,7 +142,6 @@ const getScoreColor = (score) => {
 // ============================================
 
 const EvaluationsPage = () => {
-    // Calculate Average
     const avgScore = Math.round(scoreTrendData.reduce((acc, curr) => acc + curr.score, 0) / scoreTrendData.length);
 
     return (
@@ -176,13 +169,19 @@ const EvaluationsPage = () => {
                 </DashboardCard>
             </RowContainer>
 
-            {/* Row 2: Trend Chart */}
+            {/* Row 2: Score Trend */}
             <RowContainer>
                 <DashboardCard>
                     <CardHeader>
-                        <Avatar sx={{ bgcolor: '#e3f2fd', color: '#2196f3' }}>
+                        {/* Icon box — tinted bg pattern */}
+                        <Box sx={{
+                            width: 42, height: 42, borderRadius: 2.5, flexShrink: 0,
+                            backgroundColor: 'rgba(var(--primary-rgb), 0.08)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            color: 'var(--primary-color)',
+                        }}>
                             <TrendIcon />
-                        </Avatar>
+                        </Box>
                         <CardTitle>Score Trend</CardTitle>
                     </CardHeader>
                     <Box sx={{ height: 200, width: '100%', p: 2 }}>
@@ -205,10 +204,10 @@ const EvaluationsPage = () => {
                                 <Line
                                     type="monotone"
                                     dataKey="score"
-                                    stroke="#2196f3"
+                                    stroke="var(--primary-color)"
                                     strokeWidth={4}
-                                    dot={{ r: 5, strokeWidth: 2, fill: '#fff', stroke: '#2196f3' }}
-                                    activeDot={{ r: 7, strokeWidth: 0, fill: '#2196f3' }}
+                                    dot={{ r: 5, strokeWidth: 2, fill: '#fff', stroke: 'var(--primary-color)' }}
+                                    activeDot={{ r: 7, strokeWidth: 0, fill: 'var(--primary-color)' }}
                                 />
                             </LineChart>
                         </ResponsiveContainer>
@@ -216,77 +215,83 @@ const EvaluationsPage = () => {
                 </DashboardCard>
             </RowContainer>
 
-            {/* Row 3: Recent Evaluations List */}
+            {/* Row 3: Recent Evaluations */}
             <RowContainer>
                 <DashboardCard>
                     <CardHeader>
-                        <Avatar sx={{ bgcolor: '#f3e5f5', color: '#9c27b0' }}>
+                        <Box sx={{
+                            width: 42, height: 42, borderRadius: 2.5, flexShrink: 0,
+                            backgroundColor: '#7b1fa215',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            color: '#7b1fa2',
+                        }}>
                             <EvaluationIcon />
-                        </Avatar>
+                        </Box>
                         <CardTitle>Recent Evaluations</CardTitle>
                     </CardHeader>
-                    <List sx={{ p: 0 }}>
-                        {recentEvaluations.map((item, index) => (
-                            <React.Fragment key={item.id}>
-                                <ListItem
-                                    alignItems="center"
-                                    sx={{ py: 2.5, px: 3 }}
-                                    secondaryAction={
-                                        <IconButton edge="end">
-                                            <ChevronRightIcon />
-                                        </IconButton>
-                                    }
-                                >
-                                    <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
-                                        <Avatar
-                                            sx={{
-                                                bgcolor: 'transparent',
-                                                border: `2px solid ${getScoreColor(item.score)}`,
-                                                color: getScoreColor(item.score),
-                                                fontWeight: 800,
-                                                width: 50,
-                                                height: 50
-                                            }}
-                                        >
+
+                    {/* Box-based rows — no List/ListItem */}
+                    <Box>
+                        {recentEvaluations.map((item, index) => {
+                            const scoreColor = getScoreColor(item.score);
+                            return (
+                                <React.Fragment key={item.id}>
+                                    <Box sx={{
+                                        display: 'flex', alignItems: 'center',
+                                        py: 2, px: 3, gap: 2,
+                                    }}>
+                                        {/* Score circle */}
+                                        <Box sx={{
+                                            width: 50, height: 50, borderRadius: '50%', flexShrink: 0,
+                                            border: `2px solid ${scoreColor}`,
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            color: scoreColor,
+                                            fontWeight: 800,
+                                            fontSize: '0.95rem',
+                                        }}>
                                             {item.score}
-                                        </Avatar>
-                                    </Box>
-                                    <ListItemText
-                                        primary={
-                                            <Typography variant="subtitle1" fontWeight="700" color="#2c3e50">
+                                        </Box>
+
+                                        {/* Text */}
+                                        <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                                            <Typography variant="subtitle1" fontWeight={700} color="#2c3e50" noWrap>
                                                 {item.form}
                                             </Typography>
-                                        }
-                                        secondary={
-                                            <Box mt={0.5}>
-                                                <Typography variant="body2" color="text.secondary" fontWeight="500">
-                                                    By {item.evaluator}
-                                                </Typography>
-                                                <Typography variant="caption" color="text.disabled">
-                                                    {item.date}
-                                                </Typography>
-                                            </Box>
-                                        }
-                                    />
-                                    <Chip
-                                        label={item.status}
-                                        size="small"
-                                        sx={{
-                                            mr: 1,
-                                            display: { xs: 'none', sm: 'flex' },
-                                            bgcolor: `${getScoreColor(item.score)}15`,
-                                            color: getScoreColor(item.score),
-                                            fontWeight: 700
-                                        }}
-                                    />
-                                </ListItem>
-                                {index < recentEvaluations.length - 1 && <Divider component="li" variant="inset" sx={{ ml: 11 }} />}
-                            </React.Fragment>
-                        ))}
-                    </List>
+                                            <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                                                By {item.evaluator}
+                                            </Typography>
+                                            <Typography variant="caption" color="text.disabled">
+                                                {item.date}
+                                            </Typography>
+                                        </Box>
+
+                                        {/* Status chip + chevron */}
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
+                                            <Chip
+                                                label={item.status}
+                                                size="small"
+                                                sx={{
+                                                    backgroundColor: `${scoreColor}15`,
+                                                    color: scoreColor,
+                                                    fontWeight: 700,
+                                                    fontSize: '0.7rem',
+                                                    height: 22,
+                                                }}
+                                            />
+                                            <IconButton size="small" sx={{ color: '#ccc' }}>
+                                                <ChevronRightIcon fontSize="small" />
+                                            </IconButton>
+                                        </Box>
+                                    </Box>
+                                    {index < recentEvaluations.length - 1 && (
+                                        <Divider sx={{ ml: '82px', mr: 3, borderColor: '#f0f0f0' }} />
+                                    )}
+                                </React.Fragment>
+                            );
+                        })}
+                    </Box>
                 </DashboardCard>
             </RowContainer>
-
         </PageContainer>
     );
 };

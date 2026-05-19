@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
     Dialog,
-    DialogTitle,
     DialogContent,
     DialogActions,
     Button,
@@ -11,13 +10,10 @@ import {
     Typography,
     IconButton,
     Stack,
-    InputAdornment,
 } from '@mui/material';
 import {
     Close as CloseIcon,
     CloudUpload as UploadIcon,
-    DateRange as DateIcon,
-    AccessTime as TimeIcon,
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 
@@ -25,49 +21,74 @@ import { styled } from '@mui/material/styles';
 // Styled Components
 // ============================================
 
-const StyledDialog = styled(Dialog)(({ theme }) => ({
+const StyledDialog = styled(Dialog)({
     '& .MuiDialog-paper': {
-        borderRadius: '24px',
-        padding: theme.spacing(2),
-        minWidth: '400px',
-        maxWidth: '90%',
+        borderRadius: '20px',
+        margin: '16px',
+        width: 'calc(100% - 32px)',
+        maxWidth: '480px',
+        overflow: 'hidden',
     },
-}));
+});
 
-const DialogHeader = styled(Box)(({ theme }) => ({
+// Branded modal header — matches app primary color
+const ModalHeader = styled(Box)({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: theme.spacing(3),
-}));
+    padding: '18px 20px 16px',
+    backgroundColor: 'var(--primary-color)',
+});
 
-const UploadBox = styled(Box)(({ theme }) => ({
-    border: '2px dashed #e0e0e0',
-    borderRadius: '16px',
-    padding: theme.spacing(3),
+// Shared input style — light fill + subtle border, primary focus
+const fieldSx = {
+    '& .MuiOutlinedInput-root': {
+        borderRadius: '12px',
+        backgroundColor: '#ffffff',
+        fontSize: '0.9rem',
+        '& fieldset': { border: '1px solid #00000014' },
+        '&:hover fieldset': { border: '1px solid #00000014' },
+        '&.Mui-focused fieldset': { border: '1px solid #00000014' },
+        '&.Mui-disabled': { backgroundColor: 'rgba(0,0,0,0.04)' },
+    },
+    '& .MuiInputLabel-root': {
+        color: '#94a3b8',
+        fontSize: '0.88rem',
+        '&.Mui-focused': { color: 'var(--primary-color)' },
+    },
+    '& .MuiSelect-icon': { color: '#94a3b8' },
+};
+
+const UploadBox = styled(Box)({
+    border: '1.5px dashed #c5cdd8',
+    borderRadius: '12px',
+    padding: '20px 16px',
     textAlign: 'center',
     cursor: 'pointer',
+    backgroundColor: '#f5f7fa',
     transition: 'all 0.2s',
     '&:hover': {
-        borderColor: theme.palette.primary.main,
-        backgroundColor: `${theme.palette.primary.main}08`,
+        borderColor: 'var(--primary-color)',
+        backgroundColor: 'rgba(var(--primary-rgb), 0.04)',
     },
-}));
-
-const FileInput = styled('input')({
-    display: 'none',
 });
+
+const FileInput = styled('input')({ display: 'none' });
+
+// ============================================
+// Data
+// ============================================
+
+const requestTypes = [
+    { value: 'annual',    label: 'Annual Leave' },
+    { value: 'sick',      label: 'Sick Leave' },
+    { value: 'emergency', label: 'Emergency Leave' },
+    { value: 'dayoff',    label: 'Day Off' },
+];
 
 // ============================================
 // Component
 // ============================================
-
-const requestTypes = [
-    { value: 'annual', label: 'Annual Leave' },
-    { value: 'sick', label: 'Sick Leave' },
-    { value: 'emergency', label: 'Emergency Leave' },
-    { value: 'dayoff', label: 'Day Off' },
-];
 
 const VacationRequestModal = ({ open, onClose, onSubmit }) => {
     const [formData, setFormData] = useState({
@@ -82,42 +103,44 @@ const VacationRequestModal = ({ open, onClose, onSubmit }) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
+        setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleFileChange = (e) => {
-        if (e.target.files && e.target.files[0]) {
-            setFormData((prev) => ({
-                ...prev,
-                file: e.target.files[0],
-            }));
+        if (e.target.files?.[0]) {
+            setFormData((prev) => ({ ...prev, file: e.target.files[0] }));
         }
     };
 
     const handleSubmit = () => {
         onSubmit(formData);
         onClose();
-        // Reset form safely if needed, or rely on unmount
     };
 
-    const isPartialDay = formData.type === 'emergency'; // Example logic for showing time
+    const isPartialDay = formData.type === 'emergency';
 
     return (
-        <StyledDialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-            <DialogHeader>
-                <Typography variant="h5" fontWeight={700}>
-                    Request Time Off
-                </Typography>
-                <IconButton onClick={onClose} size="small">
-                    <CloseIcon />
-                </IconButton>
-            </DialogHeader>
+        // IONIC MIGRATION: replace with <IonModal>
+        <StyledDialog open={open} onClose={onClose} fullWidth>
 
-            <DialogContent sx={{ p: 1 }}>
-                <Stack spacing={3}>
+            {/* Branded header */}
+            <ModalHeader>
+                <Box>
+                    <Typography sx={{ fontWeight: 800, fontSize: '1.05rem', color: '#fff' }}>
+                        Request Time Off
+                    </Typography>
+                    <Typography sx={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.65)', mt: 0.25 }}>
+                        Fill in the details below
+                    </Typography>
+                </Box>
+                <IconButton onClick={onClose} size="small" sx={{ color: 'rgba(255,255,255,0.8)', '&:hover': { backgroundColor: 'rgba(255,255,255,0.12)' } }}>
+                    <CloseIcon fontSize="small" />
+                </IconButton>
+            </ModalHeader>
+
+            <DialogContent sx={{ px: 2.5, pt: 2.5, pb: 1 }}>
+                <Stack spacing={2}>
+
                     {/* Request Type */}
                     <TextField
                         select
@@ -127,17 +150,17 @@ const VacationRequestModal = ({ open, onClose, onSubmit }) => {
                         onChange={handleChange}
                         fullWidth
                         variant="outlined"
-                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                        sx={fieldSx}
                     >
-                        {requestTypes.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
+                        {requestTypes.map((opt) => (
+                            <MenuItem key={opt.value} value={opt.value}>
+                                {opt.label}
                             </MenuItem>
                         ))}
                     </TextField>
 
-                    {/* Dates Row */}
-                    <Stack direction="row" spacing={2}>
+                    {/* Date row */}
+                    <Stack direction="row" spacing={1.5}>
                         <TextField
                             type="date"
                             label="From Date"
@@ -146,7 +169,7 @@ const VacationRequestModal = ({ open, onClose, onSubmit }) => {
                             onChange={handleChange}
                             fullWidth
                             InputLabelProps={{ shrink: true }}
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                            sx={fieldSx}
                         />
                         <TextField
                             type="date"
@@ -156,13 +179,13 @@ const VacationRequestModal = ({ open, onClose, onSubmit }) => {
                             onChange={handleChange}
                             fullWidth
                             InputLabelProps={{ shrink: true }}
-                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                            sx={fieldSx}
                         />
                     </Stack>
 
-                    {/* Time Row (Conditional) */}
+                    {/* Time row — Emergency only */}
                     {isPartialDay && (
-                        <Stack direction="row" spacing={2}>
+                        <Stack direction="row" spacing={1.5}>
                             <TextField
                                 type="time"
                                 label="From Time"
@@ -171,7 +194,7 @@ const VacationRequestModal = ({ open, onClose, onSubmit }) => {
                                 onChange={handleChange}
                                 fullWidth
                                 InputLabelProps={{ shrink: true }}
-                                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                                sx={fieldSx}
                             />
                             <TextField
                                 type="time"
@@ -181,27 +204,22 @@ const VacationRequestModal = ({ open, onClose, onSubmit }) => {
                                 onChange={handleChange}
                                 fullWidth
                                 InputLabelProps={{ shrink: true }}
-                                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                                sx={fieldSx}
                             />
                         </Stack>
                     )}
 
-                    {/* File Upload */}
+                    {/* Attachment */}
                     <Box>
-                        <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+                        <Typography sx={{ fontSize: '0.78rem', fontWeight: 600, color: '#64748b', mb: 0.75 }}>
                             Attachment (Optional)
                         </Typography>
-                        <label htmlFor="file-upload">
-                            <FileInput
-                                accept="image/*,.pdf"
-                                id="file-upload"
-                                type="file"
-                                onChange={handleFileChange}
-                            />
+                        <label htmlFor="vacation-file-upload">
+                            <FileInput accept="image/*,.pdf" id="vacation-file-upload" type="file" onChange={handleFileChange} />
                             <UploadBox>
-                                <UploadIcon sx={{ fontSize: 40, color: 'text.secondary', mb: 1 }} />
-                                <Typography variant="body2" color="text.secondary" fontWeight={500}>
-                                    {formData.file ? formData.file.name : 'Click to Upload Report or Image'}
+                                <UploadIcon sx={{ fontSize: 28, color: '#94a3b8', mb: 0.5 }} />
+                                <Typography sx={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: 500 }}>
+                                    {formData.file ? formData.file.name : 'Tap to attach a file or image'}
                                 </Typography>
                             </UploadBox>
                         </label>
@@ -217,24 +235,32 @@ const VacationRequestModal = ({ open, onClose, onSubmit }) => {
                         rows={3}
                         fullWidth
                         placeholder="Add any additional details..."
-                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
+                        sx={fieldSx}
                     />
                 </Stack>
             </DialogContent>
 
-            <DialogActions sx={{ p: 3, pt: 1 }}>
+            <DialogActions sx={{ px: 2.5, pb: 2.5, pt: 1.5, gap: 1 }}>
                 <Button
                     onClick={onClose}
-                    variant="text"
-                    color="inherit"
-                    sx={{ borderRadius: '12px', px: 3, fontWeight: 600 }}
+                    variant="outlined"
+                    sx={{
+                        borderRadius: '12px', px: 3, fontWeight: 600,
+                        borderColor: '#e2e8f0', color: '#64748b',
+                        '&:hover': { backgroundColor: '#f5f7fa', borderColor: '#c5cdd8' },
+                    }}
                 >
                     Cancel
                 </Button>
                 <Button
                     onClick={handleSubmit}
                     variant="contained"
-                    sx={{ borderRadius: '12px', px: 4, py: 1, fontWeight: 700, boxShadow: 'none' }}
+                    sx={{
+                        flex: 1, borderRadius: '12px', py: 1.25, fontWeight: 700,
+                        backgroundColor: 'var(--primary-color)',
+                        boxShadow: 'none',
+                        '&:hover': { backgroundColor: 'var(--primary-hover)', boxShadow: 'none' },
+                    }}
                 >
                     Submit Request
                 </Button>

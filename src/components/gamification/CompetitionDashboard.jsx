@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import {
     Box, Typography, Button, Paper, styled, Chip,
-    SwipeableDrawer, List, ListItem, ListItemButton, Radio
+    SwipeableDrawer, Divider, IconButton, Radio
 } from '@mui/material';
 import MilestoneTrack from './MilestoneTrack';
 import CelebrationOverlay from './CelebrationOverlay';
-import { StarRate as StarIcon, ExpandMore as DropdownIcon, InfoOutlined as InfoIcon, EmojiEvents as TrophyIcon } from '@mui/icons-material';
+import { StarRate as StarIcon, FilterAlt as FilterIcon, Close as CloseIcon, EmojiEvents as TrophyIcon } from '@mui/icons-material';
 
 // Styled Components
 const DashboardContainer = styled(Box)(({ theme }) => ({
@@ -34,31 +34,6 @@ const GlowingText = styled(Typography)(({ theme }) => ({
     textTransform: 'uppercase',
     letterSpacing: 2,
     color: '#ffffff'
-}));
-
-const DropdownTrigger = styled(Box)(({ theme }) => ({
-    height: 32,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 8,
-    padding: '0 12px 0 8px',
-    borderRadius: 20,
-    backgroundColor: '#fff',
-    border: '1px solid #c4c4c4',
-    cursor: 'pointer',
-    color: 'var(--text-primary)',
-    fontWeight: 500,
-    fontSize: '0.75rem',
-    whiteSpace: 'nowrap',
-    flexShrink: 0,
-    '&:hover': {
-        borderColor: '#212121',
-        backgroundColor: '#fafafa',
-    },
-    '&:active': {
-        backgroundColor: '#f5f5f5',
-    },
 }));
 
 const DragHandle = styled(Box)({
@@ -158,18 +133,6 @@ const CompetitionDashboard = () => {
 
     return (
         <DashboardContainer>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: -2 }}>
-                {/* <Typography variant="h5" sx={{ fontWeight: 700, color: 'var(--text-primary)' }}>
-                    Competitions
-                </Typography> */}
-
-                <DropdownTrigger onClick={() => setIsBottomSheetOpen(true)}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        {currentCompetition.title}
-                    </Box>
-                    <DropdownIcon sx={{ fontSize: '1.2rem', color: '#757575' }} />
-                </DropdownTrigger>
-            </Box>
 
             <HeroHeader>
                 <Box sx={{ position: 'absolute', top: '-50%', left: '-50%', width: '200%', height: '200%', background: 'radial-gradient(circle, rgba(255,215,0,0.05) 0%, rgba(0,0,0,0) 70%)', pointerEvents: 'none', zIndex: 0 }} />
@@ -201,7 +164,7 @@ const CompetitionDashboard = () => {
             </HeroHeader>
 
             <Box>
-                <Typography variant="h5" sx={{ mb: 3, fontWeight: 700, color: 'var(--text-primary)' }}>
+                <Typography sx={{ mb: 2, fontWeight: 700, fontSize: '0.95rem', color: '#1a1a1a' }}>
                     Competition Progress
                 </Typography>
                 <MilestoneTrack
@@ -210,7 +173,22 @@ const CompetitionDashboard = () => {
                 />
             </Box>
 
-            {/* Stats Cards Row could go here */}
+            {/* Floating filter FAB — same pattern as RequestsPage / ActivitiesPage */}
+            <Box
+                onClick={() => setIsBottomSheetOpen(true)}
+                sx={{
+                    position: 'fixed', bottom: 82, right: 18,
+                    width: 52, height: 52, borderRadius: '50%',
+                    backgroundColor: 'var(--primary-color)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    cursor: 'pointer', zIndex: 200, userSelect: 'none',
+                    boxShadow: '0 4px 16px rgba(6,24,54,0.28)',
+                    transition: 'transform 0.15s ease',
+                    '&:active': { transform: 'scale(0.91)' },
+                }}
+            >
+                <FilterIcon sx={{ color: '#fff', fontSize: '1.25rem' }} />
+            </Box>
 
             {/* Overlay component for leveling up */}
             <CelebrationOverlay
@@ -226,72 +204,107 @@ const CompetitionDashboard = () => {
                 open={isBottomSheetOpen}
                 onClose={() => setIsBottomSheetOpen(false)}
                 onOpen={() => setIsBottomSheetOpen(true)}
+                disableSwipeToOpen
                 PaperProps={{
                     sx: {
-                        borderTopLeftRadius: '24px',
-                        borderTopRightRadius: '24px',
-                        paddingBottom: '20px',
-                        maxHeight: '60vh'
+                        borderRadius: '20px 20px 0 0',
+                        maxHeight: '60vh',
+                        backgroundColor: '#ffffff',
+                        display: 'flex',
+                        flexDirection: 'column',
                     }
                 }}
             >
-                <DragHandle />
-                <Box sx={{ px: 3, pt: 1, pb: 2 }}>
-                    <Typography variant="h6" fontWeight={700} textAlign="center">Select Competition</Typography>
-                </Box>
+                {/* Handle */}
+                <Box sx={{ width: 36, height: 4, borderRadius: 2, backgroundColor: '#d0d0d0', margin: '12px auto 4px' }} />
 
-                <Box sx={{ px: 3, pt: 1, pb: 0.5 }}>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: 1 }}>
-                        Active Competitions
-                    </Typography>
+                {/* Header */}
+                <Box sx={{ display: 'flex', alignItems: 'center', px: 2, pb: 1.5 }}>
+                    <Box sx={{ flex: 1 }}>
+                        <Typography sx={{ fontWeight: 700, fontSize: '1rem', color: '#1a1a1a' }}>
+                            Select Competition
+                        </Typography>
+                    </Box>
+                    <IconButton size="small" onClick={() => setIsBottomSheetOpen(false)} sx={{ color: '#bbb' }}>
+                        <CloseIcon fontSize="small" />
+                    </IconButton>
                 </Box>
-                <List sx={{ pt: 0, pb: 1 }}>
-                    {competitionsData.filter(c => c.type === 'active').map((c) => (
-                        <ListItem disablePadding key={c.id}>
-                            <ListItemButton onClick={() => handleCompetitionSelect(c.id)} sx={{ px: 3 }}>
-                                <Radio
-                                    checked={selectedCompId === c.id}
-                                    onChange={() => handleCompetitionSelect(c.id)}
-                                    size="small"
-                                    sx={{ mr: 1 }}
+                <Box sx={{ borderTop: '1px solid #f0f0f0' }} />
+
+                {/* Scrollable list */}
+                <Box sx={{ overflowY: 'auto', flex: 1, pb: 2 }}>
+                    {/* Active */}
+                    <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.8px', px: 2.5, pt: 2, pb: 0.75 }}>
+                        Active
+                    </Typography>
+                    {competitionsData.filter(c => c.type === 'active').map((c) => {
+                        const isSelected = selectedCompId === c.id;
+                        return (
+                            <Box
+                                key={c.id}
+                                onClick={() => handleCompetitionSelect(c.id)}
+                                sx={{
+                                    display: 'flex', alignItems: 'center',
+                                    px: 2.5, py: 1.1,
+                                    borderRadius: 'var(--card-radius)',
+                                    mx: 1,
+                                    cursor: 'pointer',
+                                    backgroundColor: isSelected ? 'rgba(6,24,54,0.06)' : 'transparent',
+                                    transition: 'background-color 0.12s',
+                                    '&:active': { backgroundColor: '#e8edf2' },
+                                }}
+                            >
+                                <Radio checked={isSelected} size="small" readOnly
+                                    sx={{ mr: 1.25, p: 0, color: '#cbd5e1', '&.Mui-checked': { color: 'var(--primary-color)' } }}
                                 />
-                                <Typography sx={{ fontWeight: selectedCompId === c.id ? 700 : 500 }}>
+                                <Typography sx={{
+                                    fontSize: '0.92rem',
+                                    fontWeight: isSelected ? 700 : 500,
+                                    color: isSelected ? 'var(--primary-color)' : '#334155',
+                                    flex: 1,
+                                }}>
                                     {c.title}
                                 </Typography>
-                            </ListItemButton>
-                        </ListItem>
-                    ))}
-                </List>
+                            </Box>
+                        );
+                    })}
 
-                <Box sx={{ px: 3, pt: 2, pb: 0.5 }}>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: 1 }}>
+                    {/* Available to join */}
+                    <Typography sx={{ fontSize: '0.68rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.8px', px: 2.5, pt: 2, pb: 0.75 }}>
                         Available to Join
                     </Typography>
-                </Box>
-                <List sx={{ pt: 0 }}>
                     {competitionsData.filter(c => c.type === 'available').map((c) => (
-                        <ListItem disablePadding key={c.id}>
-                            <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 3, py: 1 }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <TrophyIcon sx={{ color: '#FFD700', fontSize: 20, flexShrink: 0 }} />
-                                    <Box>
-                                        <Typography sx={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-primary)' }}>{c.title}</Typography>
-                                        <Typography sx={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>{c.participants} participants</Typography>
-                                    </Box>
-                                </Box>
-                                <Button
-                                    size="small"
-                                    variant="outlined"
-                                    startIcon={<InfoIcon sx={{ fontSize: '14px !important' }} />}
-                                    onClick={() => { setIsBottomSheetOpen(false); setEnrollComp(c); }}
-                                    sx={{ borderRadius: 10, fontSize: '0.7rem', fontWeight: 700, whiteSpace: 'nowrap', ml: 1, flexShrink: 0 }}
-                                >
-                                    Info &amp; Enroll
-                                </Button>
+                        <Box
+                            key={c.id}
+                            onClick={() => { setIsBottomSheetOpen(false); setEnrollComp(c); }}
+                            sx={{
+                                display: 'flex', alignItems: 'center',
+                                px: 2.5, py: 1.25, mx: 1,
+                                borderRadius: 'var(--card-radius)',
+                                cursor: 'pointer',
+                                gap: 1.5,
+                                '&:active': { backgroundColor: '#f8f9fa' },
+                            }}
+                        >
+                            <Box sx={{ flex: 1, minWidth: 0 }}>
+                                <Typography sx={{ fontWeight: 600, fontSize: '0.88rem', color: '#1a1a1a', lineHeight: 1.3 }}>
+                                    {c.title}
+                                </Typography>
+                                <Typography sx={{ fontSize: '0.72rem', color: '#94a3b8', mt: 0.1 }}>
+                                    {c.participants} participants
+                                </Typography>
                             </Box>
-                        </ListItem>
+                            <Box sx={{
+                                px: 1.5, py: 0.5, borderRadius: 20, flexShrink: 0,
+                                border: '1px solid var(--primary-color)',
+                            }}>
+                                <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--primary-color)' }}>
+                                    Info &amp; Enroll
+                                </Typography>
+                            </Box>
+                        </Box>
                     ))}
-                </List>
+                </Box>
             </SwipeableDrawer>
 
             {/* ── Enroll info sheet ── */}
@@ -300,34 +313,72 @@ const CompetitionDashboard = () => {
                 open={Boolean(enrollComp)}
                 onClose={() => setEnrollComp(null)}
                 onOpen={() => { }}
-                PaperProps={{ sx: { borderTopLeftRadius: 24, borderTopRightRadius: 24, pb: 4, maxHeight: '70vh' } }}
+                disableSwipeToOpen
+                PaperProps={{
+                    sx: {
+                        borderRadius: '20px 20px 0 0',
+                        maxHeight: '70vh',
+                        backgroundColor: '#ffffff',
+                        display: 'flex',
+                        flexDirection: 'column',
+                    }
+                }}
             >
-                <Box sx={{ width: 36, height: 4, borderRadius: 2, backgroundColor: '#d0d0d0', margin: '12px auto 8px' }} />
-                <Box sx={{ px: 3, pt: 1 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-                        <TrophyIcon sx={{ color: '#FFD700', fontSize: 32 }} />
-                        <Box>
-                            <Typography variant="h6" fontWeight={800}>{enrollComp?.title}</Typography>
-                            <Chip label="Not Enrolled" size="small" sx={{ fontSize: '0.65rem', height: 20, bgcolor: '#FFF3E0', color: '#E65100', fontWeight: 700 }} />
-                        </Box>
+                {/* Handle */}
+                <Box sx={{ width: 36, height: 4, borderRadius: 2, backgroundColor: '#d0d0d0', margin: '12px auto 4px' }} />
+
+                {/* Header */}
+                <Box sx={{ display: 'flex', alignItems: 'center', px: 2, pb: 1.5 }}>
+                    <Box sx={{ flex: 1 }}>
+                        <Typography sx={{ fontWeight: 700, fontSize: '1rem', color: '#1a1a1a' }}>
+                            {enrollComp?.title}
+                        </Typography>
+                        <Typography sx={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+                            Not enrolled
+                        </Typography>
                     </Box>
-                    <Typography sx={{ fontSize: '0.9rem', color: 'var(--text-secondary)', mb: 3, lineHeight: 1.6 }}>
+                    <IconButton size="small" onClick={() => setEnrollComp(null)} sx={{ color: '#bbb' }}>
+                        <CloseIcon fontSize="small" />
+                    </IconButton>
+                </Box>
+                <Box sx={{ borderTop: '1px solid #f0f0f0' }} />
+
+                {/* Body */}
+                <Box sx={{ overflowY: 'auto', flex: 1, px: 2.5, pt: 2, pb: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <Typography sx={{ fontSize: '0.875rem', color: '#6b7280', lineHeight: 1.65 }}>
                         {enrollComp?.description}
                     </Typography>
-                    <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-                        {[{ label: 'Participants', value: enrollComp?.participants }, { label: 'Ends', value: enrollComp?.endDate }].map(s => (
-                            <Box key={s.label} sx={{ flex: 1, p: 1.5, bgcolor: 'var(--surface-color)', borderRadius: 2, border: '1px solid var(--border-color)', textAlign: 'center' }}>
-                                <Typography sx={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text-primary)' }}>{s.value}</Typography>
-                                <Typography sx={{ fontSize: '0.65rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: 0.5 }}>{s.label}</Typography>
+
+                    {/* Stats info box */}
+                    <Paper elevation={0} sx={{ borderRadius: 'var(--card-radius)', backgroundColor: '#f9fafb', border: '1px solid #eef2f6', overflow: 'hidden' }}>
+                        {[
+                            { label: 'Participants', value: enrollComp?.participants },
+                            { label: 'Ends', value: enrollComp?.endDate },
+                        ].map((row, i, arr) => (
+                            <Box key={row.label}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 2, py: 1.5 }}>
+                                    <Typography variant="body2" sx={{ color: '#9e9e9e', fontWeight: 500 }}>{row.label}</Typography>
+                                    <Typography variant="body2" sx={{ fontWeight: 700, color: '#1a1a1a' }}>{row.value}</Typography>
+                                </Box>
+                                {i < arr.length - 1 && <Divider sx={{ borderColor: '#f0f0f0' }} />}
                             </Box>
                         ))}
-                    </Box>
-                    <Button fullWidth variant="contained" size="large"
-                        sx={{ borderRadius: 3, fontWeight: 800, fontSize: '0.95rem', py: 1.5, bgcolor: 'var(--primary-color)', '&:hover': { bgcolor: 'var(--primary-hover, #004494)' } }}
+                    </Paper>
+
+                    {/* CTA */}
+                    <Box
                         onClick={() => setEnrollComp(null)}
+                        sx={{
+                            height: 52, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            borderRadius: 'var(--card-radius)', backgroundColor: 'var(--primary-color)',
+                            cursor: 'pointer', userSelect: 'none',
+                            transition: 'opacity 0.15s ease', '&:active': { opacity: 0.82 },
+                        }}
                     >
-                        Enroll Now
-                    </Button>
+                        <Typography sx={{ fontWeight: 700, fontSize: '0.95rem', color: '#fff' }}>
+                            Enroll Now
+                        </Typography>
+                    </Box>
                 </Box>
             </SwipeableDrawer>
         </DashboardContainer>

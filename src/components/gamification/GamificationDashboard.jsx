@@ -1,65 +1,16 @@
 import React, { useState } from 'react';
 import { Box, Typography } from '@mui/material';
+import { EmojiEvents as TrophyIcon, CardGiftcard as CollectionIcon, Leaderboard as LeaderboardIcon } from '@mui/icons-material';
 import CompetitionDashboard from './CompetitionDashboard';
 import TrophyCase from './TrophyCase';
 import HallOfFame from './HallOfFame';
 
-// ── Activities-style header: title + pills on the same scrolling row ──────────
-const tabLabels = ['Competitions', 'Collection', 'Leaderboard'];
-
-const PageHeader = ({ currentTab, onTabChange }) => (
-    <Box sx={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 1,
-        px: 2,
-        pt: 2,
-        pb: 1.5,
-        overflowX: 'auto',
-        scrollbarWidth: 'none',
-        '&::-webkit-scrollbar': { display: 'none' },
-        flexWrap: 'nowrap',
-        backgroundColor: '#f5f5f5',
-    }}>
-        <Typography sx={{
-            fontWeight: 700,
-            fontSize: '1rem',
-            color: 'var(--text-primary, #212529)',
-            whiteSpace: 'nowrap',
-            flexShrink: 0,
-        }}>
-            Gamification
-        </Typography>
-
-        {tabLabels.map((label, i) => (
-            <Box
-                key={i}
-                onClick={() => onTabChange(i)}
-                sx={{
-                    flexShrink: 0,
-                    height: 32,
-                    px: 2,
-                    borderRadius: 20,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    fontSize: '0.75rem',
-                    fontWeight: 500,
-                    whiteSpace: 'nowrap',
-                    backgroundColor: currentTab === i ? undefined : '#fff',
-                    background: currentTab === i
-                        ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                        : undefined,
-                    color: currentTab === i ? '#fff' : 'var(--text-primary, #212529)',
-                    border: currentTab === i ? 'none' : '1px solid #e0e0e0',
-                    transition: 'all 0.2s',
-                }}
-            >
-                {label}
-            </Box>
-        ))}
-    </Box>
-);
+// ── Tab definitions ───────────────────────────────────────────────────────────
+const tabs = [
+    { label: 'Competitions', icon: <TrophyIcon sx={{ fontSize: 16 }} /> },
+    { label: 'Collection', icon: <CollectionIcon sx={{ fontSize: 16 }} /> },
+    { label: 'Leaderboard', icon: <LeaderboardIcon sx={{ fontSize: 16 }} /> },
+];
 
 // ── Root component ────────────────────────────────────────────────────────────
 const GamificationDashboard = () => {
@@ -78,8 +29,51 @@ const GamificationDashboard = () => {
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', minHeight: '100vh', bgcolor: '#f5f5f5' }}>
-            <PageHeader currentTab={currentTab} onTabChange={handleTabChange} />
-            <Box sx={{ flexGrow: 1, px: 2, pb: 2, overflowY: 'auto' }}>
+
+            {/* Segmented control — same pattern as SchedulePage */}
+            <Box sx={{ px: 2, mb: '16px', backgroundColor: '#f5f5f5' }}>
+                <Box sx={{
+                    display: 'flex',
+                    backgroundColor: '#e8edf2',
+                    borderRadius: '14px',
+                }}>
+                    {tabs.map((tab, i) => (
+                        <Box
+                            key={i}
+                            onClick={() => handleTabChange(i)}
+                            sx={{
+                                flex: 1,
+                                py: 0.9,
+                                borderRadius: '11px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: 0.75,
+                                backgroundColor: currentTab === i ? 'var(--primary-color)' : 'transparent',
+                                color: currentTab === i ? '#fff' : '#5a6a7a',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s ease',
+                                userSelect: 'none',
+                                '&:active': { opacity: 0.85 },
+                            }}
+                        >
+                            <Box sx={{ display: 'flex', color: 'inherit' }}>{tab.icon}</Box>
+                            <Typography sx={{
+                                fontSize: '0.875rem',
+                                fontWeight: currentTab === i ? 700 : 500,
+                                color: 'inherit',
+                                lineHeight: 1,
+                                whiteSpace: 'nowrap',
+                            }}>
+                                {tab.label}
+                            </Typography>
+                        </Box>
+                    ))}
+                </Box>
+            </Box>
+
+            {/* Page content */}
+            <Box sx={{ flexGrow: 1, px: 2, pb: 2 }}>
                 {currentTab === 0 && <CompetitionDashboard />}
                 {currentTab === 1 && <TrophyCase viewedUser={selectedUser} />}
                 {currentTab === 2 && <HallOfFame onViewUser={handleViewUserTrophies} />}

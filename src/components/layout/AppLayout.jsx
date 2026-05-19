@@ -3,7 +3,7 @@ import { styled } from '@mui/material/styles';
 import {
     Box, IconButton, AppBar, Toolbar, Typography,
     SwipeableDrawer,
-    Snackbar, Alert, Badge, List, ListItem, ListItemText, ListItemAvatar, Avatar, Button,
+    Snackbar, Alert, Badge,
 } from '@mui/material';
 import {
     Notifications as NotificationsIcon,
@@ -14,14 +14,34 @@ import {
     Gavel as DisputeIcon,
     Event as EventIcon,
     Description as LogsIcon,
-    Close as CloseIcon,
     SwapHoriz as SwapIcon,
     NotificationImportant as AlertIcon,
+    Close as CloseIcon,
 } from '@mui/icons-material';
 import BottomNavBar from './BottomNavBar';
 import DisputeModal from '../common/DisputeModal';
 import VacationRequestModal from '../common/VacationRequestModal';
 import ShiftSwapRequestModal from '../common/ShiftSwapRequestModal';
+
+// ============================================
+// Per-page title map
+// ============================================
+
+const PAGE_TITLES = {
+    home: 'Globitel Workforce',
+    schedule: 'My Schedule',
+    dayTimeline: 'My Schedule',
+    performance: 'My Performance',
+    performanceDetails: 'My Performance',
+    activities: 'Activities',
+    coaching: 'Coaching',
+    requests: 'My Requests',
+    rewards: 'Rewards',
+    evaluations: 'Evaluations',
+    disputes: 'Disputes',
+    events: 'Events',
+    logs: 'Logs',
+};
 
 // ============================================
 // Styled Components
@@ -38,7 +58,8 @@ const RootContainer = styled(Box)({
 
 const StyledAppBar = styled(AppBar)({
     backgroundColor: 'var(--primary-color)',
-    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.12)',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.18)',
+    borderBottom: 'none',
 });
 
 const AppTitle = styled(Typography)({
@@ -54,7 +75,7 @@ const NotificationIconButton = styled(IconButton)({
 
 const MainContent = styled(Box)({
     flexGrow: 1,
-    paddingTop: '56px', // AppBar height
+    paddingTop: 'calc(56px + 32px)', // AppBar height (56px) + page content breathing room (16px) — single source of truth for top spacing
     paddingBottom: 'calc(56px + env(safe-area-inset-bottom, 0px))', // BottomNav + safe area
 });
 
@@ -119,13 +140,13 @@ const GridLabel = styled(Typography)({
 // ============================================
 
 const moreMenuItems = [
-    { label: 'Coaching', icon: <SchoolIcon />, page: 'coaching', color: '#2196f3' },
-    { label: 'Evaluations', icon: <EvaluationIcon />, page: 'evaluations', color: '#9c27b0' },
+    // { label: 'Coaching', icon: <SchoolIcon />, page: 'coaching', color: '#2196f3' },
+    // { label: 'Evaluations', icon: <EvaluationIcon />, page: 'evaluations', color: '#9c27b0' },
     { label: 'Rewards', icon: <RewardsIcon />, page: 'rewards', color: '#ff9800' },
     { label: 'Requests', icon: <RequestsIcon />, page: 'requests', color: '#4caf50' },
     { label: 'Disputes', icon: <DisputeIcon />, page: 'disputes', color: '#f44336' },
-    { label: 'Events', icon: <EventIcon />, page: 'events', color: '#e91e63' },
-    { label: 'Logs', icon: <LogsIcon />, page: 'logs', color: '#607d8b' },
+    // { label: 'Events', icon: <EventIcon />, page: 'events', color: '#e91e63' },
+    // { label: 'Logs', icon: <LogsIcon />, page: 'logs', color: '#607d8b' },
 ];
 
 // ============================================
@@ -162,13 +183,6 @@ const mockNotifications = [
     }
 ];
 
-const NotificationItem = styled(ListItem)(({ theme, unread }) => ({
-    backgroundColor: unread ? 'rgba(33, 150, 243, 0.08)' : 'transparent',
-    borderBottom: '1px solid #f0f0f0',
-    '&:last-child': {
-        borderBottom: 'none',
-    },
-}));
 
 const AppLayout = ({ children, currentPage, onPageChange }) => {
     const [moreDrawerOpen, setMoreDrawerOpen] = useState(false);
@@ -179,7 +193,7 @@ const AppLayout = ({ children, currentPage, onPageChange }) => {
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [notificationDrawerOpen, setNotificationDrawerOpen] = useState(false);
 
-    const handleBottomNavChange = (event, newValue) => {
+    const handleBottomNavChange = (newValue) => {
         if (newValue === 'more') {
             setMoreDrawerOpen(true);
         } else {
@@ -254,48 +268,72 @@ const AppLayout = ({ children, currentPage, onPageChange }) => {
         setSwapModalOpen(false);
     };
 
+    const getPageTitle = (page) => {
+        switch (page) {
+            case 'home': return 'Globitel Workforce';
+            case 'schedule': return 'My Schedule';
+            case 'dayTimeline': return 'My Schedule';
+            case 'performance': return 'My Performance';
+            case 'performanceDetails': return 'My Performance';
+            case 'activities': return 'Activities';
+            case 'coaching': return 'Coaching';
+            case 'requests': return 'My Requests';
+            case 'rewards': return 'Rewards';
+            case 'evaluations': return 'Evaluations';
+            case 'disputes': return 'Disputes';
+            case 'events': return 'Events';
+            case 'logs': return 'Logs';
+            default:
+                return page.charAt(0).toUpperCase() + page.slice(1);
+        }
+    };
+
     return (
         <RootContainer>
-            {/* Top Navigation Bar — no hamburger */}
-            <StyledAppBar position="fixed">
-                <Toolbar variant="dense" sx={{ minHeight: 56 }}>
-                    <AppTitle variant="h6" component="div">
-                        Globitel Workforce
-                    </AppTitle>
-                    <NotificationIconButton
-                        edge="end"
-                        color="inherit"
-                        aria-label="notifications"
-                        onClick={() => setNotificationDrawerOpen(true)}
-                    >
-                        <Badge
-                            badgeContent={2}
-                            color="error"
-                            sx={{
-                                '& .MuiBadge-badge': {
-                                    right: 4,
-                                    top: 4,
-                                    border: `2px solid var(--primary-color)`,
-                                    padding: '0 4px',
-                                    height: 18,
-                                    minWidth: 18,
-                                    fontSize: '0.65rem',
-                                    fontWeight: 700,
-                                    lineHeight: 0, // Centering fix requested by user
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                }
-                            }}
-                        >
-                            <NotificationsIcon />
-                        </Badge>
-                    </NotificationIconButton>
-                </Toolbar>
-            </StyledAppBar>
+            {/* Top Navigation Bar — hidden on home (V2 has its own header) */}
+            {currentPage !== 'home' && (
+                <StyledAppBar position="fixed">
+                    <Toolbar sx={{ minHeight: '64px', px: 2, display: 'flex', alignItems: 'center' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
+                            <Typography sx={{ fontWeight: 700, fontSize: '1.15rem', color: '#ffffff', letterSpacing: '-0.2px' }}>
+                                {getPageTitle(currentPage)}
+                            </Typography>
+                        </Box>
 
-            {/* Main Content Area */}
-            <MainContent component="main">
+                        <Box sx={{ display: 'flex', gap: 0.5 }}>
+                            <IconButton
+                                onClick={() => setNotificationDrawerOpen(true)}
+                                sx={{
+                                    color: 'rgba(255,255,255,0.9)',
+                                    '&:hover': { backgroundColor: 'rgba(255,255,255,0.12)' },
+                                }}
+                            >
+                                <Badge
+                                    badgeContent={2}
+                                    color="error"
+                                    sx={{
+                                        '& .MuiBadge-badge': {
+                                            right: 2, top: 4, height: 16, minWidth: 16, fontSize: '0.6rem',
+                                        }
+                                    }}
+                                >
+                                    <NotificationsIcon />
+                                </Badge>
+                            </IconButton>
+                        </Box>
+                    </Toolbar>
+                </StyledAppBar>
+            )}
+
+            {/* Main Content Area — no top padding on home (no AppBar) */}
+            <MainContent
+                component="main"
+                sx={
+                    currentPage === 'home' ? { paddingTop: 0 } :
+                    currentPage === 'dayTimeline' ? { paddingTop: '64px' } :
+                    {}
+                }
+            >
                 {children}
             </MainContent>
 
@@ -307,7 +345,7 @@ const AppLayout = ({ children, currentPage, onPageChange }) => {
                 />
             )}
 
-            {/* More Bottom Sheet — MS Teams grid style */}
+            {/* More Bottom Sheet — Profile/Settings style */}
             <SwipeableDrawer
                 anchor="bottom"
                 open={moreDrawerOpen}
@@ -317,7 +355,7 @@ const AppLayout = ({ children, currentPage, onPageChange }) => {
                 PaperProps={{
                     sx: {
                         borderRadius: '20px 20px 0 0',
-                        maxHeight: '50vh',
+                        maxHeight: '60vh',
                         backgroundColor: '#ffffff',
                     },
                 }}
@@ -339,8 +377,7 @@ const AppLayout = ({ children, currentPage, onPageChange }) => {
                                 key={item.page}
                                 onClick={() => handleMoreMenuItemClick(item.page)}
                             >
-                                <GridIconBox bgcolor={`${item.color}18`}>
-                                    {/* Clone icon with color */}
+                                <GridIconBox bgcolor={`${item.color}15`}>
                                     <Box sx={{ color: item.color, display: 'flex' }}>
                                         {item.icon}
                                     </Box>
@@ -362,54 +399,85 @@ const AppLayout = ({ children, currentPage, onPageChange }) => {
                 PaperProps={{
                     sx: {
                         borderRadius: '20px 20px 0 0',
+                        minHeight: '50vh',
                         maxHeight: '70vh',
                         backgroundColor: '#ffffff',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        pb: 'env(safe-area-inset-bottom, 16px)',
                     },
                 }}
             >
-                <BottomSheetContainer>
-                    <DragHandle />
-                    <Box sx={{ px: 3, pt: 1, pb: 2 }}>
-                        <Typography variant="h6" fontWeight={700} textAlign="center">Notifications</Typography>
+                {/* Handle */}
+                <Box sx={{ width: 36, height: 4, borderRadius: 2, backgroundColor: '#d0d0d0', margin: '12px auto 4px' }} />
+
+                {/* Header */}
+                <Box sx={{ display: 'flex', alignItems: 'center', px: 2, pb: 1.5 }}>
+                    <Box sx={{ flex: 1 }}>
+                        <Typography sx={{ fontWeight: 700, fontSize: '1rem', color: '#1a1a1a' }}>
+                            Notifications
+                        </Typography>
                     </Box>
-                    <List sx={{ pt: 0 }}>
-                        {mockNotifications.map((notif) => (
-                            <NotificationItem key={notif.id} unread={notif.read ? 0 : 1} disablePadding>
-                                <Box sx={{ width: '100%', p: 2, display: 'flex', gap: 2 }}>
-                                    <Avatar sx={{ bgcolor: `${notif.color}20`, color: notif.color, width: 40, height: 40 }}>
-                                        {notif.icon}
-                                    </Avatar>
-                                    <Box sx={{ flex: 1 }}>
-                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                                            <Typography variant="subtitle2" fontWeight={700} sx={{ fontSize: '0.9rem' }}>
-                                                {notif.title}
-                                            </Typography>
-                                            <Typography variant="caption" color="text.secondary">
-                                                {notif.time}
-                                            </Typography>
-                                        </Box>
-                                        <Typography variant="body2" color="text.primary" sx={{ fontSize: '0.85rem', lineHeight: 1.3, mb: 0.5 }}>
-                                            {notif.message}
+                    <Typography
+                        onClick={() => {}}
+                        sx={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--primary-color)', cursor: 'pointer', mr: 1 }}
+                    >
+                        Mark all read
+                    </Typography>
+                    <IconButton size="small" onClick={() => setNotificationDrawerOpen(false)} sx={{ color: '#bbb' }}>
+                        <CloseIcon fontSize="small" />
+                    </IconButton>
+                </Box>
+                <Box sx={{ borderTop: '1px solid #f0f0f0' }} />
+
+                {/* List */}
+                <Box sx={{ overflowY: 'auto', flex: 1 }}>
+                    {mockNotifications.map((notif, index) => (
+                        <Box key={notif.id}>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'flex-start',
+                                    px: 2.5,
+                                    py: 1.75,
+                                    gap: 1.5,
+                                    backgroundColor: notif.read ? 'transparent' : 'rgba(6,24,54,0.025)',
+                                    cursor: 'pointer',
+                                    '&:active': { backgroundColor: '#f8f9fa' },
+                                }}
+                            >
+                                <Box sx={{ flex: 1, minWidth: 0 }}>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', mb: 0.5 }}>
+                                        <Typography sx={{
+                                            fontWeight: notif.read ? 500 : 700,
+                                            fontSize: '0.88rem',
+                                            color: '#1a1a1a',
+                                            lineHeight: 1.3,
+                                        }}>
+                                            {notif.title}
                                         </Typography>
-                                        {!notif.read && (
-                                            <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
-                                                <Button size="small" variant="text" sx={{ p: 0, minWidth: 'auto', fontSize: '0.75rem', fontWeight: 600 }}>
-                                                    View
-                                                </Button>
-                                                <Button size="small" variant="text" color="inherit" sx={{ p: 0, minWidth: 'auto', fontSize: '0.75rem', color: '#888' }}>
-                                                    Dismiss
-                                                </Button>
-                                            </Box>
-                                        )}
+                                        <Typography sx={{ fontSize: '0.7rem', color: '#b0b8c4', flexShrink: 0, ml: 1.5 }}>
+                                            {notif.time}
+                                        </Typography>
                                     </Box>
-                                    {!notif.read && (
-                                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#2196f3', mt: 1 }} />
-                                    )}
+                                    <Typography sx={{
+                                        fontSize: '0.8rem', color: '#6b7280', lineHeight: 1.45,
+                                        overflow: 'hidden', display: '-webkit-box',
+                                        WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+                                    }}>
+                                        {notif.message}
+                                    </Typography>
                                 </Box>
-                            </NotificationItem>
-                        ))}
-                    </List>
-                </BottomSheetContainer>
+                                {!notif.read && (
+                                    <Box sx={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: 'var(--primary-color)', mt: 0.6, flexShrink: 0 }} />
+                                )}
+                            </Box>
+                            {index < mockNotifications.length - 1 && (
+                                <Box sx={{ borderBottom: '1px solid #f0f0f0', mx: 2.5 }} />
+                            )}
+                        </Box>
+                    ))}
+                </Box>
             </SwipeableDrawer>
 
             {/* Modals */}

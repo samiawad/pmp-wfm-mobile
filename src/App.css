@@ -1,3 +1,7 @@
+:root {
+  --card-spacing: 12px;
+}
+
 /* =========================================
    Mobile App Container
    ========================================= */
@@ -11,6 +15,13 @@
   overflow-x: hidden;
 }
 
+/* =========================================
+   Main Content — top spacing lives here only
+   AppBar offset (56px) + breathing room (16px)
+   are set on <main> in AppLayout.jsx.
+   Individual page containers must NOT add
+   their own padding-top.
+   ========================================= */
 .app-container {
   width: 100%;
   padding: 0;
