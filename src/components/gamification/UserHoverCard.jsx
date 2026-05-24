@@ -1,6 +1,6 @@
 import React from 'react';
 import { Tooltip, Box, Typography, Avatar, styled } from '@mui/material';
-import { LocalFireDepartment, WorkspacePremium as BadgeIcon } from '@mui/icons-material';
+import { LocalFireDepartmentOutlined as LocalFireDepartment, WorkspacePremiumOutlined as BadgeIcon } from '@mui/icons-material';
 
 const CardContainer = styled(Box)(({ theme }) => ({
     padding: theme.spacing(3),

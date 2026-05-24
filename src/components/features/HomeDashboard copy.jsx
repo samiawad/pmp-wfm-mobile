@@ -11,13 +11,13 @@ import {
     Divider,
 } from '@mui/material';
 import {
-    CalendarMonth as CalendarIcon,
-    TrendingUp as TrendingUpIcon,
-    EmojiEvents as TrophyIcon,
-    AccessTime as ClockIcon,
-    CheckCircle as CheckIcon,
-    Warning as WarningIcon,
-    Phone as PhoneIcon,
+    CalendarMonthOutlined as CalendarIcon,
+    TrendingUpOutlined as TrendingUpIcon,
+    EmojiEventsOutlined as TrophyIcon,
+    AccessTimeOutlined as ClockIcon,
+    CheckCircleOutlined as CheckIcon,
+    WarningOutlined as WarningIcon,
+    PhoneOutlined as PhoneIcon,
 } from '@mui/icons-material';
 
 // ============================================

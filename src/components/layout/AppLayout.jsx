@@ -6,16 +6,16 @@ import {
     Snackbar, Alert, Badge,
 } from '@mui/material';
 import {
-    Notifications as NotificationsIcon,
-    School as SchoolIcon,
-    RateReview as EvaluationIcon,
-    EmojiEvents as RewardsIcon,
-    RequestPage as RequestsIcon,
-    Gavel as DisputeIcon,
-    Event as EventIcon,
-    Description as LogsIcon,
-    SwapHoriz as SwapIcon,
-    NotificationImportant as AlertIcon,
+    NotificationsOutlined as NotificationsIcon,
+    SchoolOutlined as SchoolIcon,
+    RateReviewOutlined as EvaluationIcon,
+    EmojiEventsOutlined as RewardsIcon,
+    RequestPageOutlined as RequestsIcon,
+    GavelOutlined as DisputeIcon,
+    EventOutlined as EventIcon,
+    DescriptionOutlined as LogsIcon,
+    SwapHorizOutlined as SwapIcon,
+    NotificationImportantOutlined as AlertIcon,
     Close as CloseIcon,
 } from '@mui/icons-material';
 import BottomNavBar from './BottomNavBar';

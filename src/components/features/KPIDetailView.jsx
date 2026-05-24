@@ -16,11 +16,11 @@ import {
 } from '@mui/material';
 import {
     ArrowBack as ArrowBackIcon,
-    Timeline as TimelineIcon,
-    TrendingUp as TrendingUpIcon,
-    TrendingDown as TrendingDownIcon,
-    Flag as GoalIcon,
-    BarChart as BreakdownIcon,
+    TimelineOutlined as TimelineIcon,
+    TrendingUpOutlined as TrendingUpIcon,
+    TrendingDownOutlined as TrendingDownIcon,
+    FlagOutlined as GoalIcon,
+    BarChartOutlined as BreakdownIcon,
     Check as CheckIcon,
     ExpandMore as ExpandMoreIcon,
     Close as CloseIcon,

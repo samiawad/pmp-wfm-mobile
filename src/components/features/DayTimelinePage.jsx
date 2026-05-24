@@ -16,24 +16,24 @@ import {
 } from '@mui/material';
 import {
     ArrowBack as BackIcon,
-    FreeBreakfast as BreakIcon,
-    Work as ShiftIcon,
+    FreeBreakfastOutlined as BreakIcon,
+    WorkOutlined as ShiftIcon,
     WeekendOutlined as OffDayIcon,
-    AccessTime as TimeIcon,
-    Timelapse as DurationIcon,
-    CheckCircle as StatusIcon,
-    Person as ApprovedByIcon,
-    CalendarToday as RequestDateIcon,
-    Category as TypeIcon,
+    AccessTimeOutlined as TimeIcon,
+    TimelapseOutlined as DurationIcon,
+    CheckCircleOutlined as StatusIcon,
+    PersonOutlined as ApprovedByIcon,
+    CalendarTodayOutlined as RequestDateIcon,
+    CategoryOutlined as TypeIcon,
     Close as CloseIcon,
     ChevronLeft as ChevronLeftIcon,
     ChevronRight as ChevronRightIcon,
     Add as AddIcon,
-    EventBusy as DayOffIcon,
-    PersonOff as PersonalLeaveIcon,
-    LocalHospital as SickLeaveIcon,
-    MedicalServices as SickDayOffIcon,
-    SwapHoriz as SwapIcon,
+    EventBusyOutlined as DayOffIcon,
+    PersonOffOutlined as PersonalLeaveIcon,
+    LocalHospitalOutlined as SickLeaveIcon,
+    MedicalServicesOutlined as SickDayOffIcon,
+    SwapHorizOutlined as SwapIcon,
 } from '@mui/icons-material';
 
 // ============================================
@@ -1415,6 +1415,7 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
                     sx: {
                         borderRadius: '20px 20px 0 0',
                         maxHeight: '90vh',
+                        minHeight: '50vh',
                         backgroundColor: '#ffffff',
                         display: 'flex',
                         flexDirection: 'column',
@@ -1478,8 +1479,8 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
                             {/* Category cards */}
                             <Box sx={{ display: 'flex', gap: 1.5, px: 2.5, pt: 2.5 }}>
                                 {[
-                                    { id: 'leaves', label: 'Leaves', sub: 'Day off · Sick · Personal' },
-                                    { id: 'swaps', label: 'Swaps', sub: 'Shift · Break · Day off' },
+                                    { id: 'leaves', label: 'Leave' },
+                                    { id: 'swaps', label: 'Swap' },
                                 ].map(cat => {
                                     const isSelected = selectedCategory === cat.id;
                                     const isDisabled = cat.id === 'swaps' && !!(requestFromTime && requestToTime);
@@ -1495,7 +1496,7 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
                                                 flex: 1, px: 2, py: 1.5,
                                                 borderRadius: 'var(--card-radius)',
                                                 border: `1.5px solid ${isSelected ? 'var(--primary-color)' : '#e2e8f0'}`,
-                                                backgroundColor: isSelected ? 'rgba(6,24,54,0.05)' : '#fafafa',
+                                                backgroundColor: isSelected ? 'rgba(6,24,54,0.05)' : 'white',
                                                 cursor: isDisabled ? 'default' : 'pointer',
                                                 opacity: isDisabled ? 0.4 : 1,
                                                 userSelect: 'none',
@@ -1734,8 +1735,11 @@ const DayTimelinePage = ({ dayData, scheduleList = [], onDayChange, onBack }) =>
                             }}
                         >
                             <Typography sx={{ fontWeight: 700, fontSize: '0.95rem', color: '#fff' }}>
-                                {selectedRequestType.isSwap ? 'Select Agent →' : 'Submit Request'}
+                                {selectedRequestType.isSwap ? 'Select Agent' : 'Submit Request'}
                             </Typography>
+                            {selectedRequestType.isSwap && (
+                                <ChevronRightIcon sx={{ fontSize: 18, color: '#fff' }} />
+                            )}
                         </Box>
                     </Box>
                 )}

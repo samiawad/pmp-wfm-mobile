@@ -18,18 +18,18 @@ import {
     Tooltip as MuiTooltip,
 } from '@mui/material';
 import {
-    GridView as CardViewIcon,
-    ViewList as ListViewIcon,
-    TableChart as TableViewIcon,
-    TrendingUp as TrendingUpIcon,
-    TrendingDown as TrendingDownIcon,
-    CompareArrows as CompareIcon,
+    GridViewOutlined as CardViewIcon,
+    ViewListOutlined as ListViewIcon,
+    TableChartOutlined as TableViewIcon,
+    TrendingUpOutlined as TrendingUpIcon,
+    TrendingDownOutlined as TrendingDownIcon,
+    CompareArrowsOutlined as CompareIcon,
     Close as CloseIcon,
-    CalendarToday as CalendarIcon,
+    CalendarTodayOutlined as CalendarIcon,
     Check as CheckIcon,
-    AccessTime as LastUpdatedIcon,
-    Tune as TuneIcon,
-    FilterAlt as FilterIcon,
+    AccessTimeOutlined as LastUpdatedIcon,
+    TuneOutlined as TuneIcon,
+    FilterAltOutlined as FilterIcon,
 } from '@mui/icons-material';
 import { AreaChart, Area, ResponsiveContainer, Tooltip } from 'recharts';
 import KPIDetailView from './KPIDetailView';

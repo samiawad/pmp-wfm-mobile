@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Typography, styled, Tooltip } from '@mui/material';
-import { WorkspacePremium, Shield, ElectricBolt } from '@mui/icons-material';
+import { WorkspacePremiumOutlined as WorkspacePremium, ShieldOutlined as Shield, ElectricBoltOutlined as ElectricBolt } from '@mui/icons-material';
 
 const InventoryContainer = styled(Box)(({ theme }) => ({
     display: 'flex',

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Typography, styled, Tooltip } from '@mui/material';
-import { EmojiEvents } from '@mui/icons-material';
+import { EmojiEventsOutlined as EmojiEvents } from '@mui/icons-material';
 
 const GridContainer = styled(Box)(({ theme }) => ({
     display: 'grid',

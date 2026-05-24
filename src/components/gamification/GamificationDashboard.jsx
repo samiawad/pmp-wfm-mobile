@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Typography } from '@mui/material';
-import { EmojiEvents as TrophyIcon, CardGiftcard as CollectionIcon, Leaderboard as LeaderboardIcon } from '@mui/icons-material';
+import { EmojiEventsOutlined as TrophyIcon, CardGiftcardOutlined as CollectionIcon, LeaderboardOutlined as LeaderboardIcon } from '@mui/icons-material';
 import CompetitionDashboard from './CompetitionDashboard';
 import TrophyCase from './TrophyCase';
 import HallOfFame from './HallOfFame';

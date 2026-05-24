@@ -11,11 +11,11 @@ import {
     Button,
 } from '@mui/material';
 import {
-    EmojiEvents as TrophyIcon,
-    Star as StarIcon,
-    LocalFireDepartment as StreakIcon,
-    CardGiftcard as GiftIcon,
-    Lock as LockIcon,
+    EmojiEventsOutlined as TrophyIcon,
+    StarBorder as StarIcon,
+    LocalFireDepartmentOutlined as StreakIcon,
+    CardGiftcardOutlined as GiftIcon,
+    LockOutlined as LockIcon,
 } from '@mui/icons-material';
 
 // ============================================

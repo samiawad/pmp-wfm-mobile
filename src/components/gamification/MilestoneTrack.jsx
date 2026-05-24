@@ -3,7 +3,7 @@
 
 import React from 'react';
 import { Box, Typography, Paper } from '@mui/material';
-import { Check as CheckIcon, CardGiftcard as RewardIcon, LockOutlined as LockIcon } from '@mui/icons-material';
+import { Check as CheckIcon, CardGiftcardOutlined as RewardIcon, LockOutlined as LockIcon } from '@mui/icons-material';
 
 // ── Status helpers ──────────────────────────────────────────────────────────
 

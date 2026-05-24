@@ -12,21 +12,21 @@ import {
     IconButton,
 } from '@mui/material';
 import {
-    TrendingUp as TrendingUpIcon,
-    EmojiEvents as TrophyIcon,
-    AccessTime as ClockIcon,
-    Warning as WarningIcon,
-    Phone as PhoneIcon,
-    NotificationsActive as AlertIcon,
+    TrendingUpOutlined as TrendingUpIcon,
+    EmojiEventsOutlined as TrophyIcon,
+    AccessTimeOutlined as ClockIcon,
+    WarningOutlined as WarningIcon,
+    PhoneOutlined as PhoneIcon,
+    NotificationsActiveOutlined as AlertIcon,
     ChevronRight as ChevronRightIcon,
-    SwapHoriz as SwapIcon,
+    SwapHorizOutlined as SwapIcon,
     Close as CloseIcon,
-    LocalOffer as TagIcon,
+    LocalOfferOutlined as TagIcon,
     ArrowUpward as UpArrowIcon,
     ArrowDownward as DownArrowIcon,
     EmojiEventsOutlined as TrophyOutlinedIcon,
-    CalendarToday as CalendarTodayIcon,
-    Schedule as ScheduleIcon,
+    CalendarTodayOutlined as CalendarTodayIcon,
+    ScheduleOutlined as ScheduleIcon,
 } from '@mui/icons-material';
 
 // ============================================

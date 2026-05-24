@@ -13,18 +13,18 @@ import {
     Radio,
 } from '@mui/material';
 import {
-    Search as SearchIcon,
-    EmojiEvents as RecognitionIcon,
-    Gavel as DisciplinaryIcon,
+    SearchOutlined as SearchIcon,
+    EmojiEventsOutlined as RecognitionIcon,
+    GavelOutlined as DisciplinaryIcon,
     Close as CloseIcon,
-    School as CoachingIcon,
-    Assignment as EvaluationIcon,
-    NotificationImportant as AlertIcon,
-    Description as LogIcon,
+    SchoolOutlined as CoachingIcon,
+    AssignmentOutlined as EvaluationIcon,
+    NotificationImportantOutlined as AlertIcon,
+    DescriptionOutlined as LogIcon,
     ChevronRight as ChevronRightIcon,
-    FilterAlt as FilterIcon,
+    FilterAltOutlined as FilterIcon,
     Check as CheckIcon,
-    Category as CategoryIcon,
+    CategoryOutlined as CategoryIcon,
 } from '@mui/icons-material';
 
 // ============================================

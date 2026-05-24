@@ -12,12 +12,12 @@ import {
     Paper,
 } from '@mui/material';
 import {
-    Schedule as TimeIcon,
+    ScheduleOutlined as TimeIcon,
     Check as CheckIcon,
     Close as CloseIcon,
-    FilterAlt as FilterIcon,
+    FilterAltOutlined as FilterIcon,
     ChevronRight as ChevronRightIcon,
-    ViewAgenda as ViewIcon,
+    ViewAgendaOutlined as ViewIcon,
 } from '@mui/icons-material';
 
 // ============================================

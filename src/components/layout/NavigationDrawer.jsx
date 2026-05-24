@@ -13,19 +13,19 @@ import {
 } from '@mui/material';
 import {
     Menu as MenuIcon,
-    Home as HomeIcon,
-    CalendarMonth as CalendarIcon,
-    Assessment as AssessmentIcon,
-    EmojiEvents as RewardsIcon,
-    School as CoachingIcon,
-    Gavel as DisputesIcon,
-    RateReview as EvaluationsIcon,
-    Schedule as ScheduleIcon,
-    TrendingUp as AdherenceIcon,
-    Speed as RealTimeIcon,
-    RequestPage as RequestsIcon,
-    Settings as SettingsIcon,
-    BeachAccess as VacationIcon,
+    HomeOutlined as HomeIcon,
+    CalendarMonthOutlined as CalendarIcon,
+    AssessmentOutlined as AssessmentIcon,
+    EmojiEventsOutlined as RewardsIcon,
+    SchoolOutlined as CoachingIcon,
+    GavelOutlined as DisputesIcon,
+    RateReviewOutlined as EvaluationsIcon,
+    ScheduleOutlined as ScheduleIcon,
+    TrendingUpOutlined as AdherenceIcon,
+    SpeedOutlined as RealTimeIcon,
+    RequestPageOutlined as RequestsIcon,
+    SettingsOutlined as SettingsIcon,
+    BeachAccessOutlined as VacationIcon,
 } from '@mui/icons-material';
 
 // ============================================

@@ -11,15 +11,15 @@ import {
     IconButton,
 } from '@mui/material';
 import {
-    AccessTime as ClockIcon,
-    CheckCircle as CheckIcon,
-    EventAvailable as EventIcon,
-    ViewModule as CardViewIcon,
-    TaskAlt as CompletedIcon,
-    CalendarMonth as CalendarIcon,
+    AccessTimeOutlined as ClockIcon,
+    CheckCircleOutlined as CheckIcon,
+    EventAvailableOutlined as EventIcon,
+    ViewModuleOutlined as CardViewIcon,
+    TaskAltOutlined as CompletedIcon,
+    CalendarMonthOutlined as CalendarIcon,
     ChevronLeft as ChevronLeftIcon,
     ChevronRight as ChevronRightIcon,
-    ViewList as ListViewIcon,
+    ViewListOutlined as ListViewIcon,
 } from '@mui/icons-material';
 
 // ============================================

@@ -13,15 +13,15 @@ import {
     Paper,
 } from '@mui/material';
 import {
-    BeachAccess as VacationIcon,
-    SwapHoriz as SwapIcon,
-    Pending as PendingIcon,
+    BeachAccessOutlined as VacationIcon,
+    SwapHorizOutlined as SwapIcon,
+    PendingOutlined as PendingIcon,
     Check as CheckIcon,
     Close as CloseIcon,
-    FilterAlt as FilterIcon,
+    FilterAltOutlined as FilterIcon,
     ChevronRight as ChevronRightIcon,
-    ViewAgenda as ViewIcon,
-    Category as CategoryIcon,
+    ViewAgendaOutlined as ViewIcon,
+    CategoryOutlined as CategoryIcon,
 } from '@mui/icons-material';
 
 // ============================================

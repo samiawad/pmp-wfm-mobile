@@ -19,8 +19,8 @@ import {
     ResponsiveContainer,
 } from 'recharts';
 import {
-    RateReview as EvaluationIcon,
-    TrendingUp as TrendIcon,
+    RateReviewOutlined as EvaluationIcon,
+    TrendingUpOutlined as TrendIcon,
     ChevronRight as ChevronRightIcon,
 } from '@mui/icons-material';
 

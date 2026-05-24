@@ -9,17 +9,19 @@ import {
     LinearProgress,
 } from '@mui/material';
 import {
-    Schedule as ScheduleIcon,
-    Assessment as ScorecardIcon,
-    CalendarToday as CalendarIcon,
-    AssignmentTurnedIn as RequestsIcon,
-    RateReview as EvaluationIcon,
-    NotificationImportant as AlertIcon,
-    School as CoachingIcon,
-    CardGiftcard as RewardsIcon,
+    ScheduleOutlined as ScheduleIcon,
+    AssessmentOutlined as ScorecardIcon,
+    CalendarTodayOutlined as CalendarIcon,
+    AssignmentTurnedInOutlined as RequestsIcon,
+    RateReviewOutlined as EvaluationIcon,
+    NotificationImportantOutlined as AlertIcon,
+    SchoolOutlined as CoachingIcon,
+    CardGiftcardOutlined as RewardsIcon,
     ChevronRight as ChevronRightIcon,
-    Warning as WarningIcon,
-    SwapHoriz as SwapIcon,
+    WarningOutlined as WarningIcon,
+    SwapHorizOutlined as SwapIcon,
+    AnalyticsOutlined as AnalyzedCallsIcon,
+    HeadsetMicOutlined as InteractionsIcon,
 } from '@mui/icons-material';
 
 // ============================================
@@ -45,6 +47,8 @@ const C = {
     red: '#c62828', redBg: '#ffebee',
     purple: '#6a1b9a', purpleBg: '#f3e5f5',
     teal: '#00695c', tealBg: '#e0f2f1',
+    blue: '#1565c0', blueBg: '#e3f2fd',
+    slate: '#455a64', slateBg: '#eceff1',
     amber: '#f57f17', amberBg: '#fff8e1',
 };
 
@@ -89,13 +93,13 @@ const HomeDashboardV2 = ({ onAction, onPageChange, onDayClick }) => {
             onClick: () => onPageChange?.('requests'),
         },
         {
-            icon: <EvaluationIcon sx={{ fontSize: 22 }} />,
-            iconColor: C.purple,
-            iconBg: `${C.purple}15`,
-            label: 'Evaluations',
-            metric: '92%',
-            sub: 'Last score',
-            onClick: () => onPageChange?.('evaluations'),
+            icon: <RewardsIcon sx={{ fontSize: 22 }} />,
+            iconColor: C.amber,
+            iconBg: `${C.amber}15`,
+            label: 'Rewards',
+            metric: '1,120',
+            sub: '',
+            onClick: () => onPageChange?.('rewards'),
         },
         {
             icon: <AlertIcon sx={{ fontSize: 22 }} />,
@@ -103,7 +107,7 @@ const HomeDashboardV2 = ({ onAction, onPageChange, onDayClick }) => {
             iconBg: `${C.red}15`,
             label: 'Alerts',
             metric: '1',
-            sub: 'Active now',
+            sub: '',
             badge: '!',
             badgeColor: C.red,
             onClick: () => onPageChange?.('activities'),
@@ -118,13 +122,28 @@ const HomeDashboardV2 = ({ onAction, onPageChange, onDayClick }) => {
             onClick: () => onPageChange?.('coaching'),
         },
         {
-            icon: <RewardsIcon sx={{ fontSize: 22 }} />,
-            iconColor: C.amber,
-            iconBg: `${C.amber}15`,
-            label: 'Rewards',
-            metric: '1,120',
-            sub: 'exp  ·  Level 5',
-            onClick: () => onPageChange?.('rewards'),
+            icon: <EvaluationIcon sx={{ fontSize: 22 }} />,
+            iconColor: C.purple,
+            iconBg: `${C.purple}15`,
+            label: 'Evaluations',
+            metric: '18',
+            sub: 'Avg score: 81.2',
+        },
+        {
+            icon: <AnalyzedCallsIcon sx={{ fontSize: 22 }} />,
+            iconColor: C.blue,
+            iconBg: `${C.blue}15`,
+            label: 'Analyzed Calls',
+            metric: '80',
+            sub: '',
+        },
+        {
+            icon: <InteractionsIcon sx={{ fontSize: 22 }} />,
+            iconColor: C.slate,
+            iconBg: `${C.slate}15`,
+            label: 'Total Interactions',
+            metric: '19',
+            sub: '',
         },
     ];
 
@@ -384,6 +403,55 @@ const HomeDashboardV2 = ({ onAction, onPageChange, onDayClick }) => {
                         </Grid>
                     ))}
                 </Grid>
+
+                {/* ── Rewards & Challenges Placeholder ─────── */}
+                {/* TODO: replace with real design once finalized */}
+                <Card
+                    onClick={() => onPageChange?.('rewards')}
+                    sx={{
+                        borderRadius: '16px',
+                        border: `1.5px dashed ${C.amber}55`,
+                        boxShadow: 'none',
+                        backgroundColor: `${C.amber}08`,
+                        mb: 2,
+                        cursor: 'pointer',
+                        transition: 'transform 0.1s ease',
+                        '&:active': { transform: 'scale(0.98)' },
+                    }}
+                >
+                    <CardContent sx={{ p: 2.5, '&:last-child': { pb: 2.5 } }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
+                            <Box sx={{
+                                width: 42, height: 42, borderRadius: '12px',
+                                backgroundColor: `${C.amber}18`,
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                color: C.amber,
+                            }}>
+                                <RewardsIcon sx={{ fontSize: 22 }} />
+                            </Box>
+                            <Box sx={{ flex: 1 }}>
+                                <Typography sx={{ fontWeight: 700, fontSize: '0.95rem', color: C.text1 }}>
+                                    Rewards & Challenges
+                                </Typography>
+                                <Typography sx={{ fontSize: '0.75rem', color: C.text3, fontWeight: 500 }}>
+                                    COMING SOON!
+                                </Typography>
+                            </Box>
+                            <ChevronRightIcon sx={{ fontSize: 18, color: C.text3 }} />
+                        </Box>
+                        <Box sx={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            py: 2.5,
+                            borderRadius: '12px',
+                            border: `1px dashed ${C.amber}40`,
+                            backgroundColor: `${C.amber}06`,
+                        }}>
+                            <Typography sx={{ fontSize: '0.78rem', color: C.amber, fontWeight: 600 }}>
+                                Placeholder — reward plans will appear here
+                            </Typography>
+                        </Box>
+                    </CardContent>
+                </Card>
 
                 {/* ── Pending Actions Card ───────────────── */}
                 <Card sx={{

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Typography, styled, Avatar, SwipeableDrawer, List, ListItem, ListItemButton, Radio } from '@mui/material';
 import LeaderboardRow from './LeaderboardRow';
-import { EmojiEvents as TrophyIcon, ExpandMore as DropdownIcon } from '@mui/icons-material';
+import { EmojiEventsOutlined as TrophyIcon, ExpandMore as DropdownIcon } from '@mui/icons-material';
 
 // ── Styled components (exact copy from CompetitionDashboard) ──────────────
 const DropdownTrigger = styled(Box)(() => ({

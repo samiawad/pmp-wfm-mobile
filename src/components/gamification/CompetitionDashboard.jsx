@@ -5,7 +5,7 @@ import {
 } from '@mui/material';
 import MilestoneTrack from './MilestoneTrack';
 import CelebrationOverlay from './CelebrationOverlay';
-import { StarRate as StarIcon, FilterAlt as FilterIcon, Close as CloseIcon, EmojiEvents as TrophyIcon } from '@mui/icons-material';
+import { StarRateOutlined as StarIcon, FilterAltOutlined as FilterIcon, Close as CloseIcon, EmojiEventsOutlined as TrophyIcon } from '@mui/icons-material';
 
 // Styled Components
 const DashboardContainer = styled(Box)(({ theme }) => ({

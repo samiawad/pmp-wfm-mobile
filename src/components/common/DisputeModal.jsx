@@ -18,7 +18,7 @@ import {
 } from '@mui/material';
 import {
     Close as CloseIcon,
-    CloudUpload as UploadIcon,
+    CloudUploadOutlined as UploadIcon,
 } from '@mui/icons-material';
 
 // ============================================

@@ -22,11 +22,11 @@ import {
     Cell,
 } from 'recharts';
 import {
-    EmojiEvents as TrophyIcon,
-    TrendingUp as ImprovementIcon,
-    School as SessionIcon,
-    CheckCircle as CompletedIcon,
-    Timeline as MilestoneIcon,
+    EmojiEventsOutlined as TrophyIcon,
+    TrendingUpOutlined as ImprovementIcon,
+    SchoolOutlined as SessionIcon,
+    CheckCircleOutlined as CompletedIcon,
+    TimelineOutlined as MilestoneIcon,
     TrendingFlat as NeutralIcon,
 } from '@mui/icons-material';
 
